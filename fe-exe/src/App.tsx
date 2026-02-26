@@ -4,9 +4,7 @@ import { Button } from "./components/ui/button";
 function App() {
   return (
     <>
-      <Button className="bg-yellow-500 text-white p-10 text-3xl">
-        Tailwind đang hoạt động 🚀
-      </Button>
+      <h1 className="text-3xl font-bold underline">Hello world!</h1>
     </>
   );
 }
