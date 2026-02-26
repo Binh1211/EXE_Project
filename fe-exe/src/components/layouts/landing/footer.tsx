@@ -4,7 +4,7 @@ import { Facebook, Github, Youtube } from "lucide-react";
 
 function Footer() {
   return (
-    <footer className="bg-[#281510] h-[50vh] py-16">
+    <footer className="bg-[#281510] h-[50vh] py-16 mt-20">
       <div className="text-white grid grid-cols-6 gap-8 px-[15%] mb-20">
         <div className="col-span-2 flex flex-col gap-6 mr-14">
           <img className="w-20 h-20" src="/img/logo_white.png" alt="Logo" />

@@ -1,6 +1,7 @@
 import { Route, Routes } from 'react-router';
-import HomePage from './pages/home';
 import LandingLayout from './components/layouts/landing/layout';
+import HomePage from './pages/home';
+import NewsPage from './pages/news';
 
 function Router() {
   return (
@@ -8,6 +9,7 @@ function Router() {
       <Routes>
         <Route element={<LandingLayout />}>
           <Route path="/" element={<HomePage />} />
+          <Route path="/news" element={<NewsPage />} />
         </Route>
       </Routes>
     </>
