@@ -189,7 +189,7 @@ export default function Home() {
                 className="pl-6 basis-full sm:basis-1/2 lg:basis-1/3"
               >
                 <Card className="group bg-white rounded-xl hover:bg-[#623715] hover:text-white transition h-full">
-                  <CardHeader>
+                  <CardHeader >
                     <div className="flex flex-row items-center gap-5">
                       <Icon className="size-10" />
 
@@ -239,7 +239,7 @@ export default function Home() {
                         src={item.imge}
                         className="w-full h-40 object-cover"
                       />
-                      <CardHeader>
+                      <CardHeader className="p-2">
                         <div className="flex flex-row items-center gap-5">
                           <CardTitle className="text-xl font-semibold line-clamp-1">
                             {item.title}
@@ -254,7 +254,7 @@ export default function Home() {
                           <Star className="fill-yellow-400 text-yellow-400 size-4" />{" "}
                           ({item.reviewCount} đánh giá)
                         </CardDescription>
-                        <CardFooter>
+                        <CardFooter className="p-2">
                           <div className="w-full flex justify-between">
                             <a
                               className="underline text-center block text-[#785336] font-semibold hover:underline"
@@ -320,7 +320,7 @@ export default function Home() {
       </div>
       <div className="bg-[#fff3e9]">
         <Carousel
-          className="mt-5 w-[80%] max-w-7xl mx-[10%]  "
+          className="mt-5 w-[80%] max-w-7xl mx-[13%]  "
           opts={{ align: "start", loop: true }}
         >
           <CarouselContent className="-ml-6">
@@ -330,19 +330,20 @@ export default function Home() {
                   <div className="flex flex-col items-center justify-center text-center">
                     <img src="/img/logo.png" className="w-40 h-40 " />
                     <div className="text-lg mt-4">{item.comment}</div>
-                    <img src={item.imge} className="rounded-full w-10 h-10 mt-4" />
+                    <img
+                      src={item.imge}
+                      className="rounded-full w-10 h-10 mt-4"
+                    />
                   </div>
                 </CarouselItem>
               );
             })}
           </CarouselContent>
-
           <CarouselPrevious className=" text-[#fbf0ce] hover:bg-black hover:text-white" />
           <CarouselNext className="text-[#fbf0ce] hover:bg-black hover:text-white" />
           <CarouselDots className="text-black " />
         </Carousel>
       </div>
-      <div className="h-20"></div>
     </div>
   );
 }
