@@ -171,26 +171,32 @@ function NewsContent() {
         >
           (Xem tất cả)
         </a>
-        <div className="col-span-2 flex justify-between gap-10 mx-[7%] mb-6">
+        <div className="col-span-2 flex justify-between gap-10 mx-[7%] mb-4">
           <Card className="bg-white rounded-xl flex flex-col h-full w-[23%]">
             <img
-              src="img/news1.png"
+              src="img/news2.png"
               className="h-[40%] w-full object-cover p-4 pb-0"
             />
+            <div className="flex items-center mt-3 px-4">
+              <p className="text-xs text-gray-600 font-medium">
+                Chuyên đề • Hiện đại
+              </p>
+              <div className="flex items-center ml-auto">
+                <Clock4 className="text-gray-200" size={21} />
+                <p className="text-xs text-gray-600 font-medium ml-1">
+                  15 phút đọc
+                </p>
+              </div>
+            </div>
 
             <CardHeader className="flex-1">
               <CardTitle className="text-2xl font-semibold mb-2 line-clamp-2">
                 Vistory ra mắt hệ thống minigame lịch sử mới
               </CardTitle>
-
-              <p className="text-base line-clamp-1 font-medium">
-                Tác giả: Vistory Team
-              </p>
-
               <CardDescription className="text-base text-gray-600 mt-4 line-clamp-3">
                 Vistory chính thức cập nhật chuỗi minigame theo từng giai đoạn
-                lịch sử Vistory chính thức cập nhật chuỗi minigame theo từng
-                giai đoạn lịch sử
+                lịch sử, giúp học sinh luyện tập mốc thời gian và nhân vật quan
+                trọng.
               </CardDescription>
             </CardHeader>
             <CardFooter>
@@ -207,23 +213,29 @@ function NewsContent() {
 
           <Card className="bg-white rounded-xl flex flex-col h-full w-[23%]">
             <img
-              src="img/news1.png"
+              src="img/news2.png"
               className="h-[40%] w-full object-cover p-4 pb-0"
             />
+            <div className="flex items-center mt-3 px-4">
+              <p className="text-xs text-gray-600 font-medium">
+                Chuyên đề • Hiện đại
+              </p>
+              <div className="flex items-center ml-auto">
+                <Clock4 className="text-gray-200" size={21} />
+                <p className="text-xs text-gray-600 font-medium ml-1">
+                  15 phút đọc
+                </p>
+              </div>
+            </div>
 
             <CardHeader className="flex-1">
               <CardTitle className="text-2xl font-semibold mb-2 line-clamp-2">
                 Vistory ra mắt hệ thống minigame lịch sử mới
               </CardTitle>
-
-              <p className="text-base line-clamp-1 font-medium">
-                Tác giả: Vistory Team
-              </p>
-
               <CardDescription className="text-base text-gray-600 mt-4 line-clamp-3">
                 Vistory chính thức cập nhật chuỗi minigame theo từng giai đoạn
-                lịch sử Vistory chính thức cập nhật chuỗi minigame theo từng
-                giai đoạn lịch sử
+                lịch sử, giúp học sinh luyện tập mốc thời gian và nhân vật quan
+                trọng.
               </CardDescription>
             </CardHeader>
             <CardFooter>
@@ -240,23 +252,29 @@ function NewsContent() {
 
           <Card className="bg-white rounded-xl flex flex-col h-full w-[23%]">
             <img
-              src="img/news1.png"
+              src="img/news2.png"
               className="h-[40%] w-full object-cover p-4 pb-0"
             />
+            <div className="flex items-center mt-3 px-4">
+              <p className="text-xs text-gray-600 font-medium">
+                Chuyên đề • Hiện đại
+              </p>
+              <div className="flex items-center ml-auto">
+                <Clock4 className="text-gray-200" size={21} />
+                <p className="text-xs text-gray-600 font-medium ml-1">
+                  15 phút đọc
+                </p>
+              </div>
+            </div>
 
             <CardHeader className="flex-1">
               <CardTitle className="text-2xl font-semibold mb-2 line-clamp-2">
                 Vistory ra mắt hệ thống minigame lịch sử mới
               </CardTitle>
-
-              <p className="text-base line-clamp-1 font-medium">
-                Tác giả: Vistory Team
-              </p>
-
               <CardDescription className="text-base text-gray-600 mt-4 line-clamp-3">
                 Vistory chính thức cập nhật chuỗi minigame theo từng giai đoạn
-                lịch sử Vistory chính thức cập nhật chuỗi minigame theo từng
-                giai đoạn lịch sử
+                lịch sử, giúp học sinh luyện tập mốc thời gian và nhân vật quan
+                trọng.
               </CardDescription>
             </CardHeader>
             <CardFooter>
@@ -273,22 +291,29 @@ function NewsContent() {
 
           <Card className="bg-white rounded-xl flex flex-col h-full w-[23%]">
             <img
-              src="img/news1.png"
+              src="img/news2.png"
               className="h-[40%] w-full object-cover p-4 pb-0"
             />
+            <div className="flex items-center mt-3 px-4">
+              <p className="text-xs text-gray-600 font-medium">
+                Chuyên đề • Hiện đại
+              </p>
+              <div className="flex items-center ml-auto">
+                <Clock4 className="text-gray-200" size={21} />
+                <p className="text-xs text-gray-600 font-medium ml-1">
+                  15 phút đọc
+                </p>
+              </div>
+            </div>
 
             <CardHeader className="flex-1">
               <CardTitle className="text-2xl font-semibold mb-2 line-clamp-2">
                 Vistory ra mắt hệ thống minigame lịch sử mới
               </CardTitle>
-
-              <p className="text-base line-clamp-1 font-medium">
-                Tác giả: Vistory Team
-              </p>
-
               <CardDescription className="text-base text-gray-600 mt-4 line-clamp-3">
-                hính thức cập nhật chuỗi minigame theo từng
-                giai đoạn lịch sử
+                Vistory chính thức cập nhật chuỗi minigame theo từng giai đoạn
+                lịch sử, giúp học sinh luyện tập mốc thời gian và nhân vật quan
+                trọng.
               </CardDescription>
             </CardHeader>
             <CardFooter>
