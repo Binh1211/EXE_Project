@@ -1,6 +1,5 @@
-import { useState } from "react";
 import { Link } from "react-router";
-import { Menu, Search, X } from "lucide-react";
+import { Search } from "lucide-react";
 import { Button } from "../../ui/button";
 import {
   Select,
@@ -16,7 +15,7 @@ export default function Header() {
   const navigator = useNavigate();
   return (
     <>
-      <header className="sticky top-0 z-50 w-full border-b bg-[#fbf0ce]  backdrop-blur ">
+      <header className="sticky top-0 z-50 w-full bg-[#fbf0ce]  backdrop-blur ">
         <div className=" px-6 mx-auto flex gap-7 h-20 items-center justify-between ">
           <div className="flex items-center gap-2">
             <img
@@ -48,6 +47,7 @@ export default function Header() {
             <Select>
               <SelectTrigger
                 className=" w-[25%]
+                            h-8
                             rounded-xl
                             bg-[#fff3e9]
                             border-none
@@ -131,10 +131,10 @@ export default function Header() {
             <Link to="#" className="text-sm font-medium hover:text-[#5f3713]">
               Lộ trình học
             </Link>
-            <Link to="#" className="text-sm font-medium hover:text-[#5f3713]">
+            <Link to="/contact" className="text-sm font-medium hover:text-[#5f3713]">
               Liên hệ
             </Link>
-            <Link to="#" className="text-sm font-medium hover:text-[#5f3713]">
+            <Link to="/news" className="text-sm font-medium hover:text-[#5f3713]">
               Tin tức
             </Link>
           </nav>
