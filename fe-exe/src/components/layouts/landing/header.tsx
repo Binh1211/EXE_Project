@@ -121,7 +121,7 @@ export default function Header() {
             <div className="relative group inline-block">
               <button
                 className="text-sm font-medium hover:text-[#5f3713]"
-                onClick={() => navigator("/")}
+                onClick={() => navigator("/course")}
               >
                 Khóa học
               </button>

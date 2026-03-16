@@ -3,6 +3,7 @@ import LandingLayout from './components/layouts/landing/layout';
 import HomePage from './pages/home';
 import NewsPage from './pages/news';
 import ContactPage from './pages/contact';
+import CoursePage from './pages/course';
 
 function Router() {
   return (
@@ -12,6 +13,7 @@ function Router() {
           <Route path="/" element={<HomePage />} />
           <Route path="/news" element={<NewsPage />} />
           <Route path="/contact" element={<ContactPage />} />
+          <Route path="/course" element={<CoursePage />} />
         </Route>
       </Routes>
     </>
