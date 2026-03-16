@@ -62,6 +62,11 @@ const config: Config = {
           "5": "hsl(var(--chart-5))",
         },
       },
+      fontFamily: {
+        logo: ["Cinzel", "serif"],
+        title: ["Playfair Display", "serif"],
+        body: ["EB Garamond", "serif"],
+      }
     },
   },
   plugins: [animate],

@@ -4,7 +4,7 @@ import Header from "./header";
 
 function LandingLayout() {
   return (
-    <div className="flex min-h-screen flex-col bg-[#fbf0ce]">
+    <div className="flex min-h-screen flex-col bg-[url('/img/paper-texture.png')] font-history">
       <Header />
 
       <Outlet />
