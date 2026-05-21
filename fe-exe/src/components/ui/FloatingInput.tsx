@@ -28,8 +28,8 @@ export default function FloatingInput({
   const isFloating = focused || hasValue;
 
   return (
-    <div className="w-full">
-      <div className="relative">
+    <div className="w-full block" style={{ width: "100%" }}>
+      <div className="relative w-full" style={{ width: "100%" }}>
         <input
           {...props}
           id={id}
@@ -43,14 +43,14 @@ export default function FloatingInput({
             setFocused(false);
             onBlur?.(e);
           }}
+          style={{ width: "100%" }}
           className={`
-            block w-full rounded-md border bg-transparent
-            px-3 pb-2.5 pt-4 text-sm outline-none transition-all duration-200
+            block !w-full !min-w-full rounded-md border bg-transparent
+            px-4 pb-2.5 pt-4 text-sm outline-none transition-all duration-200
             ${disabled ? "bg-gray-100 cursor-not-allowed" : ""}
-            ${
-              error
-                ? "border-red-500 focus:border-red-500"
-                : "border-gray-300 focus:border-blue-600"
+            ${error
+              ? "border-red-500 focus:border-red-500"
+              : "border-gray-300 focus:border-blue-600"
             }
             ${className}
           `}
@@ -59,12 +59,11 @@ export default function FloatingInput({
         <label
           htmlFor={id}
           className={`
-            absolute left-3 z-10 bg-white px-1 text-sm
+            absolute left-4 z-10 bg-white px-1 text-sm
             transition-all duration-200 ease-in-out
-            ${
-              isFloating
-                ? "top-2 -translate-y-4 scale-75"
-                : "top-1/2 -translate-y-1/2 scale-100"
+            ${isFloating
+              ? "top-2 -translate-y-4 scale-75"
+              : "top-1/2 -translate-y-1/2 scale-100"
             }
             ${error ? "text-red-500" : "text-gray-500"}
           `}
@@ -74,9 +73,8 @@ export default function FloatingInput({
       </div>
 
       <p
-        className={`mt-1 text-xs min-h-[18px] transition-opacity duration-200 ${
-          error ? "text-red-500 opacity-100" : "opacity-0"
-        }`}
+        className={`mt-1 text-xs min-h-[18px] transition-opacity duration-200 ${error ? "text-red-500 opacity-100" : "opacity-0"
+          }`}
       >
         {error || "placeholder"}
       </p>

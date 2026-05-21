@@ -105,32 +105,34 @@ function ContactContent() {
         Gửi tin nhắn cho chúng tôi
       </h4>
       <div className="grid grid-cols-2 gap-2 mt-6 mx-[10%]">
-        <div>
+        <div className="w-full">
           <form onSubmit={handleSubmit} className="w-full space-y-6">
-            <FloatingInput
-              id="fullName"
-              name="fullName"
-              label="Họ và tên"
-              value={formData.fullName}
-              onChange={handleChange}
-              onBlur={handleNameBlur}
-              error={errors.fullName}
-              required
-            />
-
-            <FloatingInput
-              id="email"
-              name="email"
-              type="email"
-              label="Email"
-              value={formData.email}
-              onChange={handleChange}
-              onBlur={handleEmailBlur}
-              error={errors.email}
-              required
-            />
-
-            <div>
+            <div className="w-full">
+              <FloatingInput
+                id="fullName"
+                name="fullName"
+                label="Họ và tên"
+                value={formData.fullName}
+                onChange={handleChange}
+                onBlur={handleNameBlur}
+                error={errors.fullName}
+                required
+              />
+            </div>
+            <div className="w-full">
+              <FloatingInput
+                id="email"
+                name="email"
+                type="email"
+                label="Email"
+                value={formData.email}
+                onChange={handleChange}
+                onBlur={handleEmailBlur}
+                error={errors.email}
+                required
+              />
+            </div>
+            <div className="w-full">
               <textarea
                 name="note"
                 rows={5}
