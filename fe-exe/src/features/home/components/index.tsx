@@ -121,7 +121,7 @@ const newsData = [
 export default function Home() {
   return (
     // <div className="flex flex-col gap-10 bg-gradient-to-b from-[#fbf0ce] via-[#d8d0ad] to-[#f9f4e6]">
-    <div className="flex flex-col gap-10 font-serif tracking-widest">
+    <div className="flex flex-col gap-10 font-body">
       <div className="flex justify-between items-start">
         <div className="w-[35%] ml-[10%] mt-20 mb-1 flex flex-col gap-5">
           <h1 className="text-7xl font-bold text-[#623715] ">Vistory</h1>
@@ -380,7 +380,7 @@ export default function Home() {
               </div>
             ))}
           </div>
-          
+
           {/* Right Column (item 0 - Main item) */}
           <div className="flex flex-col lg:w-[50%] h-[352px]">
             {newsData.slice(0, 1).map((item, index) => (

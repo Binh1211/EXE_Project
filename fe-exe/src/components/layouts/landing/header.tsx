@@ -17,7 +17,7 @@ export default function Header() {
     <>
       <header className="sticky top-0 z-50 w-full  bg-[#fbf0ce]  backdrop-blur ">
         <div className=" px-6 mx-auto flex gap-7 h-20 items-center justify-between ">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2" onClick={() => navigator("/")}>
             <img
               src="/img/logo.png"
               alt="EXE"
@@ -91,28 +91,28 @@ export default function Header() {
               >
                 Trang chủ
               </button>
-              <div className="absolute left-0 mt-2 w-40 bg-[#fff3e9] shadow-lg rounded-xl opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all duration-200">
+              <div className="absolute left-0 mt-2 w-40 bg-[#fff3e9] shadow-lg rounded-xl p-1 opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all duration-200">
                 <a
                   href="#"
-                  className="block px-4 py-2 hover:bg-[#f3e2d3] hover:border-l-2 border-[#623715] rounded-xl"
+                  className="flex items-center px-2 py-3 text-sm hover:bg-[#f3e2d3] hover:border-l-2 border-[#623715] rounded-xl transition-all"
                 >
                   Về Vistory
                 </a>
                 <a
                   href="#"
-                  className="block px-4 py-2 hover:bg-[#f3e2d3] hover:border-l-2 border-[#623715] rounded-xl"
+                  className="flex items-center px-2 py-3 text-sm hover:bg-[#f3e2d3] hover:border-l-2 border-[#623715] rounded-xl transition-all"
                 >
                   Thành phần
                 </a>
                 <a
                   href="#"
-                  className="block px-4 py-2 hover:bg-[#f3e2d3] hover:border-l-2 border-[#623715] rounded-xl"
+                  className="flex items-center px-2 py-3 text-sm hover:bg-[#f3e2d3] hover:border-l-2 border-[#623715] rounded-xl transition-all"
                 >
                   Tính năng
                 </a>
                 <a
                   href="#"
-                  className="block px-4 py-2 hover:bg-[#f3e2d3] hover:border-l-2 border-[#623715] rounded-xl"
+                  className="flex items-center px-2 py-3 text-sm hover:bg-[#f3e2d3] hover:border-l-2 border-[#623715] rounded-xl transition-all"
                 >
                   Lợi ích
                 </a>
@@ -125,28 +125,28 @@ export default function Header() {
               >
                 Khóa học
               </button>
-              <div className="absolute left-0 mt-2 w-40 bg-[#fff3e9] shadow-lg rounded-xl opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all duration-200">
+              <div className="absolute left-0 mt-2 w-40 bg-[#fff3e9] shadow-lg rounded-xl p-1 opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all duration-200">
                 <a
                   href="#"
-                  className="block px-4 py-2 hover:bg-[#f3e2d3] hover:border-l-2 border-[#623715] rounded-xl"
+                  className="flex items-center px-2 py-3 text-sm hover:bg-[#f3e2d3] hover:border-l-2 border-[#623715] rounded-xl transition-all"
                 >
                   Kho học liệu
                 </a>
                 <a
                   href="#"
-                  className="block px-4 py-2 hover:bg-[#f3e2d3] hover:border-l-2 border-[#623715] rounded-xl"
+                  className="flex items-center px-2 py-3 text-sm hover:bg-[#f3e2d3] hover:border-l-2 border-[#623715] rounded-xl transition-all"
                 >
                   Ôn thi
                 </a>
                 <a
                   href="#"
-                  className="block px-4 py-2 hover:bg-[#f3e2d3] hover:border-l-2 border-[#623715] rounded-xl"
+                  className="flex items-center px-2 py-3 text-sm hover:bg-[#f3e2d3] hover:border-l-2 border-[#623715] rounded-xl transition-all"
                 >
                   Lớp học
                 </a>
                 <a
                   href="#"
-                  className="block px-4 py-2 hover:bg-[#f3e2d3] hover:border-l-2 border-[#623715] rounded-xl"
+                  className="flex items-center px-2 py-3 text-sm hover:bg-[#f3e2d3] hover:border-l-2 border-[#623715] rounded-xl transition-all"
                 >
                   Sách
                 </a>
@@ -163,12 +163,13 @@ export default function Header() {
             </Link>
           </nav>
           <div className="flex gap-2">
-            <Button className="w-24 text-sm shadow-none rounded-xl font-medium  text-black hover:text-[#5f3713] hover:rounded-xl">
+            <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=100&auto=format&fit=crop" alt="Avatar" className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm" />
+            {/* <Button className="w-24 text-sm shadow-none rounded-xl font-medium  text-black hover:text-[#5f3713] hover:rounded-xl">
               Đăng nhập
             </Button>
             <Button className="w-24 text-sm  rounded-xl font-medium bg-[#5f3713] text-white hover:scale-105 ring-0 hover:ring-2 hover:ring-[#f7f7f7] hover:bg-[#5f3713] hover:rounded-xl">
               Đăng ký
-            </Button>
+            </Button> */}
           </div>
         </div>
       </header>
