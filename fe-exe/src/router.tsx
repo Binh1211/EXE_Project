@@ -7,6 +7,10 @@ import CoursePage from './pages/course';
 import CourseDetailPage from './pages/course-detail';
 import CourseLearningPage from './pages/course-learning';
 import GamePage from './pages/game';
+import LoginPage from './pages/login';
+import RegisterPage from './pages/register';
+import AuthPage from './pages/auth';
+import GoogleCallbackPage from './pages/auth/google-callback';
 
 function Router() {
   return (
@@ -21,9 +25,14 @@ function Router() {
           <Route path="/course/:id/learning" element={<CourseLearningPage />} />
           <Route path="/game/:id" element={<GamePage />} />
         </Route>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/auth" element={<AuthPage />} />
+        <Route path="/auth/google/callback" element={<GoogleCallbackPage />} />
       </Routes>
     </>
   );
 }
 
 export default Router;
+
