@@ -17,10 +17,7 @@ const lessonSchema = new Schema({
   isFree: { type: Boolean, default: false, index: true },
   isPublished: { type: Boolean, default: false },
   video: videoSchema,
-  xpReward: { type: Number, default: 10 },
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now },
-});
+}, { timestamps: true });
 
 lessonSchema.index({ chapterId: 1, order: 1 });
 

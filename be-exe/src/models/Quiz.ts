@@ -8,7 +8,7 @@ const optionSchema = new Schema(
 const questionSchema = new Schema(
   {
     questionId: { type: Schema.Types.ObjectId, auto: true },
-    type: { type: String, enum: ["mc", "truefalse", "fill"] },
+    type: { type: String, enum: ["mc", "truefalse"] },
     text: String,
     imageUrl: String,
     options: [optionSchema],
@@ -24,9 +24,7 @@ const quizSchema = new Schema({
   title: String,
   passingScore: { type: Number, default: 90 },
   timeLimitSec: Number,
-  xpReward: { type: Number, default: 20 },
   questions: [questionSchema],
-  createdAt: { type: Date, default: Date.now },
-});
+}, { timestamps: true });
 
 export const Quiz = mongoose.model("Quiz", quizSchema);

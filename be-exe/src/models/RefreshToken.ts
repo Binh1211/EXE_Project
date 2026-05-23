@@ -5,8 +5,7 @@ const refreshTokenSchema = new Schema({
   tokenHash: { type: String, required: true, unique: true },
   deviceInfo: String,
   expiresAt: { type: Date, required: true },
-  createdAt: { type: Date, default: Date.now },
-});
+}, { timestamps: true });
 
 refreshTokenSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 

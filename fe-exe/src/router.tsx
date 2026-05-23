@@ -17,6 +17,7 @@ import ForgotPasswordPage from './pages/forgot-password';
 import ResetPasswordPage from './pages/forgot-password/reset';
 import ProfilePage from './pages/profile';
 import ChangePasswordPage from './pages/profile/change-password';
+import VipPage from './pages/vip';
 import RequireAuth from '@/features/auth/components/RequireAuth';
 
 function Router() {
@@ -41,6 +42,7 @@ function Router() {
               </RequireAuth>
             }
           />
+          <Route path="/vip" element={<VipPage />} />
           <Route
             path="/profile/change-password"
             element={

@@ -39,7 +39,7 @@ const userSchema = new Schema(
     lastLoginAt: Date,
     isActive: { type: Boolean, default: true },
   },
-  { timestamps: false },
+  { timestamps: true },
 );
 
 userSchema.index({ level: 1 });

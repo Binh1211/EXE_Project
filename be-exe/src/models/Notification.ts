@@ -10,8 +10,7 @@ const notificationSchema = new Schema({
   body: String,
   data: Schema.Types.Mixed,
   isRead: { type: Boolean, default: false, index: true },
-  createdAt: { type: Date, default: Date.now },
-});
+}, { timestamps: true });
 
 notificationSchema.index({ userId: 1, isRead: 1 });
 notificationSchema.index(
