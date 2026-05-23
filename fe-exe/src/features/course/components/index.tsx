@@ -17,6 +17,7 @@ import {
   BookMarked,
   MapPin,
   PlayCircle,
+  Lock,
 } from "lucide-react";
 import { useNavigate } from "react-router";
 import { useAuthUser } from "@/features/auth/hooks/useAuthUser";
@@ -26,6 +27,8 @@ import {
 } from "@/features/auth/lib/auth-session";
 import { API_BASE_URL } from "@/lib/api-client";
 
+const ITEMS_PER_PAGE = 4;
+
 const SidebarItem = ({
   icon: Icon,
   text,
@@ -34,15 +37,13 @@ const SidebarItem = ({
 }: any) => {
   return (
     <div
-      className={`flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-colors ${
-        active ? "bg-[#5c3a21] text-white" : "text-gray-700 hover:bg-white/50"
-      }`}
+      className={`flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-colors ${active ? "bg-[#5c3a21] text-white" : "text-gray-700 hover:bg-white/50"
+        }`}
     >
       <Icon size={20} className={active ? "text-white" : "text-gray-600"} />
       <span
-        className={`font-medium text-sm flex-1 ${
-          active ? "text-white" : "text-gray-800"
-        }`}
+        className={`font-medium text-sm flex-1 ${active ? "text-white" : "text-gray-800"
+          }`}
       >
         {text}
       </span>
@@ -73,19 +74,26 @@ const StatCard = ({ icon: Icon, title, value, iconBg, cardBg }: any) => {
   );
 };
 
-const CourseRow = (props: any) => {
+const CourseRow = ({
+  course,
+  absoluteIndex,
+  userLevel,
+}: {
+  course: any;
+  absoluteIndex: number;
+  userLevel: number;
+}) => {
   const navigate = useNavigate();
   const { user } = useAuthUser();
-  const course = props.course || props;
-  const index = typeof props.index === "number" ? props.index : undefined;
-  const id = course.id;
-  const image = course.image;
-  const title = course.title;
-  const description = course.description;
-  const views = course.views;
-  const students = course.students;
+
+  const { id, image, title, description } = course;
+
+  // Level 1 chỉ được phép click vào 2 khóa đầu tiên (absoluteIndex 0 và 1)
+  const isLocked = userLevel <= 1 && absoluteIndex >= 2;
+  const isPremium = absoluteIndex >= 2;
 
   const handleClick = () => {
+    if (isLocked) return;
     if (!user) {
       navigate("/login");
       return;
@@ -93,14 +101,15 @@ const CourseRow = (props: any) => {
     navigate(`/course/${id}`);
   };
 
-  const isPremium = typeof index === "number" && index >= 2; // 0-based: 2 => 3rd item onwards
-
   return (
     <div
       onClick={handleClick}
-      className="grid grid-cols-12 gap-4 items-center py-4 border-b border-gray-200 hover:bg-white/50 transition-colors px-4 cursor-pointer"
+      className={`grid grid-cols-12 gap-4 items-center py-4 border-b border-gray-200 transition-colors px-4 ${isLocked
+        ? "opacity-50 cursor-not-allowed"
+        : "hover:bg-white/50 cursor-pointer"
+        }`}
     >
-      <div className="col-span-6 flex gap-4 pr-4">
+      <div className="col-span-8 flex gap-4 pr-4">
         <img
           src={image}
           alt={title}
@@ -114,19 +123,18 @@ const CourseRow = (props: any) => {
         </div>
       </div>
 
-      <div className="col-span-1 text-sm font-medium text-gray-700">{views}</div>
-      {isPremium ? (
-        <div className="col-span-3 flex items-center justify-center">
+      <div className="col-span-4 flex items-center">
+        {isLocked ? (
+          <span className="text-sm font-bold text-white bg-gray-500 px-3 py-1 rounded-full flex items-center gap-1">
+            <Lock size={12} />
+            Cần nâng cấp
+          </span>
+        ) : isPremium ? (
           <span className="text-sm font-bold text-white bg-[#b45309] px-3 py-1 rounded-full">
             Premium
           </span>
-        </div>
-      ) : (
-        <>
-          <div className="col-span-2 text-sm"></div>
-          <div className="col-span-1 text-sm font-medium text-gray-700 text-center">{students}</div>
-        </>
-      )}
+        ) : null}
+      </div>
     </div>
   );
 };
@@ -158,14 +166,17 @@ export default function CoursePage() {
   const stored = getStoredUser();
   const displayName = user?.fullName || stored?.fullName || "User";
   const rawAvatarUrl = user?.avatarUrl || stored?.avatarUrl;
+
   // Construct full URL if it's a relative path
   const avatarUrl = rawAvatarUrl?.startsWith("http")
     ? rawAvatarUrl
     : rawAvatarUrl
-    ? `${API_BASE_URL}${rawAvatarUrl}`
-    : undefined;
+      ? `${API_BASE_URL}${rawAvatarUrl}`
+      : undefined;
 
-  // Local fallback courses (kept from the previous hardcoded rows)
+  // Lấy level của user, mặc định là 1 nếu chưa có
+  const userLevel: number = user?.level ?? stored?.level ?? 1;
+
   const initialCourses = [
     {
       id: "ww2",
@@ -224,6 +235,15 @@ export default function CoursePage() {
   ];
 
   const [courses, setCourses] = useState<any[]>(initialCourses);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const totalPages = Math.ceil(courses.length / ITEMS_PER_PAGE);
+
+  // Slice danh sách khóa học theo trang hiện tại
+  const pagedCourses = courses.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
 
   useEffect(() => {
     let mounted = true;
@@ -232,9 +252,12 @@ export default function CoursePage() {
         const res = await fetch(`${API_BASE_URL}/courses`);
         if (!res.ok) return;
         const data = await res.json();
-        if (mounted && Array.isArray(data)) setCourses(data);
+        if (mounted && Array.isArray(data)) {
+          setCourses(data);
+          setCurrentPage(1); // reset về trang 1 khi fetch xong
+        }
       } catch (err) {
-        // keep fallback courses
+        // giữ fallback courses
       }
     };
     fetchCourses();
@@ -245,7 +268,7 @@ export default function CoursePage() {
 
   return (
     <div
-      className="min-h-screen font-sans  flex overflow-hidden "
+      className="min-h-screen font-sans flex overflow-hidden"
       style={{
         backgroundImage:
           'url("https://www.transparenttextures.com/patterns/cream-paper.png")',
@@ -266,9 +289,12 @@ export default function CoursePage() {
         </nav>
 
         <div className="w-full bg-[#fdf8e7] rounded-xl p-5 mt-auto text-center border border-black/5">
-          <h4 className="font-bold text-gray-800 text-sm mb-2">Nâng cấp tài khoản</h4>
+          <h4 className="font-bold text-gray-800 text-sm mb-2">
+            Nâng cấp tài khoản
+          </h4>
           <p className="text-[10px] text-gray-500 mb-4">
-            Khám phá các tính năng mới thông qua việc đăng ký các gói nâng cấp của chúng tôi
+            Khám phá các tính năng mới thông qua việc đăng ký các gói nâng cấp
+            của chúng tôi
           </p>
           <button className="w-full bg-[#5c3a21] text-white text-xs font-bold py-2.5 rounded-lg hover:bg-[#4a2e1a] transition-colors">
             Nâng cấp ngay
@@ -285,91 +311,73 @@ export default function CoursePage() {
               <h2 className="text-3xl text-gray-800 font-serif mb-1">
                 Xin chào, <span className="font-bold">{displayName}</span>
               </h2>
-              <p className="text-gray-500 text-sm">Hãy cùng nhau học thêm nhiều kiến thức mới nào!</p>
+              <p className="text-gray-500 text-sm">
+                Hãy cùng nhau học thêm nhiều kiến thức mới nào!
+              </p>
             </div>
-            <div className="flex items-center gap-4">
-              <button className="flex items-center gap-2 bg-[#5c3a21] text-white px-5 py-2.5 rounded-2xl font-medium text-sm hover:bg-[#4a2e1a] transition-colors">
-                <Video size={18} />
-                Khóa học mới
-              </button>
-              <button className="p-2.5 rounded-2xl bg-white/50 border border-black/5 hover:bg-white text-gray-600 transition-colors relative">
-                <Bell size={20} />
-                <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border border-[#f4ebd8]"></span>
-              </button>
-            </div>
-          </div>
-
-          {/* Stats Row */}
-          <div className="grid grid-cols-4 gap-6 mb-10">
-            <StatCard
-              icon={BookMarked}
-              title="Khóa học mới"
-              value="168"
-              iconBg="bg-[#3b82f6]"
-              cardBg="bg-[#eef2ff]"
-            />
-            <StatCard
-              icon={CheckCircle2}
-              title="Khóa học đã hoàn thành"
-              value="$13,851"
-              iconBg="bg-[#14b8a6]"
-              cardBg="bg-[#e6fffa]"
-            />
-            <StatCard
-              icon={GraduationCap}
-              title="Tổng học viên"
-              value="5,622"
-              iconBg="bg-[#f43f5e]"
-              cardBg="bg-[#fff1f2]"
-            />
-            <StatCard
-              icon={Eye}
-              title="Người học mới hôm nay"
-              value="110"
-              iconBg="bg-[#eab308]"
-              cardBg="bg-[#fefce8]"
-            />
           </div>
 
           {/* Course List */}
           <div>
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="font-bold text-gray-800 text-lg">Các khóa học hiện có</h3>
-              <div className="flex gap-4">
-                <button className="flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-gray-900">
-                  Phân loại <ChevronDown size={16} />
-                </button>
-                <button className="flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-gray-900">
-                  Theo lớp <ChevronDown size={16} />
-                </button>
-              </div>
-            </div>
-
             <div className="bg-white/40 rounded-2xl overflow-hidden border border-black/5 shadow-sm">
               {/* Table Header */}
               <div className="bg-[#5c3a21] text-white grid grid-cols-12 gap-4 px-4 py-3 rounded-t-2xl">
-                <div className="col-span-6 font-semibold text-sm pl-4">Tên khóa học</div>
-                <div className="col-span-2"></div>
-                <div className="col-span-1 font-semibold text-sm">Lượt xem</div>
-                <div className="col-span-2 font-semibold text-sm"></div>
-                <div className="col-span-1 font-semibold text-sm text-center">Học viên</div>
+                <div className="col-span-8 font-semibold text-sm pl-4">
+                  Tên khóa học
+                </div>
+                <div className="col-span-4 font-semibold text-sm">
+                  Trạng thái
+                </div>
               </div>
-              {courses.map((c, idx) => (
-                <CourseRow key={c.id} course={c} index={idx} />
-              ))}
+
+              {pagedCourses.map((c, idx) => {
+                // absoluteIndex = vị trí thực trong toàn bộ danh sách (không phụ thuộc trang)
+                const absoluteIndex =
+                  (currentPage - 1) * ITEMS_PER_PAGE + idx;
+                return (
+                  <CourseRow
+                    key={c.id}
+                    course={c}
+                    absoluteIndex={absoluteIndex}
+                    userLevel={userLevel}
+                  />
+                );
+              })}
 
               {/* Pagination */}
               <div className="p-4 flex justify-center items-center gap-4 border-t border-gray-200">
-                <button className="text-gray-400 hover:text-gray-600">
+                <button
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="text-gray-400 hover:text-gray-600 disabled:opacity-30 disabled:cursor-not-allowed transition-opacity"
+                >
                   <ChevronLeft size={18} />
                 </button>
+
                 <div className="flex items-center gap-3 text-sm font-medium">
-                  <button className="w-6 h-6 rounded-full bg-gray-200 text-gray-800 flex items-center justify-center">1</button>
-                  <button className="w-6 h-6 rounded-full hover:bg-gray-100 text-gray-600 flex items-center justify-center">2</button>
-                  <button className="w-6 h-6 rounded-full hover:bg-gray-100 text-gray-600 flex items-center justify-center">3</button>
-                  <button className="w-6 h-6 rounded-full hover:bg-gray-100 text-gray-600 flex items-center justify-center">4</button>
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                    (page) => (
+                      <button
+                        key={page}
+                        onClick={() => setCurrentPage(page)}
+                        className={`w-6 h-6 rounded-full flex items-center justify-center transition-colors ${page === currentPage
+                          ? "bg-[#5c3a21] text-white"
+                          : "hover:bg-gray-100 text-gray-600"
+                          }`}
+                      >
+                        {page}
+                      </button>
+                    )
+                  )}
                 </div>
-                <button className="text-gray-600 hover:text-gray-800">
+
+                <button
+                  onClick={() =>
+                    setCurrentPage((p) => Math.min(totalPages, p + 1))
+                  }
+                  disabled={currentPage === totalPages}
+                  className="text-gray-600 hover:text-gray-800 disabled:opacity-30 disabled:cursor-not-allowed transition-opacity"
+                >
                   <ChevronRight size={18} />
                 </button>
               </div>
@@ -384,17 +392,25 @@ export default function CoursePage() {
         <div className="mb-10 w-full">
           <h3 className="font-bold text-gray-800 text-lg mb-4">Hồ sơ</h3>
           <div className="flex items-center gap-3">
-            <img src={avatarUrl} alt="Avatar" className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm" />
+            <img
+              src={avatarUrl}
+              alt="Avatar"
+              className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm"
+            />
             <div>
               <h4 className="font-bold text-gray-800 text-sm">{displayName}</h4>
-              <p className="text-xs text-gray-500">Lịch sử & Văn minh thế giới</p>
+              <p className="text-xs text-gray-500">
+                Lịch sử & Văn minh thế giới
+              </p>
             </div>
           </div>
         </div>
 
         {/* Highlighted Courses */}
         <div className="mb-10 w-full">
-          <h3 className="font-bold text-gray-800 text-lg mb-4">Khóa học nổi bật</h3>
+          <h3 className="font-bold text-gray-800 text-lg mb-4">
+            Khóa học nổi bật
+          </h3>
           <div className="flex flex-col gap-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -402,11 +418,15 @@ export default function CoursePage() {
                   <MapPin size={18} />
                 </div>
                 <div>
-                  <h4 className="font-bold text-gray-800 text-xs">Lịch Sử Việt Nam Qua Các Thời Kỳ</h4>
+                  <h4 className="font-bold text-gray-800 text-xs">
+                    Lịch Sử Việt Nam Qua Các Thời Kỳ
+                  </h4>
                   <p className="text-[10px] text-gray-400">12+ khóa học</p>
                 </div>
               </div>
-              <button className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-[10px] font-bold py-1 px-3 rounded-2xl transition-colors whitespace-nowrap">Xem Khóa Học</button>
+              <button className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-[10px] font-bold py-1 px-3 rounded-2xl transition-colors whitespace-nowrap">
+                Xem Khóa Học
+              </button>
             </div>
 
             <div className="flex items-center justify-between">
@@ -415,11 +435,15 @@ export default function CoursePage() {
                   <PlayCircle size={18} />
                 </div>
                 <div>
-                  <h4 className="font-bold text-gray-800 text-xs">Lịch Sử Thế Giới</h4>
+                  <h4 className="font-bold text-gray-800 text-xs">
+                    Lịch Sử Thế Giới
+                  </h4>
                   <p className="text-[10px] text-gray-400">10+ khóa học</p>
                 </div>
               </div>
-              <button className="bg-[#fce7f3] hover:bg-[#fbcfe8] text-[#be185d] text-[10px] font-bold py-1 px-3 rounded-2xl transition-colors whitespace-nowrap">Xem Khóa Học</button>
+              <button className="bg-[#fce7f3] hover:bg-[#fbcfe8] text-[#be185d] text-[10px] font-bold py-1 px-3 rounded-2xl transition-colors whitespace-nowrap">
+                Xem Khóa Học
+              </button>
             </div>
 
             <div className="flex items-center justify-between">
@@ -428,24 +452,36 @@ export default function CoursePage() {
                   <BookOpen size={18} />
                 </div>
                 <div>
-                  <h4 className="font-bold text-gray-800 text-xs">Các Cuộc Chiến Tranh Lớn</h4>
+                  <h4 className="font-bold text-gray-800 text-xs">
+                    Các Cuộc Chiến Tranh Lớn
+                  </h4>
                   <p className="text-[10px] text-gray-400">8+ khóa học</p>
                 </div>
               </div>
-              <button className="bg-[#e0f2fe] hover:bg-[#bae6fd] text-[#0369a1] text-[10px] font-bold py-1 px-3 rounded-2xl transition-colors whitespace-nowrap">Xem Khóa Học</button>
+              <button className="bg-[#e0f2fe] hover:bg-[#bae6fd] text-[#0369a1] text-[10px] font-bold py-1 px-3 rounded-2xl transition-colors whitespace-nowrap">
+                Xem Khóa Học
+              </button>
             </div>
           </div>
         </div>
 
         {/* Next Lesson */}
         <div className="w-full pt-6 border-t border-black/5">
-          <h3 className="font-bold text-gray-800 text-sm mb-4">Bài học tiếp theo</h3>
+          <h3 className="font-bold text-gray-800 text-sm mb-4">
+            Bài học tiếp theo
+          </h3>
           <div className="text-center mb-4">
-            <h4 className="font-title font-bold text-gray-800 text-base mb-1">Bài 5: Sự sụp đổ của Đế chế La Mã</h4>
+            <h4 className="font-title font-bold text-gray-800 text-base mb-1">
+              Bài 5: Sự sụp đổ của Đế chế La Mã
+            </h4>
             <p className="text-xs text-gray-500">Thời lượng: 20 phút</p>
           </div>
           <div className="rounded-2xl overflow-hidden shadow-md relative group cursor-pointer">
-            <img src="/img/news1.png" alt="Roman Empire" className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500" />
+            <img
+              src="/img/news1.png"
+              alt="Roman Empire"
+              className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500"
+            />
             <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
               <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center text-[#5c3a21]">
                 <PlayCircle size={28} />

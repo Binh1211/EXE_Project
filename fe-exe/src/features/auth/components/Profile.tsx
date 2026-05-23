@@ -5,6 +5,7 @@ import {
   getAuthErrorMessage,
   updateProfileAndSave,
 } from "@/features/auth/api/auth-api";
+import { uploadToCloudinary } from "@/lib/cloudinary";
 import { getStoredUser } from "@/features/auth/lib/auth-session";
 import AuthAlert from "@/features/auth/components/AuthAlert";
 import {
@@ -106,15 +107,9 @@ export default function Profile() {
     try {
       // Upload avatar if changed
       if (avatarFile) {
-        const reader = new FileReader();
-        const base64Promise = new Promise<string>((resolve, reject) => {
-          reader.onload = () => resolve(reader.result as string);
-          reader.onerror = reject;
-          reader.readAsDataURL(avatarFile);
-        });
-        const base64Avatar = await base64Promise;
-        const updatedUser = await authApi.uploadAvatar(base64Avatar);
-        // Construct full URL if it's a relative path
+        const secureUrl = await uploadToCloudinary(avatarFile);
+        const updatedUser = await authApi.uploadAvatar(secureUrl);
+        // Construct full URL if it's a relative path (for backward compatibility)
         if (updatedUser.avatarUrl) {
           const fullUrl = updatedUser.avatarUrl.startsWith("http")
             ? updatedUser.avatarUrl

@@ -19,6 +19,10 @@ import ProfilePage from './pages/profile';
 import ChangePasswordPage from './pages/profile/change-password';
 import VipPage from './pages/vip';
 import RequireAuth from '@/features/auth/components/RequireAuth';
+import HostRoomView from "@/features/flashcard-room/components/HostRoomView";
+import JoinRoomView from "@/features/flashcard-room/components/JoinRoomView";
+import PlayRoomView from "@/features/flashcard-room/components/PlayRoomView";
+import LeaderboardView from "@/features/flashcard-room/components/LeaderboardView";
 
 function Router() {
   return (
@@ -58,6 +62,26 @@ function Router() {
         <Route path="/forgot-password/reset" element={<ResetPasswordPage />} />
         <Route path="/auth" element={<AuthPage />} />
         <Route path="/auth/google/callback" element={<GoogleCallbackPage />} />
+        
+        {/* Flashcard Rooms (No layout wrapper for full immersion) */}
+        <Route
+          path="/flashcard-rooms/host"
+          element={
+            <RequireAuth>
+              <HostRoomView />
+            </RequireAuth>
+          }
+        />
+        <Route path="/flashcard-rooms/join" element={<JoinRoomView />} />
+        <Route
+          path="/flashcard-rooms/:code/play"
+          element={
+            <RequireAuth>
+              <PlayRoomView />
+            </RequireAuth>
+          }
+        />
+        <Route path="/flashcard-rooms/:code/leaderboard" element={<LeaderboardView />} />
       </Routes>
     </>
   );

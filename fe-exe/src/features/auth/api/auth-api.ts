@@ -67,11 +67,11 @@ export const authApi = {
     });
   },
 
-  /** POST /api/auth/avatar (upload avatar as base64) */
-  uploadAvatar(base64Data: string) {
+  /** POST /api/auth/avatar (update avatar url) */
+  uploadAvatar(avatarUrl: string) {
     return apiRequest<AuthUser>(`${AUTH_PREFIX}/avatar`, {
       method: "POST",
-      body: JSON.stringify({ avatar: base64Data }),
+      body: JSON.stringify({ avatarUrl }),
     });
   },
 

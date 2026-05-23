@@ -96,11 +96,11 @@ export async function changePasswordHandler(req: AuthRequest, res: Response) {
 }
 
 export async function uploadAvatarHandler(req: AuthRequest, res: Response) {
-  const base64Avatar = req.body.avatar as string;
-  if (!base64Avatar) {
-    throw new AuthError(400, "Avatar không được để trống.");
+  const avatarUrl = req.body.avatarUrl as string;
+  if (!avatarUrl) {
+    throw new AuthError(400, "URL ảnh đại diện không được để trống.");
   }
-  const user = await uploadAvatar(req.userId!, base64Avatar);
+  const user = await uploadAvatar(req.userId!, avatarUrl);
   res.json(user);
 }
 
