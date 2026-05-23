@@ -8,9 +8,7 @@ import CoursePage from './pages/course';
 import CourseDetailPage from './pages/course-detail';
 import CourseLearningPage from './pages/course-learning';
 import GamePage from './pages/game';
-<<<<<<< HEAD
 import TimeLinePage from './pages/timeline';
-=======
 import LoginPage from './pages/login';
 import RegisterPage from './pages/register';
 import AuthPage from './pages/auth';
@@ -21,7 +19,6 @@ import ProfilePage from './pages/profile';
 import ChangePasswordPage from './pages/profile/change-password';
 import RequireAuth from '@/features/auth/components/RequireAuth';
 
->>>>>>> 3761beed0b097a53660d163bafe18244a20759f8
 function Router() {
   return (
     <>
@@ -35,9 +32,7 @@ function Router() {
           <Route path="/course/:id" element={<CourseDetailPage />} />
           <Route path="/course/:id/learning" element={<CourseLearningPage />} />
           <Route path="/game/:id" element={<GamePage />} />
-<<<<<<< HEAD
           <Route path="/time-line" element={<TimeLinePage />} />
-=======
           <Route
             path="/profile"
             element={
@@ -54,7 +49,6 @@ function Router() {
               </RequireAuth>
             }
           />
->>>>>>> 3761beed0b097a53660d163bafe18244a20759f8
         </Route>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />

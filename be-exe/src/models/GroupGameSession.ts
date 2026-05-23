@@ -24,8 +24,7 @@ const groupGameSessionSchema = new Schema({
   endedAt: Date,
   participants: [participantSchema],
   xpMultiplier: { type: Number, default: 1.5 },
-  createdAt: { type: Date, default: Date.now },
-});
+}, { timestamps: true });
 
 groupGameSessionSchema.index({ groupId: 1, status: 1 });
 

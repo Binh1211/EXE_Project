@@ -17,7 +17,6 @@ const groupSchema = new Schema({
   maxMembers: { type: Number, default: 50 },
   isPrivate: { type: Boolean, default: true },
   members: [memberSchema],
-  createdAt: { type: Date, default: Date.now },
-});
+}, { timestamps: true });
 
 export const Group = mongoose.model("Group", groupSchema);

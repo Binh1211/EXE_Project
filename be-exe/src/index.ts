@@ -8,7 +8,6 @@ async function bootstrap() {
 
   app.listen(env.port, () => {
     console.log(`API running at http://localhost:${env.port}`);
-    console.log(`Health: http://localhost:${env.port}/api/health`);
   });
 }
 

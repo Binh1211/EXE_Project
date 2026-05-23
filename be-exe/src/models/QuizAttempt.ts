@@ -19,7 +19,7 @@ const quizAttemptSchema = new Schema({
   answers: [answerSchema],
   xpAwarded: Number,
   submittedAt: { type: Date, default: Date.now },
-});
+}, { timestamps: true });
 
 quizAttemptSchema.index({ userId: 1, quizId: 1 });
 
