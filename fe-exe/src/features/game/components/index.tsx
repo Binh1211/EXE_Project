@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import "./Game.css";
 
@@ -48,6 +48,9 @@ const getGrade = (correctCount: number, totalQuestions: number): string => {
 export default function App() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  // chapter index passed from course-learn page (e.g. ?chapter=0)
+  const chapterParam = parseInt(searchParams.get('chapter') ?? '0', 10);
   const [started, setStarted] = useState(false);
   const [position, setPosition] = useState(0);
   const [current, setCurrent] = useState(0);
@@ -285,6 +288,21 @@ export default function App() {
                 >
                   Xem lịch sử
                 </button>
+                {(correctCount / questions.length) >= 0.9 && (
+                  <button
+                    className="actionBtn nextBtn"
+                    onClick={() => {
+                        const currentUnlocked = parseInt(localStorage.getItem('unlockedChapter') || '0', 10);
+                        // Only advance if this chapter hasn't been unlocked yet (prevents re-play from over-unlocking)
+                        const newUnlocked = Math.max(currentUnlocked, chapterParam + 1);
+                        localStorage.setItem('unlockedChapter', newUnlocked.toString());
+                        navigate(`/course/${id}/learning`);
+                    }}
+                    style={{ backgroundColor: '#10b981', marginLeft: '10px' }}
+                  >
+                    Hoàn thành & Mở khóa chương tiếp theo
+                  </button>
+                )}
               </div>
             </div>
           </div>

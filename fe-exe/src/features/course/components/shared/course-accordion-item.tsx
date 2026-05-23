@@ -1,4 +1,4 @@
-import { ChevronDown, PlayCircle, BookOpen, Gamepad2 } from 'lucide-react';
+import { ChevronDown, PlayCircle, BookOpen, Gamepad2, Lock } from 'lucide-react';
 
 interface Lesson {
     name: string;
@@ -13,6 +13,7 @@ interface CourseAccordionItemProps {
     onToggle: () => void;
     onLessonSelect?: (lesson: Lesson) => void;
     variant?: 'light' | 'default';
+    isLocked?: boolean;
 }
 
 export const CourseAccordionItem = ({
@@ -21,17 +22,27 @@ export const CourseAccordionItem = ({
     isActive,
     onToggle,
     onLessonSelect,
-    variant = 'light'
+    variant = 'light',
+    isLocked = false
 }: CourseAccordionItemProps) => {
+    const handleToggle = () => {
+        if (!isLocked) {
+            onToggle();
+        }
+    };
     if (variant === 'default') {
         return (
             <div className="border-b border-[#5c3a21]/10 last:border-0 px-4 py-4">
                 <button
-                    onClick={onToggle}
-                    className="w-full flex items-center justify-between py-1.5 text-left group"
+                    onClick={handleToggle}
+                    className={`w-full flex items-center justify-between py-1.5 text-left group ${isLocked ? 'cursor-not-allowed opacity-50' : ''}`}
                 >
                     <span className="font-title font-bold text-[16px] text-[#5c3a21] group-hover:opacity-80 transition-all">{title}</span>
-                    <ChevronDown size={16} className={`text-[#5c3a21]/40 transition-transform duration-300 ${isActive ? '' : '-rotate-90'}`} />
+                    {isLocked ? (
+                        <Lock size={16} className="text-[#5c3a21]/60" />
+                    ) : (
+                        <ChevronDown size={16} className={`text-[#5c3a21]/40 transition-transform duration-300 ${isActive ? '' : '-rotate-90'}`} />
+                    )}
                 </button>
 
                 {isActive && (
@@ -65,11 +76,15 @@ export const CourseAccordionItem = ({
     return (
         <div className="border-b border-[#5c3a21]/10 last:border-0 px-4 py-4 bg-white">
             <button
-                onClick={onToggle}
-                className="w-full flex items-center justify-between py-1.5 text-left group"
+                onClick={handleToggle}
+                className={`w-full flex items-center justify-between py-1.5 text-left group ${isLocked ? 'cursor-not-allowed opacity-50' : ''}`}
             >
                 <span className="font-title font-bold text-[16px] text-[#5c3a21] group-hover:opacity-80 transition-all">{title}</span>
-                <ChevronDown size={16} className={`text-[#5c3a21]/40 transition-transform duration-300 ${isActive ? '' : '-rotate-90'}`} />
+                {isLocked ? (
+                    <Lock size={16} className="text-[#5c3a21]/60" />
+                ) : (
+                    <ChevronDown size={16} className={`text-[#5c3a21]/40 transition-transform duration-300 ${isActive ? '' : '-rotate-90'}`} />
+                )}
             </button>
 
             {isActive && (

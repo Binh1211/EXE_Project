@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import {
     Star,
@@ -12,7 +12,10 @@ import {
     PlayCircle,
     Infinity,
     Trophy,
-    Play
+    Play,
+    Lock,
+    BookOpen,
+    Gamepad2
 } from 'lucide-react';
 import {
     CourseBreadcrumb,
@@ -26,11 +29,18 @@ import {
 
 const CourseDetailPage = () => {
     const [activeAccordion, setActiveAccordion] = useState(0);
+    const [unlockedChapter, setUnlockedChapter] = useState(0);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const unlocked = parseInt(localStorage.getItem('unlockedChapter') || '0', 10);
+        setUnlockedChapter(unlocked);
+    }, []);
 
     const accordionData = [
         {
             title: "Chương 1: Bối cảnh trước chiến tranh",
+            image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200&auto=format&fit=crop",
             lessons: [
                 { name: "Tình hình thế giới sau Thế chiến I", time: "20 phút", type: 'video' as const },
                 { name: "Sự trỗi dậy của chủ nghĩa phát xít", time: "18 phút", type: 'book' as const },
@@ -39,24 +49,28 @@ const CourseDetailPage = () => {
         },
         {
             title: "Chương 2: Diễn biến chính của chiến tranh",
+            image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=1200&auto=format&fit=crop",
             lessons: [
                 { name: "Chiến tranh bùng nổ tại Châu Âu", time: "25 phút", type: 'video' as const }
             ]
         },
         {
             title: "Chương 3: Những nhân vật và quốc gia quan trọng",
+            image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1200&auto=format&fit=crop",
             lessons: [
                 { name: "Các phe trục", time: "15 phút", type: 'video' as const }
             ]
         },
         {
             title: "Chương 4: Hệ quả của chiến tranh",
+            image: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=1200&auto=format&fit=crop",
             lessons: [
                 { name: "Sự phân chia lại cục diện thế giới", time: "20 phút", type: 'video' as const }
             ]
         },
         {
             title: "Chương 5: Bài học lịch sử từ Chiến tranh thế giới II",
+            image: "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1200&auto=format&fit=crop",
             lessons: [
                 { name: "Tổng kết", time: "10 phút", type: 'video' as const }
             ]
@@ -96,11 +110,6 @@ const CourseDetailPage = () => {
                                     ))}
                                 </div>
                                 <span className="font-bold">5.0</span>
-                            </div>
-
-                            <div className="flex items-center gap-1.5">
-                                <Clock size={16} className="text-white/60" />
-                                <span>3 giờ học</span>
                             </div>
                         </div>
 
@@ -163,154 +172,303 @@ const CourseDetailPage = () => {
 
             <div className="relative z-10">
                 <Hero />
-                {/* Main Content Grid */}
-                <div className="ml-[10%] mx-auto px-10 grid grid-cols-12 gap-10">
-                    {/* Left Column - Lesson Content */}
-                    <div className="col-span-12 lg:col-span-8 pt-10">
-                        {/* Course Content Header */}
-                        <div className="flex justify-between items-end mb-8 pl-2">
+                {/* MAIN CONTENT */}
+                <div className="w-full relative z-10">
+                    {/* COURSE CONTENT */}
+                    <div className="w-full px-8 md:px-12 pt-14">
+                        {/* HEADER */}
+                        <div className="flex justify-between items-end mb-10">
                             <div>
-                                <h2 className="text-[34px] font-serif font-bold text-gray-800 mb-4">Nội dung khóa học</h2>
-                                <p className="text-[13px] font-semibold text-gray-500 uppercase tracking-widest">
-                                    5 chương • 15 bài giảng • Tổng thời lượng: 3 giờ
+                                <h2 className="text-[42px] font-serif font-bold text-gray-800 mb-4 italic">
+                                    Nội dung khóa học
+                                </h2>
+
+                                <p className="text-[13px] font-semibold text-gray-500 uppercase tracking-[0.3em]">
+                                    5 chương • 15 bài giảng
                                 </p>
                             </div>
-                            <button className="text-[13px] font-bold text-[#5c3a21] underline underline-offset-[10px] decoration-1 hover:text-[#4a2e1a] transition-all">
-                                Xem tất cả
-                            </button>
                         </div>
 
-                        <div className="flex flex-col min-h-[620px] mb-12">
-                            <div className="space-y-4 mb-8">
-                                {accordionData.map((item, index) => (
-                                    <CourseAccordionItem
-                                        key={index}
-                                        {...item}
-                                        isActive={activeAccordion === index}
-                                        onToggle={() => setActiveAccordion(activeAccordion === index ? -1 : index)}
-                                        onLessonSelect={(lesson) => navigate(`/course/ww2/learning?lesson=${encodeURIComponent(lesson.name)}`)}
-                                        variant="light"
-                                    />
-                                ))}
-                            </div>
+                        {/* HORIZONTAL TIMELINE CHAPTERS */}
+                        <div className="relative w-full h-[600px] overflow-hidden rounded-[40px] bg-black shadow-2xl">
+                            <div className="flex w-full h-full">
+                                {accordionData.map((item, index) => {
+                                    const isLocked = index > unlockedChapter;
+                                    const isActive =
+                                        activeAccordion === index &&
+                                        !isLocked;
 
-                            <button className="w-full py-5 bg-[#5c3a21] text-white rounded-2xl font-bold text-[15px] hover:bg-[#4a2e1a] transition-all shadow-xl shadow-[#5c3a21]/10 transform active:scale-[0.99] mt-auto">
-                                1 Chương tiếp theo
-                            </button>
+                                    return (
+                                        <div
+                                            key={index}
+                                            onMouseEnter={() => {
+                                                if (!isLocked) {
+                                                    setActiveAccordion(index);
+                                                }
+                                            }}
+                                            className={`relative overflow-hidden cursor-pointer transition-all duration-700 ease-in-out
+                            ${isActive
+                                                    ? "flex-[2.7]"
+                                                    : "flex-1"
+                                                }`}
+                                            onClick={() => {
+                                                if (!isLocked) {
+                                                    navigate(`/course/ww2/learning?lesson=${encodeURIComponent(
+                                                        item.lessons[0].name
+                                                    )}`);
+                                                }
+                                            }}
+                                        >
+
+                                            {/* IMAGE */}
+                                            <img
+                                                src={item.image}
+                                                alt={item.title}
+                                                className={`absolute inset-0 w-full h-full object-cover transition-all duration-700
+                                ${isActive
+                                                        ? "scale-105 saturate-125 brightness-110 grayscale-0"
+                                                        : isLocked
+                                                            ? "grayscale brightness-[0.25]"
+                                                            : "grayscale brightness-[0.45]"
+                                                    }`}
+                                            />
+
+                                            {/* OVERLAY */}
+                                            <div
+                                                className={`absolute inset-0 transition-all duration-500
+                                ${isActive
+                                                        ? "bg-black/20"
+                                                        : "bg-black/55"
+                                                    }`}
+                                            />
+
+                                            {/* ACTIVE GLOW */}
+                                            <div
+                                                className={`absolute inset-0 z-20 transition-all duration-500
+                                ${isActive
+                                                        ? "border-2 border-white/60 shadow-[0_0_60px_rgba(255,255,255,0.25)]"
+                                                        : "border border-transparent"
+                                                    }`}
+                                            />
+
+                                            {/* LOCK */}
+                                            {isLocked && (
+                                                <div
+                                                    className="absolute z-40
+                                    top-1/2 left-1/2
+                                    -translate-x-1/2 -translate-y-1/2
+                                    flex flex-col items-center gap-4"
+                                                >
+                                                    <Lock
+                                                        size={42}
+                                                        className="text-white/60"
+                                                    />
+
+                                                    <p
+                                                        className="text-white/60
+                                        text-xs md:text-sm
+                                        uppercase tracking-[0.25em]
+                                        text-center"
+                                                    >
+                                                        Locked
+                                                    </p>
+                                                </div>
+                                            )}
+
+                                            {/* CONTENT */}
+                                            <div
+                                                className="absolute inset-0 z-30
+                                flex flex-col justify-end
+                                p-5 md:p-8"
+                                            >
+                                                {/* NUMBER */}
+                                                <div
+                                                    className={`mb-5 transition-all duration-500
+                                    ${isActive
+                                                            ? "opacity-100"
+                                                            : "opacity-50"
+                                                        }`}
+                                                >
+                                                    <span
+                                                        className="text-white/60
+                                        text-sm tracking-[0.4em]"
+                                                    >
+                                                        CHAPTER {index + 1}
+                                                    </span>
+                                                </div>
+
+                                                {/* TITLE */}
+                                                <h2
+                                                    className={`font-bold text-white leading-tight transition-all duration-500 font-serif
+                                    ${isActive
+                                                            ? "text-4xl md:text-5xl"
+                                                            : "text-xl md:text-2xl"
+                                                        }`}
+                                                >
+                                                    {item.title}
+                                                </h2>
+
+                                                {/* LESSONS */}
+                                                <div
+                                                    className={`overflow-hidden transition-all duration-700
+                                    ${isActive
+                                                            ? "max-h-[400px] opacity-100 mt-8"
+                                                            : "max-h-0 opacity-0"
+                                                        }`}
+                                                >
+                                                    <div
+                                                        className="space-y-3
+                                        bg-black/40 backdrop-blur-xl
+                                        border border-white/10
+                                        rounded-2xl
+                                        p-5"
+                                                    >
+                                                        {item.lessons.map(
+                                                            (
+                                                                lesson,
+                                                                lIndex
+                                                            ) => (
+                                                                <div
+                                                                    key={
+                                                                        lIndex
+                                                                    }
+                                                                    onClick={(
+                                                                        e
+                                                                    ) => {
+                                                                        e.stopPropagation();
+
+                                                                        navigate(
+                                                                            `/course/ww2/learning?lesson=${encodeURIComponent(
+                                                                                lesson.name
+                                                                            )}`
+                                                                        );
+                                                                    }}
+                                                                    className="group flex items-center justify-between
+                                                    p-4 rounded-xl
+                                                    bg-white/[0.03]
+                                                    hover:bg-white/[0.08]
+                                                    transition-all duration-300
+                                                    cursor-pointer"
+                                                                >
+                                                                    <div className="flex items-center gap-4">
+                                                                        <div
+                                                                            className="w-10 h-10 rounded-xl
+                                                            bg-white/10
+                                                            flex items-center justify-center"
+                                                                        >
+                                                                            {lesson.type ===
+                                                                                "book" ? (
+                                                                                <BookOpen
+                                                                                    size={
+                                                                                        18
+                                                                                    }
+                                                                                    className="text-white"
+                                                                                />
+                                                                            ) : lesson.type ===
+                                                                                "game" ? (
+                                                                                <Gamepad2
+                                                                                    size={
+                                                                                        18
+                                                                                    }
+                                                                                    className="text-white"
+                                                                                />
+                                                                            ) : (
+                                                                                <PlayCircle
+                                                                                    size={
+                                                                                        18
+                                                                                    }
+                                                                                    className="text-white"
+                                                                                />
+                                                                            )}
+                                                                        </div>
+
+                                                                        <div>
+                                                                            <p
+                                                                                className="text-white font-medium
+                                                                group-hover:underline"
+                                                                            >
+                                                                                {
+                                                                                    lesson.name
+                                                                                }
+                                                                            </p>
+
+                                                                            {lesson.time && (
+                                                                                <p className="text-white/50 text-sm mt-1">
+                                                                                    {
+                                                                                        lesson.time
+                                                                                    }
+                                                                                </p>
+                                                                            )}
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            )
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
                         </div>
                     </div>
 
-                    {/* Right Column - Sidebar */}
-                    <div className="col-span-12 lg:col-span-4 relative z-20">
-                        <div className="sticky top-10 space-y-10">
-                            {/* Main Sidebar Card */}
-                            <div className="mt-12 bg-white rounded-[32px] shadow-2xl shadow-black/5 overflow-hidden border border-black/5">
+                    {/* SIDEBAR MOVED DOWN */}
+                    <div className="max-w-[1280px] mx-auto px-8 md:px-12 pt-16">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                            {/* MAIN SIDEBAR CARD */}
+                            <div className="bg-white rounded-[32px] shadow-2xl shadow-black/5 overflow-hidden border border-black/5">
                                 <div className="p-8">
                                     <div className="grid grid-cols-2 gap-y-10 mb-6">
                                         <div className="flex items-center gap-4">
-                                            <PlayCircle size={22} className="text-[#d97706]/80" />
-                                            <span className="text-[14px] font-bold text-gray-700">Khóa học online</span>
+                                            <PlayCircle
+                                                size={22}
+                                                className="text-[#d97706]/80"
+                                            />
+                                            <span className="text-[14px] font-bold text-gray-700">
+                                                Khóa học online
+                                            </span>
                                         </div>
+
                                         <div className="flex items-center gap-4">
-                                            <Trophy size={22} className="text-[#059669]/80" />
-                                            <span className="text-[14px] font-bold text-gray-700">Chứng chỉ</span>
+                                            <Trophy
+                                                size={22}
+                                                className="text-[#059669]/80"
+                                            />
+                                            <span className="text-[14px] font-bold text-gray-700">
+                                                Chứng chỉ
+                                            </span>
                                         </div>
+
                                         <div className="flex items-center gap-4">
-                                            <Clock size={20} className="text-[#2563eb]/80" />
-                                            <span className="text-[14px] font-bold text-gray-700">3 giờ học</span>
-                                        </div>
-                                        <div className="flex items-center gap-4">
-                                            <Infinity size={24} className="text-[#7c3aed]/80" />
-                                            <span className="text-[14px] font-bold text-gray-700">Trọn đời</span>
+                                            <Infinity
+                                                size={24}
+                                                className="text-[#7c3aed]/80"
+                                            />
+                                            <span className="text-[14px] font-bold text-gray-700">
+                                                Trọn đời
+                                            </span>
                                         </div>
                                     </div>
 
                                     <div className="pt-4 border-t border-black/5">
-                                        <h4 className="font-serif font-bold text-gray-800 text-lg mb-4">Vistory Academy</h4>
-                                        <p className="text-xs text-gray-500 leading-relaxed mb-4">
-                                            Nền tảng học lịch sử trực tuyến giúp sinh viên và người yêu lịch sử hiểu sâu hơn về các sự kiện, nhân vật và nền văn minh đã định hình thế giới.
-                                        </p>
-                                        <div className="flex items-center gap-2 mb-4">
-                                            <span className="font-bold text-sm">4.8</span>
-                                            <span className="text-xs text-gray-400">đánh giá</span>
-                                        </div>
+                                        <h4 className="font-serif font-bold text-gray-800 text-lg mb-4">
+                                            Vistory Academy
+                                        </h4>
 
-                                        <div className="grid grid-cols-3 gap-2 py-3 border-y border-black/5 text-center">
-                                            <div>
-                                                <p className="text-sm font-bold">300</p>
-                                                <p className="text-[10px] text-gray-400">Học viên</p>
-                                            </div>
-                                            <div className="border-x border-black/5">
-                                                <p className="text-sm font-bold">32</p>
-                                                <p className="text-[10px] text-gray-400">Khóa học</p>
-                                            </div>
-                                            <div>
-                                                <p className="text-sm font-bold">1321</p>
-                                                <p className="text-[10px] text-gray-400">Đánh giá</p>
-                                            </div>
-                                        </div>
+                                        <p className="text-xs text-gray-500 leading-relaxed">
+                                            Nền tảng học lịch sử trực tuyến...
+                                        </p>
                                     </div>
                                 </div>
                             </div>
 
-                            {/* Progress Card */}
+                            {/* PROGRESS CARD */}
                             <CourseProgressCard
-                                totalDuration="3 giờ"
-                                studiedTime="1.5 giờ"
-                                completedLessons={6}
                                 progressPercentage={50}
                                 variant="large"
                             />
-                        </div>
-                    </div>
-                </div>
-
-                {/* Additional Info Section - 100% Width Background */}
-                <div className="bg-[#FFF6F4] py-16 mt-10">
-                    <div className="max-w-[1280px] mx-auto px-10">
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
-                            <div className="space-y-12">
-                                <CourseOutcome
-                                    title="Thông tin thêm về khóa học"
-                                    outcomes={[
-                                        "Hiểu rõ nguyên nhân dẫn đến Chiến tranh Thế giới II.",
-                                        "Phân tích các sự kiện và bước ngoặt quan trọng của cuộc chiến.",
-                                        "Tìm hiểu vai trò của các quốc gia và lãnh đạo trong chiến tranh.",
-                                        "Hiểu được tác động của chiến tranh đối với chính trị và xã hội thế giới.",
-                                        "Nhận thức được bài học lịch sử để tránh lặp lại những sai lầm trong tương lai."
-                                    ]}
-                                    titleClassName="text-[38px] font-title font-bold text-[#5c3a21] leading-tight mb-12"
-                                    itemClassName="text-[#6b5a4a] text-[16px] leading-relaxed font-medium"
-                                    checkColor="text-[#5c3a21] stroke-[3]"
-                                />
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-6 items-start">
-                                <div className="space-y-6">
-                                    <img
-                                        src="/img/news1.png"
-                                        className="rounded-2xl w-full h-[200px] object-cover shadow-xl"
-                                        alt="Historical scene 1"
-                                    />
-                                    <img
-                                        src="/img/news2.png"
-                                        className="rounded-2xl w-full h-[160px] object-cover shadow-xl"
-                                        alt="Historical scene 2"
-                                    />
-                                </div>
-                                <div className="space-y-6 pt-12">
-                                    <img
-                                        src="/img/news3.png"
-                                        className="rounded-2xl w-full h-[140px] object-cover shadow-xl"
-                                        alt="Historical scene 3"
-                                    />
-                                    <img
-                                        src="/img/news1.png"
-                                        className="rounded-2xl w-full h-[220px] object-cover shadow-xl"
-                                        alt="Historical scene 4"
-                                    />
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -331,21 +489,18 @@ const CourseDetailPage = () => {
                             <RelatedCourseCard
                                 image="/img/news1.png"
                                 title="Lịch Sử Việt Nam Qua Các Thời Kỳ"
-                                duration="2.5 giờ học"
                                 rating="5.0"
                                 description="Tìm hiểu hành trình phát triển của Việt Nam từ thời kỳ dựng nước qua các triều đại lịch sử."
                             />
                             <RelatedCourseCard
                                 image="/img/news2.png"
                                 title="Những Cuộc Chiến Tranh Lớn Trong Lịch Sử"
-                                duration="3 giờ học"
                                 rating="5.0"
                                 description="Phân tích nguyên nhân, diễn biến và kết quả của các cuộc chiến lớn thay đổi lịch sử thế giới."
                             />
                             <RelatedCourseCard
                                 image="/img/news3.png"
                                 title="Các Nền Văn Minh Cổ Đại"
-                                duration="2 giờ học"
                                 rating="5.0"
                                 description="Khám phá các nền văn minh lớn của bộ lạc Ai Cập, Lưỡng Hà, Hy Lạp và La Mã để thấy chúng đã định hình thế giới hiện đại."
                             />

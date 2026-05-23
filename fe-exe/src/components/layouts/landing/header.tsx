@@ -92,64 +92,70 @@ export default function Header() {
                 Trang chủ
               </button>
               <div className="absolute left-0 mt-2 w-40 bg-[#fff3e9] shadow-lg rounded-xl p-1 opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all duration-200">
-                <a
-                  href="#"
+                <Link
+                  to="#"
                   className="flex items-center px-2 py-3 text-sm hover:bg-[#f3e2d3] hover:border-l-2 border-[#623715] rounded-xl transition-all"
                 >
                   Về Vistory
-                </a>
-                <a
-                  href="#"
+                </Link>
+                <Link
+                  to="#"
                   className="flex items-center px-2 py-3 text-sm hover:bg-[#f3e2d3] hover:border-l-2 border-[#623715] rounded-xl transition-all"
                 >
                   Thành phần
-                </a>
-                <a
-                  href="#"
+                </Link>
+                <Link
+                  to="#"
                   className="flex items-center px-2 py-3 text-sm hover:bg-[#f3e2d3] hover:border-l-2 border-[#623715] rounded-xl transition-all"
                 >
                   Tính năng
-                </a>
-                <a
-                  href="#"
+                </Link>
+                <Link
+                  to="#"
                   className="flex items-center px-2 py-3 text-sm hover:bg-[#f3e2d3] hover:border-l-2 border-[#623715] rounded-xl transition-all"
                 >
                   Lợi ích
-                </a>
+                </Link>
               </div>
             </div>
             <div className="relative group inline-block">
               <button
                 className="text-sm font-medium hover:text-[#5f3713]"
-                onClick={() => navigator("/course")}
+                onClick={() => navigator("/time-line")}
               >
                 Khóa học
               </button>
               <div className="absolute left-0 mt-2 w-40 bg-[#fff3e9] shadow-lg rounded-xl p-1 opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all duration-200">
-                <a
-                  href="#"
+                <Link
+                  to="/time-line"
+                  className="flex items-center px-2 py-3 text-sm hover:bg-[#f3e2d3] hover:border-l-2 border-[#623715] rounded-xl transition-all"
+                >
+                  Time Line Lịch sử
+                </Link>
+                <Link
+                  to="/course"
                   className="flex items-center px-2 py-3 text-sm hover:bg-[#f3e2d3] hover:border-l-2 border-[#623715] rounded-xl transition-all"
                 >
                   Kho học liệu
-                </a>
-                <a
-                  href="#"
+                </Link>
+                <Link
+                  to="#"
                   className="flex items-center px-2 py-3 text-sm hover:bg-[#f3e2d3] hover:border-l-2 border-[#623715] rounded-xl transition-all"
                 >
                   Ôn thi
-                </a>
-                <a
-                  href="#"
+                </Link>
+                <Link
+                  to="#"
                   className="flex items-center px-2 py-3 text-sm hover:bg-[#f3e2d3] hover:border-l-2 border-[#623715] rounded-xl transition-all"
                 >
                   Lớp học
-                </a>
-                <a
-                  href="#"
+                </Link>
+                <Link
+                  to="#"
                   className="flex items-center px-2 py-3 text-sm hover:bg-[#f3e2d3] hover:border-l-2 border-[#623715] rounded-xl transition-all"
                 >
                   Sách
-                </a>
+                </Link>
               </div>
             </div>
             <Link to="#" className="text-sm font-medium hover:text-[#5f3713]">

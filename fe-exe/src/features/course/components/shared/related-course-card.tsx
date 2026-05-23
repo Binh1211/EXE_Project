@@ -4,7 +4,6 @@ interface RelatedCourseCardProps {
     image: string;
     title: string;
     rating: string;
-    duration: string;
     description: string;
 }
 
@@ -12,7 +11,6 @@ export const RelatedCourseCard = ({
     image,
     title,
     rating,
-    duration,
     description
 }: RelatedCourseCardProps) => (
     <div className="bg-white rounded-[24px] overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group flex flex-col h-full border border-black/5">
@@ -23,10 +21,6 @@ export const RelatedCourseCard = ({
         </div>
         <div className="p-7 flex flex-col flex-grow">
             <div className="flex items-center justify-between mb-6 text-[13px] text-gray-500 font-medium">
-                <div className="flex items-center gap-2">
-                    <Clock size={16} className="text-[#a88d7a]" />
-                    <span>{duration}</span>
-                </div>
                 <div className="flex items-center gap-2">
                     <div className="flex text-yellow-500 gap-0.5">
                         {[...Array(5)].map((_, i) => (

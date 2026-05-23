@@ -1,17 +1,11 @@
 import { BarChart3 } from 'lucide-react';
 
 interface CourseProgressCardProps {
-    totalDuration: string;
-    studiedTime: string;
-    completedLessons: number;
     progressPercentage: number;
     variant?: 'large' | 'small';
 }
 
 export const CourseProgressCard = ({
-    totalDuration,
-    studiedTime,
-    completedLessons,
     progressPercentage,
     variant = 'large'
 }: CourseProgressCardProps) => {
@@ -28,18 +22,6 @@ export const CourseProgressCard = ({
 
                 <div className="flex items-center">
                     <div className="flex-grow space-y-3">
-                        <div className="flex justify-between items-center text-[11px]">
-                            <span className="text-white/60">Thời lượng khóa học:</span>
-                            <span className="font-bold whitespace-nowrap">{totalDuration}</span>
-                        </div>
-                        <div className="flex justify-between items-center text-[11px]">
-                            <span className="text-white/60">Thời gian đã học:</span>
-                            <span className="font-bold whitespace-nowrap">{studiedTime}</span>
-                        </div>
-                        <div className="flex justify-between items-center text-[11px]">
-                            <span className="text-white/60">Số bài đã hoàn thành:</span>
-                            <span className="font-bold whitespace-nowrap">{completedLessons}</span>
-                        </div>
                         <div className="pt-2 flex justify-between items-center text-[11px] border-t border-white/10">
                             <span className="text-white/60">Tiến độ hoàn thành:</span>
                             <span className="font-bold whitespace-nowrap">{progressPercentage}%</span>
@@ -78,18 +60,6 @@ export const CourseProgressCard = ({
 
             <div className="flex items-center justify-between">
                 <div className="flex-[1.5] space-y-4 pr-2">
-                    <div className="flex justify-between items-center text-[12px] gap-4">
-                        <span className="text-white/60 whitespace-nowrap">Thời lượng khóa học:</span>
-                        <span className="font-bold whitespace-nowrap">{totalDuration}</span>
-                    </div>
-                    <div className="flex justify-between items-center text-[12px] gap-4">
-                        <span className="text-white/60 whitespace-nowrap">Thời gian đã học:</span>
-                        <span className="font-bold whitespace-nowrap">{studiedTime}</span>
-                    </div>
-                    <div className="flex justify-between items-center text-[12px] gap-4">
-                        <span className="text-white/60 whitespace-nowrap">Số bài đã hoàn thành:</span>
-                        <span className="font-bold whitespace-nowrap">{completedLessons}</span>
-                    </div>
                     <div className="pb-4 flex justify-between items-center text-[12px] gap-4">
                         <span className="text-white/60 whitespace-nowrap">Tiến độ hoàn thành:</span>
                         <span className="font-bold whitespace-nowrap">{progressPercentage}%</span>

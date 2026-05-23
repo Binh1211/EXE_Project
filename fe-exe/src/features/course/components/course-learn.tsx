@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import {
     Star,
@@ -6,7 +6,6 @@ import {
     Share2,
     Play,
     Monitor,
-    Clock,
     AlarmClock,
     BookOpen,
     Video
@@ -18,52 +17,159 @@ import {
     CourseProgressCard,
     CourseOutcome
 } from './shared';
+import FlashCards from './shared/flash-card';
+import FAQBot from './shared/faq-bot';
 
 // Shared components are imported from './shared'
 
 const CourseLearningPage = () => {
     const [activeAccordion, setActiveAccordion] = useState(0);
     const [activeTab, setActiveTab] = useState('Overview');
+    const [unlockedChapter, setUnlockedChapter] = useState(0);
+    const [chapterCompleted, setChapterCompleted] = useState(false);
+    const [videoWatched, setVideoWatched] = useState(false);
     const [searchParams] = useSearchParams();
     const lessonNameFromUrl = searchParams.get('lesson');
     const navigate = useNavigate();
+
+    // Refs for YouTube IFrame Player API
+    const ytContainerRef = useRef<HTMLDivElement>(null);
+    const ytPlayerRef = useRef<any>(null);
+
+    useEffect(() => {
+        const unlocked = parseInt(localStorage.getItem('unlockedChapter') || '0', 10);
+        setUnlockedChapter(unlocked);
+    }, []);
 
     const accordionData = [
         {
             title: "Chương 1: Bối cảnh trước chiến tranh",
             lessons: [
-                { name: "Tình hình thế giới sau Thế chiến I", time: "20 phút", type: 'video' as const, videoId: "NKpMA_gLrdE" },
-                { name: "Sự trỗi dậy của chủ nghĩa phát xít", time: "18 phút", type: 'book' as const },
+                { name: "Tình hình thế giới sau Thế chiến I", type: 'video' as const, videoId: "NKpMA_gLrdE" },
+                { name: "Sự trỗi dậy của chủ nghĩa phát xít", type: 'book' as const },
                 { name: "Minigame kiểm tra", type: "game" as const }
             ]
         },
         {
             title: "Chương 2: Diễn biến chính của chiến tranh",
             lessons: [
-                { name: "Chiến tranh bùng nổ tại Châu Âu", time: "25 phút", type: 'video' as const, videoId: "NKpMA_gLrdE" }
+                { name: "Chiến tranh bùng nổ tại Châu Âu", type: 'video' as const, videoId: "NKpMA_gLrdE" }
             ]
         },
         {
             title: "Chương 3: Những nhân vật và quốc gia quan trọng",
             lessons: [
-                { name: "Các phe trục", time: "15 phút", type: 'video' as const, videoId: "NKpMA_gLrdE" }
+                { name: "Các phe trục", type: 'video' as const, videoId: "NKpMA_gLrdE" }
             ]
         },
         {
             title: "Chương 4: Hệ quả của chiến tranh",
             lessons: [
-                { name: "Sự phân chia lại cục diện thế giới", time: "20 phút", type: 'video' as const, videoId: "NKpMA_gLrdE" }
+                { name: "Sự phân chia lại cục diện thế giới", type: 'video' as const, videoId: "NKpMA_gLrdE" }
             ]
         },
         {
             title: "Chương 5: Bài học lịch sử từ Chiến tranh thế giới II",
             lessons: [
-                { name: "Tổng kết", time: "10 phút", type: 'video' as const, videoId: "NKpMA_gLrdE" }
+                { name: "Tổng kết", type: 'video' as const, videoId: "NKpMA_gLrdE" }
             ]
         }
     ];
 
     const [activeLesson, setActiveLesson] = useState<any>(accordionData[0].lessons[0]);
+
+    // Determine current chapter index and whether it has a game
+    const currentChapterIndex = accordionData.findIndex(ch =>
+        ch.lessons.some(l => l.name === activeLesson?.name)
+    );
+    const currentChapter = currentChapterIndex >= 0 ? accordionData[currentChapterIndex] : null;
+    const chapterHasGame = currentChapter?.lessons.some(l => l.type === 'game') ?? false;
+    const isLastLessonOfChapter =
+        currentChapter !== null &&
+        currentChapter.lessons[currentChapter.lessons.length - 1]?.name === activeLesson?.name;
+    // For video lessons: must watch to end. For book lessons: always ready.
+    const isLessonCompleted =
+        activeLesson?.type === 'video' ? videoWatched : true;
+
+    const canCompleteWithoutGame =
+        !chapterHasGame &&
+        isLastLessonOfChapter &&
+        currentChapterIndex === unlockedChapter &&
+        currentChapterIndex < accordionData.length - 1 &&
+        isLessonCompleted;
+
+    // Reset video watched + completed badge when lesson changes
+    useEffect(() => {
+        setChapterCompleted(false);
+        setVideoWatched(false);
+    }, [activeLesson]);
+
+    // YouTube IFrame Player API: create player when video lesson is active
+    useEffect(() => {
+        if (activeLesson?.type !== 'video' || !activeLesson?.videoId) return;
+
+        let playerInstance: any = null;
+
+        const createPlayer = () => {
+            if (!ytContainerRef.current) return;
+            // Destroy previous player
+            if (ytPlayerRef.current) {
+                try { ytPlayerRef.current.destroy(); } catch { /* ignore */ }
+                ytPlayerRef.current = null;
+            }
+            // YT.Player replaces the div with an iframe
+            ytContainerRef.current.innerHTML = '';
+            const div = document.createElement('div');
+            ytContainerRef.current.appendChild(div);
+
+            playerInstance = new (window as any).YT.Player(div, {
+                videoId: activeLesson.videoId,
+                width: '100%',
+                height: '100%',
+                playerVars: { rel: 0, modestbranding: 1 },
+                events: {
+                    onStateChange: (event: any) => {
+                        // State 0 = video ended
+                        if (event.data === 0) setVideoWatched(true);
+                    }
+                }
+            });
+            ytPlayerRef.current = playerInstance;
+        };
+
+        if ((window as any).YT?.Player) {
+            // API already loaded
+            createPlayer();
+        } else {
+            // Load the API script if not already added
+            if (!document.getElementById('yt-iframe-api-script')) {
+                const script = document.createElement('script');
+                script.id = 'yt-iframe-api-script';
+                script.src = 'https://www.youtube.com/iframe_api';
+                document.head.appendChild(script);
+            }
+            // Queue our callback (preserve any existing one)
+            const existing = (window as any).onYouTubeIframeAPIReady;
+            (window as any).onYouTubeIframeAPIReady = () => {
+                existing?.();
+                createPlayer();
+            };
+        }
+
+        return () => {
+            if (playerInstance) {
+                try { playerInstance.destroy(); } catch { /* ignore */ }
+            }
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [activeLesson?.videoId, activeLesson?.type]);
+
+    const handleCompleteChapter = () => {
+        const next = currentChapterIndex + 1;
+        localStorage.setItem('unlockedChapter', next.toString());
+        setUnlockedChapter(next);
+        setChapterCompleted(true);
+    };
 
     // Handle deep linking from URL ?lesson=Name
     useEffect(() => {
@@ -71,12 +177,14 @@ const CourseLearningPage = () => {
             accordionData.forEach((chapter, chapterIndex) => {
                 const foundLesson = chapter.lessons.find(l => l.name === lessonNameFromUrl);
                 if (foundLesson) {
-                    setActiveLesson(foundLesson);
-                    setActiveAccordion(chapterIndex);
+                    if (chapterIndex <= unlockedChapter) {
+                        setActiveLesson(foundLesson);
+                        setActiveAccordion(chapterIndex);
+                    }
                 }
             });
         }
-    }, [lessonNameFromUrl]);
+    }, [lessonNameFromUrl, unlockedChapter]);
 
     const DocumentReader = ({ lesson }: { lesson: any }) => (
         <div className="bg-[#FFFDF9] h-full flex flex-col p-16 relative overflow-y-auto">
@@ -122,11 +230,8 @@ const CourseLearningPage = () => {
 
     const tabs = [
         { id: 'Overview', label: 'Tổng quan' },
-        { id: 'QA', label: 'Hỏi & Đáp' },
-        { id: 'Notes', label: 'Ghi chú' },
-        { id: 'Announcements', label: 'Thông báo khóa học' },
-        { id: 'Reviews', label: 'Đánh giá học viên' },
-        { id: 'Tools', label: 'Công cụ học tập' }
+        { id: 'FAQ', label: 'Hỏi & Đáp' },
+        { id: 'Review', label: 'Ôn tập' },
     ];
 
     const MinigameView = () => (
@@ -141,7 +246,7 @@ const CourseLearningPage = () => {
             </div>
 
             {/* Start Button */}
-            <button className="relative z-10 px-10 py-4 bg-[#5c3a21] border-2 border-white/40 rounded-xl shadow-2xl hover:bg-[#4a2e1a] hover:scale-105 transition-all group" onClick={() => navigate('/game/ww2')}>
+            <button className="relative z-10 px-10 py-4 bg-[#5c3a21] border-2 border-white/40 rounded-xl shadow-2xl hover:bg-[#4a2e1a] hover:scale-105 transition-all group" onClick={() => navigate(`/game/ww2?chapter=${currentChapterIndex}`)}>
                 <span className="text-white text-[28px] font-title font-bold tracking-wide">Bắt đầu</span>
                 {/* Subtle Glow Effect */}
                 <div className="absolute inset-0 rounded-xl bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
@@ -165,10 +270,6 @@ const CourseLearningPage = () => {
                                 ))}
                             </div>
                             <span className="text-sm font-bold opacity-80">5.0</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-white/60 text-sm">
-                            <Clock size={16} />
-                            <span>3 giờ</span>
                         </div>
                     </div>
                 </div>
@@ -195,20 +296,33 @@ const CourseLearningPage = () => {
                         <MinigameView />
                     ) : (
                         <div className="w-full h-full bg-black">
-                            {activeLesson.videoId && (
-                                <iframe
-                                    className="w-full h-full"
-                                    src={`https://www.youtube.com/embed/${activeLesson.videoId}?rel=0&modestbranding=1`}
-                                    title={activeLesson.name}
-                                    allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                    allowFullScreen
-                                ></iframe>
-                            )}
+                            {/* YouTube IFrame Player API mounts here via ytContainerRef */}
+                            <div ref={ytContainerRef} className="w-full h-full" />
                             {!activeLesson.videoId && (
                                 <div className="w-full h-full flex items-center justify-center">
                                     <div className="w-24 h-24 rounded-full bg-white/5 flex items-center justify-center text-white/90 border border-white/10 cursor-pointer hover:scale-110 transition-transform">
                                         <Play size={48} fill="currentColor" />
                                     </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {/* Unlock next chapter button for chapters without game/quiz */}
+                    {canCompleteWithoutGame && (
+                        <div className="absolute bottom-4 right-4 z-20">
+                            {!chapterCompleted ? (
+                                <button
+                                    onClick={handleCompleteChapter}
+                                    className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-bold px-5 py-2.5 rounded-xl shadow-lg transition-all duration-200 border border-emerald-400/30"
+                                >
+                                    <AlarmClock size={16} />
+                                    Hoàn thành chương & Mở khóa tiếp theo
+                                </button>
+                            ) : (
+                                <div className="flex items-center gap-2 bg-emerald-700/80 text-white font-bold px-5 py-2.5 rounded-xl shadow border border-emerald-400/30 backdrop-blur">
+                                    <Video size={16} />
+                                    Chương đã mở khóa! 🎉
                                 </div>
                             )}
                         </div>
@@ -222,7 +336,7 @@ const CourseLearningPage = () => {
                         <div className="mb-8 text-center lg:text-left">
                             <h2 className="text-[32px] font-title font-bold text-[#5c3a21] leading-tight mb-2">Nội dung khóa học</h2>
                             <p className="text-[13px] text-gray-500 font-medium">
-                                5 chương • 15 bài giảng • 3 giờ
+                                5 chương • 15 bài giảng
                             </p>
                         </div>
 
@@ -235,6 +349,7 @@ const CourseLearningPage = () => {
                                     onToggle={() => setActiveAccordion(activeAccordion === index ? -1 : index)}
                                     onLessonSelect={(lesson) => setActiveLesson(lesson)}
                                     variant="default"
+                                    isLocked={index > unlockedChapter}
                                 />
                             ))}
                         </div>
@@ -242,10 +357,8 @@ const CourseLearningPage = () => {
                 </div>
             </div>
 
-            {/* Bottom Section: Tabs (Left) and Cards (Right) */}
             <div className="flex flex-col lg:flex-row bg-[#FFF6F4] border-t border-black/5">
-                {/* Left Side: Tabs & Content (70%) */}
-                <div className="lg:w-[70%] flex flex-col border-black/5">
+                <div className="lg:w-[100%] flex flex-col border-black/5">
                     {/* Tabs Section */}
                     <div className="border-b border-black/5">
                         <div className="flex gap-8 px-12">
@@ -266,61 +379,90 @@ const CourseLearningPage = () => {
                     </div>
 
                     {/* Tab Content */}
-                    <div className="p-12">
+                    <div className="p-4">
                         {activeTab === 'Overview' && (
-                            <CourseOutcome
-                                title="Thông tin thêm về khóa học"
-                                outcomes={[
-                                    "Hiểu rõ nguyên nhân dẫn đến Chiến tranh Thế giới II.",
-                                    "Phân tích các sự kiện và bước ngoặt quan trọng của cuộc chiến.",
-                                    "Tìm hiểu vai trò của các quốc gia và lãnh đạo trong chiến tranh.",
-                                    "Hiểu được tác động của chiến tranh đối với chính trị và xã hội thế giới.",
-                                    "Nhận thức được bài học lịch sử để tránh lặp lại những sai lầm trong tương lai."
-                                ]}
-                            />
+                            <>
+                                <div className="flex flex-row items-start justify-between">
+                                    <CourseOutcome
+                                        title="Thông tin thêm về khóa học"
+                                        outcomes={[
+                                            "Hiểu rõ nguyên nhân dẫn đến Chiến tranh Thế giới II.",
+                                            "Phân tích các sự kiện và bước ngoặt quan trọng của cuộc chiến.",
+                                            "Tìm hiểu vai trò của các quốc gia và lãnh đạo trong chiến tranh.",
+                                            "Hiểu được tác động của chiến tranh đối với chính trị và xã hội thế giới.",
+                                            "Nhận thức được bài học lịch sử để tránh lặp lại những sai lầm trong tương lai."
+                                        ]}
+                                    />
+                                    <CourseProgressCard
+                                        progressPercentage={50}
+                                        variant="large"
+                                    />
+                                </div>
+                            </>
                         )}
-                    </div>
-                </div>
-
-                {/* Right Side: Sidebar Cards (30%) */}
-                <div className="lg:w-[30%] p-10 space-y-6">
-                    {/* Lên lịch học Card */}
-                    <div className="bg-[#FFF6F4] border-2 border-[#5c3a21] rounded-[20px] p-4 shadow-sm">
-                        <div className="flex items-center gap-4 mb-4">
-                            <div className="p-3 bg-[#FFF6F4]/5 rounded-xl">
-                                <AlarmClock size={24} className="text-[#5c3a21]" />
+                        {activeTab === 'Review' && (
+                            <div className="mt-6 mx-[7%] flex flex-col items-center pb-10">
+                                <div className="w-full mb-4">
+                                    <h3 className="text-2xl font-bold text-[#5c3a21]">
+                                        Ôn tập kiến thức
+                                    </h3>
+                                </div>
+                                <FlashCards
+                                    cards={[
+                                        {
+                                            year: "1939",
+                                            content: "Đức xâm lược Ba Lan, khởi đầu Chiến tranh Thế giới II.",
+                                        },
+                                        {
+                                            year: "1941",
+                                            content: "Nhật Bản tấn công Trân Châu Cảng, Mỹ chính thức tham chiến.",
+                                        },
+                                        {
+                                            year: "1945",
+                                            content: "Đức và Nhật Bản đầu hàng, chiến tranh kết thúc.",
+                                        },
+                                    ]}
+                                />
                             </div>
-                            <h3 className="text-xl font-bold text-gray-800">Lên lịch học</h3>
-                        </div>
-                        <p className="text-sm text-[#5c3a21] mb-8 leading-relaxed font-medium">
-                            Việc thiết lập thời gian học giúp bạn duy trì thói quen học tập hiệu quả và hoàn thành khóa học đúng tiến độ.
-                        </p>
-                        <div className="flex gap-4">
-                            <button className="flex-grow py-3 bg-[#5c3a21] text-white rounded-full font-bold text-sm hover:bg-[#4a2e1a] transition-all">
-                                Bắt đầu
-                            </button>
-                            <button className="flex-grow py-3 border border-[#5c3a21] text-[#5c3a21] rounded-full font-bold text-sm hover:bg-[#5c3a21]/5 transition-all">
-                                Bỏ qua
-                            </button>
-                        </div>
-                    </div>
+                        )}
+                        {activeTab === 'FAQ' && (
+                            <div className="mt-6 mx-[7%] flex flex-col items-center pb-10">
+                                <FAQBot
+                                    data={[
+                                        {
+                                            question: "Khi nào Chiến tranh Thế giới thứ II bắt đầu?",
+                                            answer: "Chiến tranh Thế giới thứ II bắt đầu vào ngày 1 tháng 9 năm 1939.",
+                                        },
+                                        {
+                                            question: "Ai là lãnh đạo của Đức trong thời gian chiến tranh?",
+                                            answer: "Adolf Hitler là lãnh đạo của Đức Quốc xã trong thời gian chiến tranh.",
+                                        },
+                                        {
+                                            question: "Hoa Kỳ có tham gia chiến tranh ngay từ đầu không?",
+                                            answer: "Không, Hoa Kỳ ban đầu giữ thái độ trung lập nhưng đã chính thức tham chiến vào tháng 12 năm 1941 sau vụ tấn công Trân Châu Cảng.",
+                                        },
+                                        {
+                                            question: "Chiến tranh kết thúc khi nào?",
+                                            answer: "Chiến tranh kết thúc vào năm 1945, khi Đức đầu hàng vào tháng 5 và Nhật Bản đầu hàng vào tháng 9.",
+                                        },
+                                        {
+                                            question: "Hậu quả chính của chiến tranh là gì?",
+                                            answer: "Chiến tranh dẫn đến cái chết của hàng chục triệu người, sự tan rã của các đế quốc châu Âu, sự trỗi dậy của Hoa Kỳ và Liên Xô như hai siêu cường, và sự thành lập Liên Hợp Quốc.",
+                                        },
+                                    ]}
+                                />
+                            </div>
+                        )}
 
-                    {/* Tiến độ khóa học Card */}
-                    <CourseProgressCard
-                        totalDuration="3 giờ"
-                        studiedTime="1.5 giờ"
-                        completedLessons={6}
-                        progressPercentage={50}
-                        variant="small"
-                    />
+                    </div>
                 </div>
             </div>
 
             {/* Related Courses Section */}
-            <div className="pt-16 relative overflow-hidden">
+            <div className="pt-16  overflow-hidden">
                 <div className="absolute inset-0 -z-10"></div>
 
-                <div className="max-w-[1280px] mx-auto px-10 relative z-10">
+                <div className="max-w-[1280px] mx-auto px-10  z-10">
                     <div className="flex justify-between items-end mb-6">
                         <div>
                             <h2 className="text-[40px] font-serif font-bold text-[#5c3a21] mb-2 italic">Khóa học liên quan</h2>
@@ -332,21 +474,18 @@ const CourseLearningPage = () => {
                         <RelatedCourseCard
                             image="/img/news1.png"
                             title="Lịch Sử Việt Nam Qua Các Thời Kỳ"
-                            duration="2.5 giờ học"
                             rating="5.0"
                             description="Tìm hiểu hành trình phát triển của Việt Nam từ thời kỳ dựng nước qua các triều đại lịch sử."
                         />
                         <RelatedCourseCard
                             image="/img/news2.png"
                             title="Những Cuộc Chiến Tranh Lớn Trong Lịch Sử"
-                            duration="3 giờ học"
                             rating="5.0"
                             description="Phân tích nguyên nhân, diễn biến và kết quả của các cuộc chiến lớn thay đổi lịch sử thế giới."
                         />
                         <RelatedCourseCard
                             image="/img/news3.png"
                             title="Các Nền Văn Minh Cổ Đại"
-                            duration="2 giờ học"
                             rating="5.0"
                             description="Khám phá các nền văn minh lớn của bộ lạc Ai Cập, Lưỡng Hà, Hy Lạp và La Mã để thấy chúng đã định hình thế giới hiện đại."
                         />
