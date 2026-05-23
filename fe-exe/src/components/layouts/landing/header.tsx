@@ -10,9 +10,13 @@ import {
   SelectValue,
 } from "../../ui/select";
 import { useNavigate } from "react-router-dom";
+import { AUTH_ROUTES } from "@/features/auth/constants";
+import { useAuthUser } from "@/features/auth/hooks/useAuthUser";
+import AvatarDropdown from "@/features/auth/components/AvatarDropdown";
 
 export default function Header() {
   const navigator = useNavigate();
+  const { isLoggedIn } = useAuthUser();
   return (
     <>
       <header className="sticky top-0 z-50 w-full  bg-[#fbf0ce]  backdrop-blur ">
@@ -168,14 +172,25 @@ export default function Header() {
               Tin tức
             </Link>
           </nav>
-          <div className="flex gap-2">
-            <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=100&auto=format&fit=crop" alt="Avatar" className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm" />
-            {/* <Button className="w-24 text-sm shadow-none rounded-xl font-medium  text-black hover:text-[#5f3713] hover:rounded-xl">
-              Đăng nhập
-            </Button>
-            <Button className="w-24 text-sm  rounded-xl font-medium bg-[#5f3713] text-white hover:scale-105 ring-0 hover:ring-2 hover:ring-[#f7f7f7] hover:bg-[#5f3713] hover:rounded-xl">
-              Đăng ký
-            </Button> */}
+          <div className="flex items-center gap-2">
+            {isLoggedIn ? (
+              <AvatarDropdown />
+            ) : (
+              <>
+                <Button
+                  className="w-24 text-sm shadow-none rounded-xl font-medium text-black hover:text-[#5f3713] hover:rounded-xl"
+                  onClick={() => navigator(AUTH_ROUTES.login)}
+                >
+                  Đăng nhập
+                </Button>
+                <Button
+                  className="w-24 text-sm rounded-xl font-medium bg-[#5f3713] text-white hover:scale-105 ring-0 hover:ring-2 hover:ring-[#f7f7f7] hover:bg-[#5f3713] hover:rounded-xl"
+                  onClick={() => navigator(AUTH_ROUTES.register)}
+                >
+                  Đăng ký
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </header>
