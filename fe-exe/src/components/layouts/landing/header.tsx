@@ -162,8 +162,8 @@ export default function Header() {
                 </Link>
               </div>
             </div>
-            <Link to="#" className="text-sm font-medium hover:text-[#5f3713]">
-              Lộ trình học
+            <Link to="/vip" className="text-sm font-medium hover:text-[#5f3713]">
+              Mua VIP
             </Link>
             <Link to="/contact" className="text-sm font-medium hover:text-[#5f3713]">
               Liên hệ

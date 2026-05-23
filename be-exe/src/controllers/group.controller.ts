@@ -1,4 +1,6 @@
 import type { Request, Response } from "express";
+import type { AuthRequest } from "../middleware/auth.middleware.js";
+import { User } from "../models/User.js";
 import { z } from "zod";
 import {
   addMember,
@@ -54,7 +56,18 @@ export async function getByInvite(req: Request, res: Response) {
 }
 
 export async function createGroupHandler(req: Request, res: Response) {
-  const data = createSchema.parse(req.body);
+  const authReq = req as AuthRequest;
+  if (!authReq.userId) {
+    res.status(401).json({ message: "Unauthorized" });
+    return;
+  }
+  const user = await User.findById(authReq.userId);
+  if (user?.subscription?.plan !== "level3") {
+    res.status(403).json({ message: "Bạn cần nâng cấp VIP Cao cấp để tạo phòng nhóm." });
+    return;
+  }
+
+  const data = createSchema.parse({ ...req.body, ownerId: authReq.userId });
   const group = await createGroup(data);
   res.status(201).json(group);
 }
