@@ -24,16 +24,6 @@ export function createApp() {
   // Serve static files from uploads directory
   app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
-  app.get("/api/health", (_req, res) => {
-    res.json({
-      status: "ok",
-      service: "be-exe",
-      database:
-        mongoose.connection.readyState === 1 ? "connected" : "disconnected",
-      mongoHost: mongoose.connection.host || null,
-    });
-  });
-
   app.use("/api", routes);
 
   app.use(errorHandler);

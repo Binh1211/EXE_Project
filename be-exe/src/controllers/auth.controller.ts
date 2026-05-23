@@ -148,6 +148,3 @@ export async function googleCallback(req: AuthRequest, res: Response) {
   res.redirect(`${state.redirectUri}?${params.toString()}`);
 }
 
-export async function health(_req: AuthRequest, res: Response) {
-  res.json({ status: "ok", service: "be-exe" });
-}

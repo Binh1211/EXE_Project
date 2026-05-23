@@ -15,7 +15,6 @@ const flashcardSetSchema = new Schema({
   lessonId: { type: Schema.Types.ObjectId, ref: "Lesson", required: true },
   title: String,
   cards: [cardSchema],
-  createdAt: { type: Date, default: Date.now },
-});
+}, { timestamps: true });
 
 export const FlashcardSet = mongoose.model("FlashcardSet", flashcardSetSchema);

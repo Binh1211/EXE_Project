@@ -13,3 +13,4 @@ export { GroupGameSession } from "./GroupGameSession.js";
 export { LeaderboardEntry } from "./LeaderboardEntry.js";
 export { PaymentTransaction } from "./PaymentTransaction.js";
 export { Notification } from "./Notification.js";
+export { Timeline } from "./Timeline.js";

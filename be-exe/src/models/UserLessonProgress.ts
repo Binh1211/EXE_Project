@@ -15,7 +15,6 @@ const userLessonProgressSchema = new Schema({
   quizPassed: { type: Boolean, default: false },
   quizAttempts: { type: Number, default: 0 },
   completedAt: Date,
-  xpEarned: { type: Number, default: 0 },
 });
 
 userLessonProgressSchema.index({ userId: 1, lessonId: 1 }, { unique: true });
