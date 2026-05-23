@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Home,
   MessageSquare,
@@ -40,7 +40,9 @@ const SidebarItem = ({
     >
       <Icon size={20} className={active ? "text-white" : "text-gray-600"} />
       <span
-        className={`font-medium text-sm flex-1 ${active ? "text-white" : "text-gray-800"}`}
+        className={`font-medium text-sm flex-1 ${
+          active ? "text-white" : "text-gray-800"
+        }`}
       >
         {text}
       </span>
@@ -71,20 +73,31 @@ const StatCard = ({ icon: Icon, title, value, iconBg, cardBg }: any) => {
   );
 };
 
-const CourseRow = ({
-  id,
-  image,
-  title,
-  description,
-  tag,
-  views,
-  price,
-  students,
-}: any) => {
+const CourseRow = (props: any) => {
   const navigate = useNavigate();
+  const { user } = useAuthUser();
+  const course = props.course || props;
+  const index = typeof props.index === "number" ? props.index : undefined;
+  const id = course.id;
+  const image = course.image;
+  const title = course.title;
+  const description = course.description;
+  const views = course.views;
+  const students = course.students;
+
+  const handleClick = () => {
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+    navigate(`/course/${id}`);
+  };
+
+  const isPremium = typeof index === "number" && index >= 2; // 0-based: 2 => 3rd item onwards
+
   return (
     <div
-      onClick={() => navigate(`/course/${id}`)}
+      onClick={handleClick}
       className="grid grid-cols-12 gap-4 items-center py-4 border-b border-gray-200 hover:bg-white/50 transition-colors px-4 cursor-pointer"
     >
       <div className="col-span-6 flex gap-4 pr-4">
@@ -100,22 +113,20 @@ const CourseRow = ({
           )}
         </div>
       </div>
-      <div className="col-span-2 flex items-center">
-        {tag && (
-          <span className="text-[10px] bg-[#fdf2e9] text-[#d97706] px-2 py-1 rounded-full font-semibold whitespace-nowrap">
-            {tag}
+
+      <div className="col-span-1 text-sm font-medium text-gray-700">{views}</div>
+      {isPremium ? (
+        <div className="col-span-3 flex items-center justify-center">
+          <span className="text-sm font-bold text-white bg-[#b45309] px-3 py-1 rounded-full">
+            Premium
           </span>
-        )}
-      </div>
-      <div className="col-span-1 text-sm font-medium text-gray-700">
-        {views}
-      </div>
-      <div className="col-span-2 text-sm font-bold text-emerald-500">
-        {price}
-      </div>
-      <div className="col-span-1 text-sm font-medium text-gray-700 text-center">
-        {students}
-      </div>
+        </div>
+      ) : (
+        <>
+          <div className="col-span-2 text-sm"></div>
+          <div className="col-span-1 text-sm font-medium text-gray-700 text-center">{students}</div>
+        </>
+      )}
     </div>
   );
 };
@@ -151,8 +162,86 @@ export default function CoursePage() {
   const avatarUrl = rawAvatarUrl?.startsWith("http")
     ? rawAvatarUrl
     : rawAvatarUrl
-      ? `${API_BASE_URL}${rawAvatarUrl}`
-      : undefined;
+    ? `${API_BASE_URL}${rawAvatarUrl}`
+    : undefined;
+
+  // Local fallback courses (kept from the previous hardcoded rows)
+  const initialCourses = [
+    {
+      id: "ww2",
+      image: "/img/news1.png",
+      title: "Chiến Tranh Thế Giới II",
+      description:
+        "Hiểu rõ nguyên nhân dẫn đến Chiến tranh Thế giới II, các sự kiện quan trọng và tác động của các cuộc chiến đối với thế giới hiện đại.",
+      views: "17,913",
+      students: "62",
+    },
+    {
+      id: "civilizations",
+      image: "/img/news2.png",
+      title: "Các Nền Văn Minh Lớn Trong Lịch Sử",
+      description:
+        "Tìm hiểu cách các nền văn minh phát triển, giao thương và ảnh hưởng đến thế giới hiện đại.",
+      views: "64,142",
+      students: "21",
+    },
+    {
+      id: "ww1-ww2",
+      image: "/img/news3.png",
+      title: "Chiến Tranh Thế Giới I & II",
+      description:
+        "Phân tích nguyên nhân, diễn biến và hậu quả của hai cuộc chiến lớn nhất trong lịch sử nhân loại.",
+      views: "38,841",
+      students: "43",
+    },
+    {
+      id: "vn-history",
+      image: "/img/news1.png",
+      title: "Lịch Sử Việt Nam Từ Cổ Đại Đến Hiện Đại",
+      description:
+        "Hành trình qua các triều đại, các cuộc kháng chiến và sự phát triển của Việt Nam.",
+      views: "53,814",
+      students: "181",
+    },
+    {
+      id: "empires",
+      image: "/img/news2.png",
+      title: "Các Đế Chế Lớn Trong Lịch Sử Nhân Loại",
+      description:
+        "Tìm hiểu về đế chế La Mã, Mông Cổ, Ottoman và cách họ thay đổi thế giới.",
+      views: "21,741",
+      students: "73",
+    },
+    {
+      id: "liberation",
+      image: "/img/news3.png",
+      title: "Phong Trào Giải Phóng Dân Tộc Trên Thế Giới",
+      description:
+        "Khám phá các cuộc đấu tranh giành độc lập của nhiều quốc gia trên thế giới.",
+      views: "18,853",
+      students: "31",
+    },
+  ];
+
+  const [courses, setCourses] = useState<any[]>(initialCourses);
+
+  useEffect(() => {
+    let mounted = true;
+    const fetchCourses = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/courses`);
+        if (!res.ok) return;
+        const data = await res.json();
+        if (mounted && Array.isArray(data)) setCourses(data);
+      } catch (err) {
+        // keep fallback courses
+      }
+    };
+    fetchCourses();
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   return (
     <div
@@ -177,12 +266,9 @@ export default function CoursePage() {
         </nav>
 
         <div className="w-full bg-[#fdf8e7] rounded-xl p-5 mt-auto text-center border border-black/5">
-          <h4 className="font-bold text-gray-800 text-sm mb-2">
-            Nâng cấp tài khoản
-          </h4>
+          <h4 className="font-bold text-gray-800 text-sm mb-2">Nâng cấp tài khoản</h4>
           <p className="text-[10px] text-gray-500 mb-4">
-            Khám phá các tính năng mới thông qua việc đăng ký các gói nâng cấp
-            của chúng tôi
+            Khám phá các tính năng mới thông qua việc đăng ký các gói nâng cấp của chúng tôi
           </p>
           <button className="w-full bg-[#5c3a21] text-white text-xs font-bold py-2.5 rounded-lg hover:bg-[#4a2e1a] transition-colors">
             Nâng cấp ngay
@@ -199,9 +285,7 @@ export default function CoursePage() {
               <h2 className="text-3xl text-gray-800 font-serif mb-1">
                 Xin chào, <span className="font-bold">{displayName}</span>
               </h2>
-              <p className="text-gray-500 text-sm">
-                Hãy cùng nhau học thêm nhiều kiến thức mới nào!
-              </p>
+              <p className="text-gray-500 text-sm">Hãy cùng nhau học thêm nhiều kiến thức mới nào!</p>
             </div>
             <div className="flex items-center gap-4">
               <button className="flex items-center gap-2 bg-[#5c3a21] text-white px-5 py-2.5 rounded-2xl font-medium text-sm hover:bg-[#4a2e1a] transition-colors">
@@ -250,9 +334,7 @@ export default function CoursePage() {
           {/* Course List */}
           <div>
             <div className="flex justify-between items-center mb-4">
-              <h3 className="font-bold text-gray-800 text-lg">
-                Các khóa học hiện có
-              </h3>
+              <h3 className="font-bold text-gray-800 text-lg">Các khóa học hiện có</h3>
               <div className="flex gap-4">
                 <button className="flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-gray-900">
                   Phân loại <ChevronDown size={16} />
@@ -266,73 +348,15 @@ export default function CoursePage() {
             <div className="bg-white/40 rounded-2xl overflow-hidden border border-black/5 shadow-sm">
               {/* Table Header */}
               <div className="bg-[#5c3a21] text-white grid grid-cols-12 gap-4 px-4 py-3 rounded-t-2xl">
-                <div className="col-span-6 font-semibold text-sm pl-4">
-                  Tên khóa học
-                </div>
+                <div className="col-span-6 font-semibold text-sm pl-4">Tên khóa học</div>
                 <div className="col-span-2"></div>
                 <div className="col-span-1 font-semibold text-sm">Lượt xem</div>
-                <div className="col-span-2 font-semibold text-sm">Giá</div>
-                <div className="col-span-1 font-semibold text-sm text-center">
-                  Học viên
-                </div>
+                <div className="col-span-2 font-semibold text-sm"></div>
+                <div className="col-span-1 font-semibold text-sm text-center">Học viên</div>
               </div>
-              <CourseRow
-                id="ww2"
-                image="/img/news1.png"
-                title="Chiến Tranh Thế Giới II"
-                description="Hiểu rõ nguyên nhân dẫn đến Chiến tranh Thế giới II, các sự kiện quan trọng và tác động của các cuộc chiến đối với thế giới hiện đại."
-                tag="Dùng thử miễn phí"
-                views="17,913"
-                price="0đ"
-                students="62"
-              />
-              <CourseRow
-                id="civilizations"
-                image="/img/news2.png"
-                title="Các Nền Văn Minh Lớn Trong Lịch Sử"
-                description="Tìm hiểu cách các nền văn minh phát triển, giao thương và ảnh hưởng đến thế giới hiện đại."
-                tag="Dùng thử miễn phí"
-                views="64,142"
-                price="99.000đ"
-                students="21"
-              />
-              <CourseRow
-                id="ww1-ww2"
-                image="/img/news3.png"
-                title="Chiến Tranh Thế Giới I & II"
-                description="Phân tích nguyên nhân, diễn biến và hậu quả của hai cuộc chiến lớn nhất trong lịch sử nhân loại."
-                views="38,841"
-                price="119.000đ"
-                students="43"
-              />
-              <CourseRow
-                id="vn-history"
-                image="/img/news1.png"
-                title="Lịch Sử Việt Nam Từ Cổ Đại Đến Hiện Đại"
-                description="Hành trình qua các triều đại, các cuộc kháng chiến và sự phát triển của Việt Nam."
-                views="53,814"
-                price="149.000đ"
-                students="181"
-              />
-              <CourseRow
-                id="empires"
-                image="/img/news2.png"
-                title="Các Đế Chế Lớn Trong Lịch Sử Nhân Loại"
-                description="Tìm hiểu về đế chế La Mã, Mông Cổ, Ottoman và cách họ thay đổi thế giới."
-                tag="Dùng thử miễn phí"
-                views="21,741"
-                price="99.000đ"
-                students="73"
-              />
-              <CourseRow
-                id="liberation"
-                image="/img/news3.png"
-                title="Phong Trào Giải Phóng Dân Tộc Trên Thế Giới"
-                description="Khám phá các cuộc đấu tranh giành độc lập của nhiều quốc gia trên thế giới."
-                views="18,853"
-                price="79.000đ"
-                students="31"
-              />
+              {courses.map((c, idx) => (
+                <CourseRow key={c.id} course={c} index={idx} />
+              ))}
 
               {/* Pagination */}
               <div className="p-4 flex justify-center items-center gap-4 border-t border-gray-200">
@@ -340,18 +364,10 @@ export default function CoursePage() {
                   <ChevronLeft size={18} />
                 </button>
                 <div className="flex items-center gap-3 text-sm font-medium">
-                  <button className="w-6 h-6 rounded-full bg-gray-200 text-gray-800 flex items-center justify-center">
-                    1
-                  </button>
-                  <button className="w-6 h-6 rounded-full hover:bg-gray-100 text-gray-600 flex items-center justify-center">
-                    2
-                  </button>
-                  <button className="w-6 h-6 rounded-full hover:bg-gray-100 text-gray-600 flex items-center justify-center">
-                    3
-                  </button>
-                  <button className="w-6 h-6 rounded-full hover:bg-gray-100 text-gray-600 flex items-center justify-center">
-                    4
-                  </button>
+                  <button className="w-6 h-6 rounded-full bg-gray-200 text-gray-800 flex items-center justify-center">1</button>
+                  <button className="w-6 h-6 rounded-full hover:bg-gray-100 text-gray-600 flex items-center justify-center">2</button>
+                  <button className="w-6 h-6 rounded-full hover:bg-gray-100 text-gray-600 flex items-center justify-center">3</button>
+                  <button className="w-6 h-6 rounded-full hover:bg-gray-100 text-gray-600 flex items-center justify-center">4</button>
                 </div>
                 <button className="text-gray-600 hover:text-gray-800">
                   <ChevronRight size={18} />
@@ -368,25 +384,17 @@ export default function CoursePage() {
         <div className="mb-10 w-full">
           <h3 className="font-bold text-gray-800 text-lg mb-4">Hồ sơ</h3>
           <div className="flex items-center gap-3">
-            <img
-              src={avatarUrl}
-              alt="Avatar"
-              className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm"
-            />
+            <img src={avatarUrl} alt="Avatar" className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm" />
             <div>
               <h4 className="font-bold text-gray-800 text-sm">{displayName}</h4>
-              <p className="text-xs text-gray-500">
-                Lịch sử & Văn minh thế giới
-              </p>
+              <p className="text-xs text-gray-500">Lịch sử & Văn minh thế giới</p>
             </div>
           </div>
         </div>
 
         {/* Highlighted Courses */}
         <div className="mb-10 w-full">
-          <h3 className="font-bold text-gray-800 text-lg mb-4">
-            Khóa học nổi bật
-          </h3>
+          <h3 className="font-bold text-gray-800 text-lg mb-4">Khóa học nổi bật</h3>
           <div className="flex flex-col gap-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -394,15 +402,11 @@ export default function CoursePage() {
                   <MapPin size={18} />
                 </div>
                 <div>
-                  <h4 className="font-bold text-gray-800 text-xs">
-                    Lịch Sử Việt Nam Qua Các Thời Kỳ
-                  </h4>
+                  <h4 className="font-bold text-gray-800 text-xs">Lịch Sử Việt Nam Qua Các Thời Kỳ</h4>
                   <p className="text-[10px] text-gray-400">12+ khóa học</p>
                 </div>
               </div>
-              <button className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-[10px] font-bold py-1 px-3 rounded-2xl transition-colors whitespace-nowrap">
-                Xem Khóa Học
-              </button>
+              <button className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-[10px] font-bold py-1 px-3 rounded-2xl transition-colors whitespace-nowrap">Xem Khóa Học</button>
             </div>
 
             <div className="flex items-center justify-between">
@@ -411,15 +415,11 @@ export default function CoursePage() {
                   <PlayCircle size={18} />
                 </div>
                 <div>
-                  <h4 className="font-bold text-gray-800 text-xs">
-                    Lịch Sử Thế Giới
-                  </h4>
+                  <h4 className="font-bold text-gray-800 text-xs">Lịch Sử Thế Giới</h4>
                   <p className="text-[10px] text-gray-400">10+ khóa học</p>
                 </div>
               </div>
-              <button className="bg-[#fce7f3] hover:bg-[#fbcfe8] text-[#be185d] text-[10px] font-bold py-1 px-3 rounded-2xl transition-colors whitespace-nowrap">
-                Xem Khóa Học
-              </button>
+              <button className="bg-[#fce7f3] hover:bg-[#fbcfe8] text-[#be185d] text-[10px] font-bold py-1 px-3 rounded-2xl transition-colors whitespace-nowrap">Xem Khóa Học</button>
             </div>
 
             <div className="flex items-center justify-between">
@@ -428,36 +428,24 @@ export default function CoursePage() {
                   <BookOpen size={18} />
                 </div>
                 <div>
-                  <h4 className="font-bold text-gray-800 text-xs">
-                    Các Cuộc Chiến Tranh Lớn
-                  </h4>
+                  <h4 className="font-bold text-gray-800 text-xs">Các Cuộc Chiến Tranh Lớn</h4>
                   <p className="text-[10px] text-gray-400">8+ khóa học</p>
                 </div>
               </div>
-              <button className="bg-[#e0f2fe] hover:bg-[#bae6fd] text-[#0369a1] text-[10px] font-bold py-1 px-3 rounded-2xl transition-colors whitespace-nowrap">
-                Xem Khóa Học
-              </button>
+              <button className="bg-[#e0f2fe] hover:bg-[#bae6fd] text-[#0369a1] text-[10px] font-bold py-1 px-3 rounded-2xl transition-colors whitespace-nowrap">Xem Khóa Học</button>
             </div>
           </div>
         </div>
 
         {/* Next Lesson */}
         <div className="w-full pt-6 border-t border-black/5">
-          <h3 className="font-bold text-gray-800 text-sm mb-4">
-            Bài học tiếp theo
-          </h3>
+          <h3 className="font-bold text-gray-800 text-sm mb-4">Bài học tiếp theo</h3>
           <div className="text-center mb-4">
-            <h4 className="font-title font-bold text-gray-800 text-base mb-1">
-              Bài 5: Sự sụp đổ của Đế chế La Mã
-            </h4>
+            <h4 className="font-title font-bold text-gray-800 text-base mb-1">Bài 5: Sự sụp đổ của Đế chế La Mã</h4>
             <p className="text-xs text-gray-500">Thời lượng: 20 phút</p>
           </div>
           <div className="rounded-2xl overflow-hidden shadow-md relative group cursor-pointer">
-            <img
-              src="/img/news1.png"
-              alt="Roman Empire"
-              className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500"
-            />
+            <img src="/img/news1.png" alt="Roman Empire" className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500" />
             <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
               <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center text-[#5c3a21]">
                 <PlayCircle size={28} />

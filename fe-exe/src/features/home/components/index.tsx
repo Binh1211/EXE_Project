@@ -99,25 +99,6 @@ const features = [
   },
 ];
 
-
-const newsData = [
-  {
-    title: "Vistory ra mắt hệ thống minigame lịch sử mới",
-    desc: "Vistory chính thức cập nhật chuỗi minigame theo từng giai đoạn lịch sử, giúp học sinh luyện tập mốc thời gian và nhân vật quan trọng.",
-    image: "/img/home4.png",
-  },
-  {
-    title: "Xu hướng học lịch sử qua nền tảng số năm 2026",
-    desc: "Các trường học và CLB đang tích cực ứng dụng nền tảng e-learning để đổi mới cách tiếp cận môn Lịch sử.",
-    image: "/img/home2.png",
-  },
-  {
-    title: "Lịch sử Việt Nam trong thời đại số, Vì sao học qua tương tác giúp ghi nhớ lâu hơn?",
-    desc: "Giáo dục lịch sử đang chuyển mình mạnh mẽ với công nghệ. Bài học trực quan, minigame và hệ thống ôn tập thông minh giúp học sinh hiểu bản chất sự kiện thay vì học thuộc lòng.",
-    image: "/img/home3.png",
-  },
-];
-
 export default function Home() {
   return (
     // <div className="flex flex-col gap-10 bg-gradient-to-b from-[#fbf0ce] via-[#d8d0ad] to-[#f9f4e6]">
@@ -254,42 +235,12 @@ export default function Home() {
                     key={index}
                     className="pl-6 basis-full sm:basis-1/2 lg:basis-1/4"
                   >
-                    <Card className="group bg-white rounded-xl hover:bg-[#623715] hover:text-white transition h-full">
+                    <Card className="group rounded-xl overflow-hidden hover:shadow-lg transition cursor-pointer border-0 shadow-md">
                       <img
                         src={item.imge}
-                        className="w-full h-40 object-cover"
+                        alt={item.title}
+                        className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-500"
                       />
-                      <CardHeader className="p-2">
-                        <div className="flex flex-row items-center gap-5">
-                          <CardTitle className="text-xl font-semibold line-clamp-1">
-                            {item.title}
-                          </CardTitle>
-                        </div>
-
-                        <CardDescription className="h-[60%] w-[60%]  text-gray-400 group-hover:text-gray-200 transition line-clamp-2">
-                          {item.desc}
-                        </CardDescription>
-                        <CardDescription className="h-[60%] w-[60%]  text-gray-400 group-hover:text-gray-200 transition line-clamp-2 flex gap-1 items-center">
-                          {item.rating}{" "}
-                          <Star className="fill-yellow-400 text-yellow-400 size-4" />{" "}
-                          ({item.reviewCount} đánh giá)
-                        </CardDescription>
-                        <CardFooter className="p-2">
-                          <div className="w-full flex justify-between">
-                            <a
-                              className="underline text-center block text-[#785336] font-semibold hover:underline"
-                              href="#"
-                            >
-                              Đọc tiếp
-                            </a>
-                            <div className="flex items-center">
-                              <p className="text-sm text-gray-600 font-semibold">
-                                2,534 lượt xem
-                              </p>
-                            </div>
-                          </div>
-                        </CardFooter>
-                      </CardHeader>
                     </Card>
                   </CarouselItem>
                 );
@@ -364,35 +315,7 @@ export default function Home() {
           <CarouselDots className="text-black " />
         </Carousel>
       </div>
-      {/* Tin Tức Section */}
-      <div className="w-[85%] max-w-7xl mx-auto mt-20 mb-20">
-        <h2 className="text-4xl font-history text-[#623715] mb-8 font-bold">Tin Tức</h2>
-        <div className="flex flex-col lg:flex-row gap-10">
-          {/* Left Column (items 1 and 2) */}
-          <div className="flex flex-col gap-8 lg:w-[50%] h-full justify-between">
-            {newsData.slice(1, 3).map((item, index) => (
-              <div key={index} className="flex gap-6 h-[160px]">
-                <img src={item.image} alt={item.title} className="w-[240px] h-full object-cover rounded-md shadow-sm" />
-                <div className="flex-1 flex flex-col pt-1">
-                  <h3 className="text-xl font-bold text-[#623715] mb-3 font-history line-clamp-2">{item.title}</h3>
-                  <p className="text-sm text-gray-500 leading-relaxed line-clamp-4">{item.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
 
-          {/* Right Column (item 0 - Main item) */}
-          <div className="flex flex-col lg:w-[50%] h-[352px]">
-            {newsData.slice(0, 1).map((item, index) => (
-              <div key={index} className="h-full flex flex-col">
-                <img src={item.image} alt={item.title} className="w-full h-[240px] object-cover rounded-md shadow-sm mb-5" />
-                <h3 className="text-2xl font-bold text-[#623715] mb-3 font-history line-clamp-2">{item.title}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed line-clamp-2">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
