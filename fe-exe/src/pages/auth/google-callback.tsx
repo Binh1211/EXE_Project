@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { saveAuthSession } from "@/features/auth/api/auth-api";
+import { saveAuthSession } from "@/features/auth/lib/auth-session";
 import type { AuthResponse, AuthUser } from "@/features/auth/types";
 
 /**

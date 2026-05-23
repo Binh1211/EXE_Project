@@ -11,6 +11,13 @@ export class ApiError extends Error {
   }
 }
 
+export class NetworkError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "NetworkError";
+  }
+}
+
 type ApiErrorBody = {
   message?: string;
 };
@@ -21,7 +28,12 @@ export async function apiRequest<T>(
 ): Promise<T> {
   const headers = new Headers(options.headers);
 
-  if (options.body && !headers.has("Content-Type")) {
+  // Don't set Content-Type for FormData, let the browser handle it
+  if (
+    options.body &&
+    !(options.body instanceof FormData) &&
+    !headers.has("Content-Type")
+  ) {
     headers.set("Content-Type", "application/json");
   }
 
@@ -30,10 +42,16 @@ export async function apiRequest<T>(
     headers.set("Authorization", `Bearer ${token}`);
   }
 
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    ...options,
-    headers,
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${API_BASE_URL}${path}`, {
+      ...options,
+      headers,
+    });
+  } catch {
+    throw new NetworkError(
+      `Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối mạng của bạn và thử lại.`,);
+  }
 
   const data = (await response.json().catch(() => null)) as
     | T
@@ -49,4 +67,14 @@ export async function apiRequest<T>(
   }
 
   return data as T;
+}
+
+export function getApiErrorMessage(error: unknown): string {
+  if (error instanceof NetworkError || error instanceof ApiError) {
+    return error.message;
+  }
+  if (error instanceof Error) {
+    return error.message;
+  }
+  return "Đã có lỗi xảy ra. Vui lòng thử lại.";
 }

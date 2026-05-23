@@ -1,12 +1,8 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import {
-  getAuthErrorMessage,
-  registerAndSave,
-} from "@/features/auth/api/auth-api";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { authApi, getAuthErrorMessage } from "@/features/auth/api/auth-api";
 import AuthAlert from "@/features/auth/components/AuthAlert";
 import AuthCard from "@/features/auth/components/AuthCard";
-import GoogleAuthButton from "@/features/auth/components/GoogleAuthButton";
 import {
   AUTH_ROUTES,
   authFieldClass,
@@ -15,21 +11,24 @@ import {
   authPrimaryBtnClass,
 } from "@/features/auth/constants";
 
-export default function Register() {
+export default function ResetPassword() {
   const navigate = useNavigate();
-  const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get("token") ?? "";
+
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setSuccess("");
 
-    if (!fullName || !email || !password || !confirmPassword) {
-      setError("Vui lòng điền đầy đủ thông tin.");
+    if (!token) {
+      setError("Link đặt lại mật khẩu không hợp lệ hoặc đã hết hạn.");
       return;
     }
 
@@ -45,8 +44,9 @@ export default function Register() {
 
     setIsLoading(true);
     try {
-      await registerAndSave({ fullName, email, password });
-      navigate("/");
+      const res = await authApi.resetPassword({ token, password });
+      setSuccess(res.message || "Đặt lại mật khẩu thành công!");
+      setTimeout(() => navigate(AUTH_ROUTES.login), 1500);
     } catch (err) {
       setError(getAuthErrorMessage(err));
     } finally {
@@ -54,54 +54,49 @@ export default function Register() {
     }
   };
 
+  if (!token) {
+    return (
+      <AuthCard title="Đặt lại mật khẩu">
+        <AuthAlert
+          type="error"
+          message="Link không hợp lệ. Vui lòng yêu cầu gửi lại email."
+        />
+        <Link
+          to={AUTH_ROUTES.forgotPassword}
+          className="mt-4 block text-center text-sm font-semibold text-[#5f3713] hover:underline"
+        >
+          Gửi lại email
+        </Link>
+      </AuthCard>
+    );
+  }
+
   return (
     <AuthCard
-      title="Tạo tài khoản"
-      bannerSrc="/img/register_banner.png"
-      bannerAlt="Lối đi Hoàng Thành Huế"
+      title="Đặt lại mật khẩu"
+      bannerSrc="/img/login_banner.png"
+      bannerAlt="Cổng Hoàng Thành Huế"
       footer={
         <p className="mt-5 text-center text-sm text-gray-500">
-          Đã có tài khoản?{" "}
           <Link
             to={AUTH_ROUTES.login}
             className="font-semibold text-[#5f3713] hover:underline"
           >
-            Đăng nhập ngay!
+            Quay lại đăng nhập
           </Link>
         </p>
       }
     >
+      <p className="mb-4 text-sm text-gray-600">
+        Nhập mật khẩu mới cho tài khoản của bạn.
+      </p>
+
       <AuthAlert type="error" message={error} />
+      <AuthAlert type="success" message={success} />
 
       <form onSubmit={handleSubmit} className="space-y-2.5">
         <div className={authFieldClass}>
-          <label className={authLabelClass}>Họ và tên</label>
-          <input
-            type="text"
-            placeholder="Nguyễn Văn A"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-            className={authInputClass}
-            required
-            disabled={isLoading}
-          />
-        </div>
-
-        <div className={authFieldClass}>
-          <label className={authLabelClass}>Email</label>
-          <input
-            type="email"
-            placeholder="Example@email.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className={authInputClass}
-            required
-            disabled={isLoading}
-          />
-        </div>
-
-        <div className={authFieldClass}>
-          <label className={authLabelClass}>Mật khẩu</label>
+          <label className={authLabelClass}>Mật khẩu mới</label>
           <input
             type="password"
             placeholder="Ít nhất 8 ký tự"
@@ -134,21 +129,10 @@ export default function Register() {
           {isLoading ? (
             <span className="inline-block h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
           ) : (
-            "Đăng ký"
+            "Cập nhật mật khẩu"
           )}
         </button>
       </form>
-
-      <div className="relative my-5 flex items-center justify-center">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-gray-200" />
-        </div>
-        <span className="relative bg-white px-3 text-xs text-gray-400">
-          Hoặc đăng ký qua
-        </span>
-      </div>
-
-      <GoogleAuthButton mode="register" label="Google" disabled={isLoading} />
     </AuthCard>
   );
 }

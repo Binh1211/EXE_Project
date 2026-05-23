@@ -1,12 +1,8 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import {
-  getAuthErrorMessage,
-  loginAndSave,
-} from "@/features/auth/api/auth-api";
+import { Link } from "react-router-dom";
+import { authApi, getAuthErrorMessage } from "@/features/auth/api/auth-api";
 import AuthAlert from "@/features/auth/components/AuthAlert";
 import AuthCard from "@/features/auth/components/AuthCard";
-import GoogleAuthButton from "@/features/auth/components/GoogleAuthButton";
 import {
   AUTH_ROUTES,
   authFieldClass,
@@ -15,26 +11,29 @@ import {
   authPrimaryBtnClass,
 } from "@/features/auth/constants";
 
-export default function Login() {
-  const navigate = useNavigate();
+export default function ForgotPassword() {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setSuccess("");
 
-    if (!email || !password) {
-      setError("Vui lòng điền đầy đủ thông tin.");
+    if (!email.trim()) {
+      setError("Vui lòng nhập email.");
       return;
     }
 
     setIsLoading(true);
     try {
-      await loginAndSave({ email, password });
-      navigate("/");
+      const res = await authApi.forgotPassword({ email: email.trim() });
+      setSuccess(
+        res.message ||
+          "Nếu email tồn tại trong hệ thống, chúng tôi đã gửi link đặt lại mật khẩu. Vui lòng kiểm tra hộp thư.",
+      );
     } catch (err) {
       setError(getAuthErrorMessage(err));
     } finally {
@@ -44,22 +43,26 @@ export default function Login() {
 
   return (
     <AuthCard
-      title="Đăng Nhập"
+      title="Quên mật khẩu"
       bannerSrc="/img/login_banner.png"
       bannerAlt="Cổng Hoàng Thành Huế"
       footer={
         <p className="mt-5 text-center text-sm text-gray-500">
-          Chưa có tài khoản?{" "}
           <Link
-            to={AUTH_ROUTES.register}
+            to={AUTH_ROUTES.login}
             className="font-semibold text-[#5f3713] hover:underline"
           >
-            Đăng ký ngay!
+            Quay lại đăng nhập
           </Link>
         </p>
       }
     >
+      <p className="mb-4 text-sm text-gray-600">
+        Nhập email đã đăng ký. Chúng tôi sẽ gửi link đặt lại mật khẩu qua email.
+      </p>
+
       <AuthAlert type="error" message={error} />
+      <AuthAlert type="success" message={success} />
 
       <form onSubmit={handleSubmit} className="space-y-2.5">
         <div className={authFieldClass}>
@@ -75,27 +78,6 @@ export default function Login() {
           />
         </div>
 
-        <div className={authFieldClass}>
-          <label className={authLabelClass}>Mật khẩu</label>
-          <input
-            type="password"
-            placeholder="Ít nhất 8 ký tự"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className={authInputClass}
-            required
-            disabled={isLoading}
-          />
-          <div className="flex justify-end pt-0.5">
-            <Link
-              to={AUTH_ROUTES.forgotPassword}
-              className="text-xs text-blue-600 hover:underline"
-            >
-              Quên mật khẩu?
-            </Link>
-          </div>
-        </div>
-
         <button
           type="submit"
           disabled={isLoading}
@@ -104,21 +86,10 @@ export default function Login() {
           {isLoading ? (
             <span className="inline-block h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
           ) : (
-            "Đăng nhập"
+            "Gửi email đặt lại mật khẩu"
           )}
         </button>
       </form>
-
-      <div className="relative my-5 flex items-center justify-center">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-gray-200" />
-        </div>
-        <span className="relative bg-white px-3 text-xs text-gray-400">
-          Hoặc đăng nhập qua
-        </span>
-      </div>
-
-      <GoogleAuthButton mode="login" label="Google" disabled={isLoading} />
     </AuthCard>
   );
 }
