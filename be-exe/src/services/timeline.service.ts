@@ -21,9 +21,7 @@ function normalizeSlug(value: string) {
 async function ensureSlugIsUnique(slug: string, excludeId?: string) {
   let candidate = slug;
   let suffix = 1;
-  const baseQuery = excludeId
-    ? { _id: { $ne: excludeId } }
-    : {};
+  const baseQuery = excludeId ? { _id: { $ne: excludeId } } : {};
 
   while (await Timeline.findOne({ slug: candidate, ...baseQuery })) {
     candidate = `${slug}-${suffix}`;
@@ -40,7 +38,7 @@ function validateObjectId(id: string) {
 }
 
 export async function getAllTimelines() {
-  return await Timeline.find().sort({ createdAt: -1 });
+  return await Timeline.find().sort({ order: 1 });
 }
 
 export async function getTimelineBySlug(slug: string) {
@@ -57,6 +55,8 @@ export async function createTimeline(input: {
   imageUrl: string;
   displayTime: string;
   slug?: string;
+  order: number;
+  chapters?: string[];
 }) {
   const slugValue = normalizeSlug(input.slug ?? input.title);
   const uniqueSlug = await ensureSlugIsUnique(slugValue);
@@ -67,6 +67,8 @@ export async function createTimeline(input: {
     imageUrl: input.imageUrl.trim(),
     displayTime: input.displayTime.trim(),
     slug: uniqueSlug,
+    order: input.order,
+    chapters: input.chapters || [],
   });
 
   return timeline;
@@ -80,6 +82,8 @@ export async function updateTimeline(
     imageUrl?: string;
     displayTime?: string;
     slug?: string;
+    order?: number;
+    chapters?: string[];
   },
 ) {
   validateObjectId(id);
@@ -105,6 +109,12 @@ export async function updateTimeline(
   }
   if (updates.displayTime !== undefined) {
     timeline.displayTime = updates.displayTime.trim();
+  }
+  if (updates.order !== undefined) {
+    timeline.order = updates.order;
+  }
+  if (updates.chapters !== undefined) {
+    timeline.chapters = updates.chapters as any[];
   }
 
   await timeline.save();

@@ -1,14 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Gamepad2, Loader2 } from "lucide-react";
 import "./Game.css";
 import { IMG } from "@/lib/images";
-
-type Question = {
-  question: string;
-  options: string[];
-  answer: string;
-};
+import { lessonApi } from "@/features/course/api/lesson-api";
+import { lessonProgressApi } from "@/features/course/api/lesson-progress-api";
+import {
+  mapQuizToGameQuestions,
+  type GameQuestion,
+} from "../lib/map-quiz-to-game";
 
 type AnswerRecord = {
   questionIndex: number;
@@ -17,24 +17,6 @@ type AnswerRecord = {
   userAnswer: string;
   isCorrect: boolean;
 };
-
-const questions: Question[] = [
-  {
-    question: "Việt Nam tuyên bố độc lập năm nào?",
-    options: ["1930", "1945", "1954", "1975"],
-    answer: "1945",
-  },
-  {
-    question: "Chiến tranh thế giới II bắt đầu năm nào?",
-    options: ["1914", "1939", "1941", "1945"],
-    answer: "1939",
-  },
-  {
-    question: "Chiến thắng Điện Biên Phủ năm nào?",
-    options: ["1945", "1954", "1968", "1975"],
-    answer: "1954",
-  },
-];
 
 const getGrade = (correctCount: number, totalQuestions: number): string => {
   const percentage = (correctCount / totalQuestions) * 100;
@@ -46,74 +28,117 @@ const getGrade = (correctCount: number, totalQuestions: number): string => {
   return "F";
 };
 
-export default function App() {
-  const { id } = useParams();
+const MAX_OBSTACLES = 6;
+const OBSTACLE_GAP = 200;
+const MOVE_SPEED = 4;
+
+export default function HistoryMiniGame() {
+  const { id: timelineSlug } = useParams();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  // chapter index passed from course-learn page (e.g. ?chapter=0)
-  const chapterParam = parseInt(searchParams.get('chapter') ?? '0', 10);
+  const lessonId = searchParams.get("lesson");
+  const chapterSlug = searchParams.get("chapter");
+
+  const [questions, setQuestions] = useState<GameQuestion[]>([]);
+  const [quizTitle, setQuizTitle] = useState("");
+  const [passingScore, setPassingScore] = useState(70);
+  const [loadState, setLoadState] = useState<"loading" | "ready" | "error">(
+    "loading",
+  );
+  const [loadError, setLoadError] = useState("");
+
   const [started, setStarted] = useState(false);
   const [position, setPosition] = useState(0);
   const [current, setCurrent] = useState(0);
   const [showQuestion, setShowQuestion] = useState(false);
   const [lives, setLives] = useState(3);
   const [jump, setJump] = useState(false);
+  const [hurt, setHurt] = useState(false);
   const [correctCount, setCorrectCount] = useState(0);
   const [queue, setQueue] = useState<number[]>([]);
   const [obstacles, setObstacles] = useState<number[]>([]);
   const [destroyed, setDestroyed] = useState<boolean[]>([]);
+  const [destroyBurst, setDestroyBurst] = useState<number | null>(null);
   const [timer, setTimer] = useState(15);
-  const [startTime, setStartTime] = useState<number>(0);
-  const [elapsedTime, setElapsedTime] = useState<string>("0:00");
+  const [startTime, setStartTime] = useState(0);
+  const [elapsedTime, setElapsedTime] = useState("0:00");
   const [history, setHistory] = useState<AnswerRecord[]>([]);
   const [showHistory, setShowHistory] = useState(false);
+  const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const [answerFeedback, setAnswerFeedback] = useState<"correct" | "wrong" | null>(
+    null,
+  );
+  const [savingProgress, setSavingProgress] = useState(false);
 
-  const MAX_OBSTACLES = 6;
+  const rafRef = useRef<number>(0);
+  const questionCount = questions.length;
+
+  const backUrl =
+    timelineSlug && chapterSlug && lessonId
+      ? `/course/${timelineSlug}/chapter/${chapterSlug}/learn?lesson=${lessonId}`
+      : timelineSlug
+        ? `/course/${timelineSlug}`
+        : "/course";
+
+  useEffect(() => {
+    if (!lessonId) {
+      setLoadState("error");
+      setLoadError("Thiếu mã bài học. Mở game từ trang học bài (tab Quiz).");
+      return;
+    }
+
+    setLoadState("loading");
+    lessonApi
+      .getLessonDetail(lessonId)
+      .then((detail) => {
+        const mapped = mapQuizToGameQuestions(detail.quizData ?? null);
+        if (mapped.length === 0) {
+          setLoadState("error");
+          setLoadError("Bài học này chưa có câu hỏi quiz.");
+          return;
+        }
+        setQuestions(mapped);
+        setQuizTitle(detail.quizData?.title ?? "Quiz ôn tập");
+        setPassingScore(detail.quizData?.passingScore ?? 70);
+        setLoadState("ready");
+      })
+      .catch(() => {
+        setLoadState("error");
+        setLoadError("Không tải được quiz. Vui lòng đăng nhập và thử lại.");
+      });
+  }, [lessonId]);
+
+  const initRun = useCallback(() => {
+    if (questionCount === 0) return;
+    const initialObstacles = questions.map((_, i) => 200 + i * OBSTACLE_GAP);
+    setQueue(questions.map((_, i) => i));
+    setObstacles(initialObstacles);
+    setDestroyed(new Array(questionCount).fill(false));
+    setPosition(0);
+    setCurrent(0);
+    setCorrectCount(0);
+    setLives(3);
+    setHistory([]);
+    setShowHistory(false);
+    setStartTime(Date.now());
+    setElapsedTime("0:00");
+  }, [questionCount, questions]);
 
   useEffect(() => {
     if (!started) return;
+    initRun();
+  }, [started, initRun]);
 
-    const initialObstacles = questions.map((_, i) => 200 + i * 200);
-
-    setQueue(questions.map((_, i) => i));
-    setObstacles(initialObstacles);
-    setDestroyed(new Array(questions.length).fill(false));
-    setStartTime(Date.now());
-  }, [started]);
-
-  // Timer for questions
   useEffect(() => {
     if (!showQuestion) return;
-
     setTimer(15);
+    setSelectedOption(null);
+    setAnswerFeedback(null);
+
     const interval = setInterval(() => {
       setTimer((prev) => {
         if (prev <= 1) {
-          // Time's up, treat as wrong answer
-          const currentQuestionIndex = queue[current];
-          if (currentQuestionIndex !== undefined) {
-            setLives((l) => l - 1);
-            setJump(true);
-            setTimeout(() => setJump(false), 400);
-            setQueue((prev) => [...prev, currentQuestionIndex]);
-            setObstacles((prev) => {
-              let next = [...prev, prev[prev.length - 1] + 200];
-              if (next.length > MAX_OBSTACLES) {
-                next = next.slice(0, MAX_OBSTACLES);
-                next = next.slice(1).map((v) => v - 200);
-                setPosition((p) => p - 200);
-                setCurrent((c) => c - 1);
-              }
-              return next;
-            });
-            setDestroyed((prev) => {
-              let next = [...prev, false];
-              if (next.length > MAX_OBSTACLES) next = next.slice(1);
-              return next;
-            });
-          }
-          setShowQuestion(false);
-          setCurrent((c) => c + 1);
+          handleWrongAnswer(true);
           return 0;
         }
         return prev - 1;
@@ -121,11 +146,11 @@ export default function App() {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [showQuestion, current, queue]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showQuestion, current]);
 
-  // Elapsed time counter
   useEffect(() => {
-    if (!started || correctCount === questions.length) return;
+    if (!started || questionCount === 0 || correctCount === questionCount) return;
 
     const interval = setInterval(() => {
       const elapsed = Math.floor((Date.now() - startTime) / 1000);
@@ -135,181 +160,291 @@ export default function App() {
     }, 100);
 
     return () => clearInterval(interval);
-  }, [started, startTime, correctCount]);
+  }, [started, startTime, correctCount, questionCount]);
 
   const currentQuestionIndex = queue[current];
   const q =
-    currentQuestionIndex !== undefined ? questions[currentQuestionIndex] : null;
+    currentQuestionIndex !== undefined
+      ? questions[currentQuestionIndex]
+      : null;
+
+  const pushWrongObstacle = useCallback(() => {
+    setQueue((prev) => {
+      const idx = prev[current];
+      return idx !== undefined ? [...prev, idx] : prev;
+    });
+
+    setObstacles((prev) => {
+      let next = [...prev, (prev[prev.length - 1] ?? 200) + OBSTACLE_GAP];
+      if (next.length > MAX_OBSTACLES) {
+        next = next.slice(0, MAX_OBSTACLES);
+        next = next.slice(1).map((v) => v - OBSTACLE_GAP);
+        setPosition((p) => Math.max(0, p - OBSTACLE_GAP));
+        setCurrent((c) => Math.max(0, c - 1));
+      }
+      return next;
+    });
+
+    setDestroyed((prev) => {
+      const next = [...prev, false];
+      return next.length > MAX_OBSTACLES ? next.slice(1) : next;
+    });
+  }, [current]);
+
+  const handleWrongAnswer = useCallback(
+    (timedOut = false) => {
+      if (timedOut && q) {
+        setHistory((prev) => [
+          ...prev,
+          {
+            questionIndex: queue[current] ?? 0,
+            question: q.question,
+            correctAnswer: q.answer,
+            userAnswer: "(Hết giờ)",
+            isCorrect: false,
+          },
+        ]);
+      }
+      setLives((l) => l - 1);
+    setHurt(true);
+    setJump(true);
+    setTimeout(() => {
+      setJump(false);
+      setHurt(false);
+    }, 500);
+    pushWrongObstacle();
+    setShowQuestion(false);
+    setCurrent((c) => c + 1);
+  }, [pushWrongObstacle, q, queue, current]);
 
   useEffect(() => {
-    if (!started || showQuestion) return;
-    if (current >= queue.length) return;
-    if (!obstacles[current]) return;
+    if (!started || showQuestion || questionCount === 0) return;
+    if (current >= queue.length || !obstacles[current]) return;
 
-    const timer = setInterval(() => {
+    const tick = () => {
       setPosition((prev) => {
-        const next = prev + 5;
-
+        const next = prev + MOVE_SPEED;
         if (next >= obstacles[current]) {
-          clearInterval(timer);
+          cancelAnimationFrame(rafRef.current);
           setShowQuestion(true);
+          return obstacles[current];
         }
-
         return next;
       });
-    }, 30);
+      rafRef.current = requestAnimationFrame(tick);
+    };
 
-    return () => clearInterval(timer);
-  }, [showQuestion, current, started, obstacles, queue]);
+    rafRef.current = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafRef.current);
+  }, [showQuestion, current, started, obstacles, queue, questionCount]);
+
+  const advanceAfterAnswer = useCallback(
+    (isCorrect: boolean) => {
+      setTimeout(() => {
+        setShowQuestion(false);
+        setSelectedOption(null);
+        setAnswerFeedback(null);
+        if (!isCorrect) {
+          setCurrent((c) => c + 1);
+        } else {
+          setCurrent((c) => c + 1);
+        }
+      }, isCorrect ? 450 : 650);
+    },
+    [],
+  );
 
   const answer = (option: string) => {
-    if (!q) return;
+    if (!q || selectedOption) return;
 
+    setSelectedOption(option);
     const isCorrect = option === q.answer;
-    const currentQuestionIndex = queue[current];
-    const newRecord: AnswerRecord = {
-      questionIndex: currentQuestionIndex,
-      question: q.question,
-      correctAnswer: q.answer,
-      userAnswer: option,
-      isCorrect: isCorrect,
-    };
-    setHistory((prev) => [...prev, newRecord]);
+
+    setHistory((prev) => [
+      ...prev,
+      {
+        questionIndex: queue[current] ?? 0,
+        question: q.question,
+        correctAnswer: q.answer,
+        userAnswer: option,
+        isCorrect,
+      },
+    ]);
 
     if (isCorrect) {
+      setAnswerFeedback("correct");
+      setDestroyBurst(current);
+      setTimeout(() => setDestroyBurst(null), 600);
+
       const copy = [...destroyed];
       copy[current] = true;
       setDestroyed(copy);
-
       setCorrectCount((c) => c + 1);
+      advanceAfterAnswer(true);
     } else {
+      setAnswerFeedback("wrong");
       setLives((l) => l - 1);
-
+      setHurt(true);
       setJump(true);
-      setTimeout(() => setJump(false), 400);
-
-      setQueue((prev) => [...prev, currentQuestionIndex]);
-
-      setObstacles((prev) => {
-        let next = [...prev, prev[prev.length - 1] + 200];
-
-        if (next.length > MAX_OBSTACLES) {
-          next = next.slice(0, MAX_OBSTACLES);
-          next = next.slice(1).map((v) => v - 200);
-
-          // dịch map
-          setPosition((p) => p - 200);
-
-          // rất quan trọng
-          setCurrent((c) => c - 1);
-        }
-
-        return next;
-      });
-
-      setDestroyed((prev) => {
-        let next = [...prev, false];
-        if (next.length > MAX_OBSTACLES) next = next.slice(1);
-        return next;
-      });
+      setTimeout(() => {
+        setJump(false);
+        setHurt(false);
+      }, 500);
+      pushWrongObstacle();
+      advanceAfterAnswer(false);
     }
-
-    setShowQuestion(false);
-    setCurrent((c) => c + 1);
   };
 
   const handleRestart = () => {
+    cancelAnimationFrame(rafRef.current);
     setStarted(false);
-    setPosition(0);
-    setCurrent(0);
     setShowQuestion(false);
-    setLives(3);
-    setJump(false);
-    setCorrectCount(0);
-    setQueue([]);
-    setObstacles([]);
-    setDestroyed([]);
-    setTimer(15);
-    setElapsedTime("0:00");
-    setHistory([]);
-    setShowHistory(false);
+    setDestroyBurst(null);
+    setSelectedOption(null);
+    setAnswerFeedback(null);
   };
 
-  const handleGameOver = () => {
+  const handleSaveAndExit = async () => {
+    if (!lessonId || questionCount === 0) {
+      navigate(backUrl);
+      return;
+    }
+
+    const scorePct = Math.round((correctCount / questionCount) * 100);
+    const passed = scorePct >= passingScore;
+
+    if (passed) {
+      setSavingProgress(true);
+      try {
+        await lessonProgressApi.upsert({
+          lessonId,
+          quizBestScore: scorePct,
+          quizPassed: true,
+          quizAttempts: 1,
+          status: "completed",
+          videoWatchedPct: 100,
+        });
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setSavingProgress(false);
+      }
+    }
+    navigate(backUrl);
+  };
+
+  if (loadState === "loading") {
     return (
-      <div className="gameoverScreen">
-        <h1>Trò chơi kết thúc</h1>
-        <p>Bạn mất tất cả các mạng sống!</p>
-        <button className="actionBtn" onClick={handleRestart}>
-          Chơi lại
+      <div className="game game--centered">
+        <Loader2 className="game-spinner" size={40} />
+        <p>Đang tải câu hỏi quiz...</p>
+      </div>
+    );
+  }
+
+  if (loadState === "error") {
+    return (
+      <div className="game game--centered">
+        <p className="game-error">{loadError}</p>
+        <button type="button" className="actionBtn" onClick={() => navigate(backUrl)}>
+          Quay lại
         </button>
       </div>
     );
-  };
+  }
 
-  if (lives <= 0) return handleGameOver();
+  if (lives <= 0 && started) {
+    return (
+      <div className="gameoverScreen">
+        <h1>Trò chơi kết thúc</h1>
+        <p>Bạn đã hết mạng. Hãy ôn lại và thử lại nhé!</p>
+        <div className="actionButtons">
+          <button type="button" className="actionBtn" onClick={handleRestart}>
+            Chơi lại
+          </button>
+          <button type="button" className="actionBtn" onClick={() => navigate(backUrl)}>
+            Về bài học
+          </button>
+        </div>
+      </div>
+    );
+  }
 
-  if (started && correctCount === questions.length && lives > 0) {
+  if (
+    started &&
+    questionCount > 0 &&
+    correctCount === questionCount &&
+    lives > 0
+  ) {
+    const scorePct = Math.round((correctCount / questionCount) * 100);
+    const passed = scorePct >= passingScore;
+
     return (
       <div className="resultScreen">
         {!showHistory ? (
           <div className="resultContent">
             <div className="pixelSoldier">
               <div className="soldier">
-                <img className="main" src={IMG.main} />
+                <img className="main" src={IMG.main} alt="" />
               </div>
             </div>
             <div className="resultInfo">
-              <h2 className="resultTitle">Kết quả</h2>
+              <h2 className="resultTitle">{quizTitle}</h2>
               <div className="scoreBox">
                 <div className="scoreItem">
                   <span className="scoreLabel">Tổng điểm</span>
                   <span className="scoreValue">
-                    {correctCount}/{questions.length}
+                    {correctCount}/{questionCount}
                   </span>
                 </div>
                 <div className="scoreItem">
-                  <span className="scoreLabel">Thời gian làm bài</span>
+                  <span className="scoreLabel">Thời gian</span>
                   <span className="scoreValue">{elapsedTime}</span>
+                </div>
+                <div className="scoreItem">
+                  <span className="scoreLabel">Yêu cầu đạt</span>
+                  <span className="scoreValue">{passingScore}%</span>
                 </div>
               </div>
               <div className="gradeBox">
                 <span className="gradeLabel">Đánh giá</span>
-                <span className="grade">
-                  {getGrade(correctCount, questions.length)}
-                </span>
+                <span className="grade">{getGrade(correctCount, questionCount)}</span>
               </div>
+              {!passed && (
+                <p className="game-hint">
+                  Cần đạt tối thiểu {passingScore}% để hoàn thành bài và mở khóa bài
+                  tiếp theo.
+                </p>
+              )}
               <div className="actionButtons">
-                <button className="actionBtn nextBtn" onClick={handleRestart}>
+                <button type="button" className="actionBtn" onClick={handleRestart}>
                   Thử lại
                 </button>
                 <button
+                  type="button"
                   className="actionBtn historyBtn"
                   onClick={() => setShowHistory(true)}
                 >
                   Xem lịch sử
                 </button>
-                {(correctCount / questions.length) >= 0.9 && (
-                  <button
-                    className="actionBtn nextBtn"
-                    onClick={() => {
-                        const currentUnlocked = parseInt(localStorage.getItem('unlockedChapter') || '0', 10);
-                        // Only advance if this chapter hasn't been unlocked yet (prevents re-play from over-unlocking)
-                        const newUnlocked = Math.max(currentUnlocked, chapterParam + 1);
-                        localStorage.setItem('unlockedChapter', newUnlocked.toString());
-                        navigate(`/course/${id}/learning`);
-                    }}
-                    style={{ backgroundColor: '#10b981', marginLeft: '10px' }}
-                  >
-                    Hoàn thành & Mở khóa chương tiếp theo
-                  </button>
-                )}
+                <button
+                  type="button"
+                  className="actionBtn nextBtn"
+                  disabled={savingProgress}
+                  onClick={() => void handleSaveAndExit()}
+                >
+                  {savingProgress
+                    ? "Đang lưu..."
+                    : passed
+                      ? "Hoàn thành & về bài học"
+                      : "Về bài học"}
+                </button>
               </div>
             </div>
           </div>
         ) : (
           <div className="historyContainer">
-            <button className="backBtn" onClick={() => setShowHistory(false)}>
+            <button type="button" className="backBtn" onClick={() => setShowHistory(false)}>
               ← Quay lại
             </button>
             <h2 className="historyTitle">Lịch sử trả lời</h2>
@@ -324,12 +459,10 @@ export default function App() {
                   <div className="historyAnswers">
                     <div className="answerRow">
                       <span className="answerLabel">Đáp án đúng:</span>
-                      <span className="correctAnswer">
-                        {record.correctAnswer}
-                      </span>
+                      <span className="correctAnswer">{record.correctAnswer}</span>
                     </div>
                     <div className="answerRow">
-                      <span className="answerLabel">Đáp án của bạn:</span>
+                      <span className="answerLabel">Bạn chọn:</span>
                       <span
                         className={`userAnswer ${record.isCorrect ? "correct" : "incorrect"}`}
                       >
@@ -350,21 +483,23 @@ export default function App() {
       </div>
     );
   }
+
   return (
     <div className="game">
-      <button
-        className="game-back-btn"
-        onClick={() => navigate(`/course/${id}/learning`)}
-      >
+      <button type="button" className="game-back-btn" onClick={() => navigate(backUrl)}>
         <ArrowLeft size={20} />
-        Quay lại khóa học
+        Quay lại bài học
       </button>
 
-      <h1>History Mini Game</h1>
+      <h1 className="game-title">
+        <Gamepad2 size={32} className="game-title-icon" />
+        {quizTitle}
+      </h1>
+      <p className="game-subtitle">{questionCount} câu hỏi từ quiz bài học</p>
 
       {!started && (
-        <button className="startBtn" onClick={() => setStarted(true)}>
-          Start Game
+        <button type="button" className="startBtn" onClick={() => setStarted(true)}>
+          Bắt đầu chơi
         </button>
       )}
 
@@ -373,47 +508,61 @@ export default function App() {
           <div className="world">
             <div className="hearts">
               {Array.from({ length: lives }).map((_, i) => (
-                <img key={i} src={IMG.heart} className="heart" />
+                <img key={i} src={IMG.heart} className="heart" alt="" />
               ))}
             </div>
 
             <div
-              className={`character ${jump ? "jump" : ""}`}
-              style={{ left: position }}
+              className={`character ${hurt ? "hurt" : ""}`}
+              style={{ transform: `translate3d(${position}px, 0, 0)` }}
             >
-              <img className="main" src={IMG.main} />
+              <div className={`character-sprite ${jump ? "jump" : ""}`}>
+                <img className="main" src={IMG.main} alt="" />
+              </div>
             </div>
 
             {obstacles.map((o, i) => (
-              <div key={i} className="obstacle" style={{ left: o }}>
+              <div
+                key={`${i}-${o}`}
+                className={`obstacle ${destroyBurst === i ? "obstacle--burst" : ""} ${destroyed[i] ? "obstacle--cleared" : ""}`}
+                style={{ transform: `translate3d(${o}px, 0, 0)` }}
+              >
                 {destroyed[i] ? (
-                  <img className="block" src={IMG.unStumblingBlock} />
+                  <img className="block" src={IMG.unStumblingBlock} alt="" />
                 ) : (
-                  <img className="block" src={IMG.stumblingBlock} />
+                  <img className="block" src={IMG.stumblingBlock} alt="" />
                 )}
               </div>
             ))}
           </div>
 
           {showQuestion && q && current < queue.length && (
-            <div className="questionOverlay">
+            <div className="questionOverlay questionOverlay--visible">
               <div className="questionCardWrapper">
-                <div className="questionCard">
+                <div
+                  className={`questionCard ${answerFeedback ? `questionCard--${answerFeedback}` : ""}`}
+                >
                   <div className="progressOverlay">
                     <div className="progressBox">
                       <div className="progressRow">
                         <span className="progressLabel">Điểm</span>
-                        <span className="progressNum">{correctCount}/{questions.length}</span>
+                        <span className="progressNum">
+                          {correctCount}/{questionCount}
+                        </span>
                       </div>
                       <div className="progressRow">
                         <span className="progressLabel">Thời gian</span>
-                        <span className="progressNum">{timer}s</span>
+                        <span
+                          className={`progressNum timer-display ${timer <= 5 ? "timer-display--danger" : ""}`}
+                        >
+                          {timer}s
+                        </span>
                       </div>
                     </div>
                   </div>
 
                   <div className="questionImage">
-                    <img src={IMG.bg} alt="question" />
+                    <img src={IMG.bg} alt="" />
                   </div>
 
                   <h3 className="questionText">{q.question}</h3>
@@ -422,7 +571,17 @@ export default function App() {
                     {q.options.map((o, idx) => (
                       <button
                         key={o}
-                        className="optionBtn"
+                        type="button"
+                        disabled={Boolean(selectedOption)}
+                        className={`optionBtn ${
+                          selectedOption === o
+                            ? answerFeedback === "correct"
+                              ? "optionBtn--correct"
+                              : answerFeedback === "wrong"
+                                ? "optionBtn--wrong"
+                                : ""
+                            : ""
+                        }`}
                         onClick={() => answer(o)}
                       >
                         <span className="optionLetter">

@@ -11,11 +11,20 @@ import {
   PlayCircle,
   Lock,
 } from "lucide-react";
-import { Link, useLocation, useNavigate } from "react-router";
+import { Link, useLocation } from "react-router";
+import { IMG } from "@/lib/images";
+import { useNavigate, useParams } from "react-router";
 import { useAuthUser } from "@/features/auth/hooks/useAuthUser";
 import { getStoredUser } from "@/features/auth/lib/auth-session";
 import { API_BASE_URL } from "@/lib/api-client";
-import { IMG } from "@/lib/images";
+import { chapterApi } from "../api/course-api";
+import { timelineApi } from "@/features/timeLine/api/timeline-api";
+import type { Timeline } from "@/features/timeLine/types";
+import type { Chapter } from "../types";
+import {
+  getEffectiveRequiredLevel,
+  isChapterLevelLocked,
+} from "../hooks/useChapterAccess";
 
 const ITEMS_PER_PAGE = 4;
 
@@ -33,15 +42,16 @@ const SidebarItem = ({
   isPro?: boolean;
 }) => {
   return (
-    <Link
-      to={to}
-      className={`flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-colors ${active ? "bg-[#5c3a21] text-white" : "text-gray-700 hover:bg-white/50"
-        }`}
+    <div
+      className={`flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-colors ${
+        active ? "bg-[#5c3a21] text-white" : "text-gray-700 hover:bg-white/50"
+      }`}
     >
       <Icon size={20} className={active ? "text-white" : "text-gray-600"} />
       <span
-        className={`font-medium text-sm flex-1 ${active ? "text-white" : "text-gray-800"
-          }`}
+        className={`font-medium text-sm flex-1 ${
+          active ? "text-white" : "text-gray-800"
+        }`}
       >
         {text}
       </span>
@@ -50,55 +60,59 @@ const SidebarItem = ({
           PRO
         </span>
       )}
-    </Link>
+    </div>
   );
 };
 
-
-
 const CourseRow = ({
   course,
-  absoluteIndex,
   userLevel,
+  timeLineSlug,
+  chapterIndex,
 }: {
-  course: any;
-  absoluteIndex: number;
+  course: Chapter;
   userLevel: number;
+  timeLineSlug: string;
+  chapterIndex: number;
 }) => {
   const navigate = useNavigate();
   const { user } = useAuthUser();
 
-  const { id, image, title, description } = course;
+  const { slug, coverImageUrl, title, description } = course;
 
-  // Level 1 chỉ được phép click vào 2 khóa đầu tiên (absoluteIndex 0 và 1)
-  const isLocked = userLevel <= 1 && absoluteIndex >= 2;
-  const isPremium = absoluteIndex >= 2;
+  const levelRequired = getEffectiveRequiredLevel(chapterIndex);
+  const isLocked = isChapterLevelLocked(chapterIndex, userLevel);
+  const isPremium = levelRequired >= 2;
 
   const handleClick = () => {
-    if (isLocked) return;
+    if (isLocked) {
+      navigate("/vip");
+      return;
+    }
+
     if (!user) {
       navigate("/login");
       return;
     }
-    navigate(`/course/${id}`);
+
+    navigate(`/course/${timeLineSlug}/chapter/${slug}`);
   };
 
   return (
     <div
       onClick={handleClick}
-      className={`grid grid-cols-12 gap-4 items-center py-4 border-b border-gray-200 transition-colors px-4 ${isLocked
-        ? "opacity-50 cursor-not-allowed"
-        : "hover:bg-white/50 cursor-pointer"
-        }`}
+      className="grid grid-cols-12 gap-4 items-center py-4 border-b border-gray-200 transition-colors px-4 hover:bg-white/50 cursor-pointer"
     >
       <div className="col-span-8 flex gap-4 pr-4">
         <img
-          src={image}
+          src={coverImageUrl || "https://placehold.co/300x200"}
           alt={title}
           className="w-24 h-24 object-cover rounded-xl shrink-0"
         />
+
         <div className="flex flex-col justify-center">
           <h4 className="font-bold text-gray-800 text-base mb-1">{title}</h4>
+
           {description && (
             <p className="text-xs text-gray-500 line-clamp-2">{description}</p>
           )}
@@ -107,21 +121,23 @@ const CourseRow = ({
 
       <div className="col-span-4 flex items-center">
         {isLocked ? (
-          <span className="text-sm font-bold text-white bg-gray-500 px-3 py-1 rounded-full flex items-center gap-1">
+          <span className="text-sm font-bold text-white bg-[#b45309] px-3 py-1 rounded-full flex items-center gap-1">
             <Lock size={12} />
-            Cần nâng cấp
+            Level {levelRequired}
           </span>
         ) : isPremium ? (
           <span className="text-sm font-bold text-white bg-[#b45309] px-3 py-1 rounded-full">
-            Premium
+            Level {levelRequired}
           </span>
-        ) : null}
+        ) : (
+          <span className="text-sm font-bold text-white bg-green-600 px-3 py-1 rounded-full">
+            Free
+          </span>
+        )}
       </div>
     </div>
   );
 };
-
-
 
 export default function CoursePage() {
   const location = useLocation();
@@ -141,64 +157,41 @@ export default function CoursePage() {
   // Lấy level của user, mặc định là 1 nếu chưa có
   const userLevel: number = user?.level ?? stored?.level ?? 1;
 
-  const initialCourses = [
-    {
-      id: "ww2",
-      image: IMG.news1,
-      title: "Chiến Tranh Thế Giới II",
-      description:
-        "Hiểu rõ nguyên nhân dẫn đến Chiến tranh Thế giới II, các sự kiện quan trọng và tác động của các cuộc chiến đối với thế giới hiện đại.",
-      views: "17,913",
-      students: "62",
-    },
-    {
-      id: "civilizations",
-      image: IMG.news2,
-      title: "Các Nền Văn Minh Lớn Trong Lịch Sử",
-      description:
-        "Tìm hiểu cách các nền văn minh phát triển, giao thương và ảnh hưởng đến thế giới hiện đại.",
-      views: "64,142",
-      students: "21",
-    },
-    {
-      id: "ww1-ww2",
-      image: IMG.news3,
-      title: "Chiến Tranh Thế Giới I & II",
-      description:
-        "Phân tích nguyên nhân, diễn biến và hậu quả của hai cuộc chiến lớn nhất trong lịch sử nhân loại.",
-      views: "38,841",
-      students: "43",
-    },
-    {
-      id: "vn-history",
-      image: IMG.news1,
-      title: "Lịch Sử Việt Nam Từ Cổ Đại Đến Hiện Đại",
-      description:
-        "Hành trình qua các triều đại, các cuộc kháng chiến và sự phát triển của Việt Nam.",
-      views: "53,814",
-      students: "181",
-    },
-    {
-      id: "empires",
-      image: IMG.news2,
-      title: "Các Đế Chế Lớn Trong Lịch Sử Nhân Loại",
-      description:
-        "Tìm hiểu về đế chế La Mã, Mông Cổ, Ottoman và cách họ thay đổi thế giới.",
-      views: "21,741",
-      students: "73",
-    },
-    {
-      id: "liberation",
-      image: IMG.news3,
-      title: "Phong Trào Giải Phóng Dân Tộc Trên Thế Giới",
-      description:
-        "Khám phá các cuộc đấu tranh giành độc lập của nhiều quốc gia trên thế giới.",
-      views: "18,853",
-      students: "31",
-    },
-  ];
+  const slugTimeline = useParams().slug ?? "";
 
-  const [courses, setCourses] = useState<any[]>(initialCourses);
+  const [timeline, setTimeline] = useState<Timeline | null>(null);
+
+  useEffect(() => {
+    if (!slugTimeline || slugTimeline === "all") return;
+
+    timelineApi
+      .getTimelineBySlug(slugTimeline)
+      .then((data: Timeline) => {
+        setTimeline(data);
+      })
+      .catch((error: Error) => {
+        console.error("Failed to fetch timeline:", error);
+      });
+  }, [slugTimeline]);
+  const [courses, setCourses] = useState<Chapter[]>([]);
+
+  useEffect(() => {
+    if (!timeline?._id) return;
+    chapterApi
+      .getChaptersByTimelineId(timeline._id)
+      .then((data) => setCourses(data))
+      .catch((error) => console.error("Failed to fetch chapters:", error));
+  }, [timeline?._id]);
+
+  useEffect(() => {
+    if (slugTimeline === "all") {
+      chapterApi
+        .getAllChapters()
+        .then((data) => setCourses(data))
+        .catch((error) => console.error("Failed to fetch all chapters:", error));
+    }
+  }, [slugTimeline]);
+
   const [currentPage, setCurrentPage] = useState(1);
 
   const totalPages = Math.ceil(courses.length / ITEMS_PER_PAGE);
@@ -206,29 +199,8 @@ export default function CoursePage() {
   // Slice danh sách khóa học theo trang hiện tại
   const pagedCourses = courses.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
+    currentPage * ITEMS_PER_PAGE,
   );
-
-  useEffect(() => {
-    let mounted = true;
-    const fetchCourses = async () => {
-      try {
-        const res = await fetch(`${API_BASE_URL}/courses`);
-        if (!res.ok) return;
-        const data = await res.json();
-        if (mounted && Array.isArray(data)) {
-          setCourses(data);
-          setCurrentPage(1); // reset về trang 1 khi fetch xong
-        }
-      } catch (err) {
-        // giữ fallback courses
-      }
-    };
-    fetchCourses();
-    return () => {
-      mounted = false;
-    };
-  }, []);
 
   return (
     <div
@@ -307,16 +279,15 @@ export default function CoursePage() {
                 </div>
               </div>
 
-              {pagedCourses.map((c, idx) => {
-                // absoluteIndex = vị trí thực trong toàn bộ danh sách (không phụ thuộc trang)
-                const absoluteIndex =
-                  (currentPage - 1) * ITEMS_PER_PAGE + idx;
+              {pagedCourses.map((c) => {
+                const chapterIndex = courses.findIndex((ch) => ch._id === c._id);
                 return (
                   <CourseRow
-                    key={c.id}
+                    key={c._id}
                     course={c}
-                    absoluteIndex={absoluteIndex}
+                    timeLineSlug={slugTimeline}
                     userLevel={userLevel}
+                    chapterIndex={chapterIndex >= 0 ? chapterIndex : 0}
                   />
                 );
               })}
@@ -337,14 +308,15 @@ export default function CoursePage() {
                       <button
                         key={page}
                         onClick={() => setCurrentPage(page)}
-                        className={`w-6 h-6 rounded-full flex items-center justify-center transition-colors ${page === currentPage
-                          ? "bg-[#5c3a21] text-white"
-                          : "hover:bg-gray-100 text-gray-600"
-                          }`}
+                        className={`w-6 h-6 rounded-full flex items-center justify-center transition-colors ${
+                          page === currentPage
+                            ? "bg-[#5c3a21] text-white"
+                            : "hover:bg-gray-100 text-gray-600"
+                        }`}
                       >
                         {page}
                       </button>
-                    )
+                    ),
                   )}
                 </div>
 
@@ -438,31 +410,6 @@ export default function CoursePage() {
               <button className="bg-[#e0f2fe] hover:bg-[#bae6fd] text-[#0369a1] text-[10px] font-bold py-1 px-3 rounded-2xl transition-colors whitespace-nowrap">
                 Xem Khóa Học
               </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Next Lesson */}
-        <div className="w-full pt-6 border-t border-black/5">
-          <h3 className="font-bold text-gray-800 text-sm mb-4">
-            Bài học tiếp theo
-          </h3>
-          <div className="text-center mb-4">
-            <h4 className="font-title font-bold text-gray-800 text-base mb-1">
-              Bài 5: Sự sụp đổ của Đế chế La Mã
-            </h4>
-            <p className="text-xs text-gray-500">Thời lượng: 20 phút</p>
-          </div>
-          <div className="rounded-2xl overflow-hidden shadow-md relative group cursor-pointer">
-            <img
-              src={IMG.news1}
-              alt="Roman Empire"
-              className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500"
-            />
-            <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center text-[#5c3a21]">
-                <PlayCircle size={28} />
-              </div>
             </div>
           </div>
         </div>

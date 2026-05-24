@@ -23,6 +23,17 @@ const timelineSchema = new Schema({
     type: String,
     required: true,
   },
+  chapters: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Chapter",
+    },
+  ],
+  order: {
+    type: Number,
+    required: true,
+    index: true,
+  },
 }, { timestamps: true });
 
 export const Timeline = mongoose.model("Timeline", timelineSchema);

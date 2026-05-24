@@ -14,6 +14,7 @@ const createTimelineSchema = z.object({
   imageUrl: z.string().min(1, "URL ảnh không được để trống."),
   displayTime: z.string().min(1, "Thời gian hiển thị không được để trống."),
   slug: z.string().optional(),
+  order: z.number().min(0, "Thứ tự không được nhỏ hơn 0."),
 });
 
 const updateTimelineSchema = createTimelineSchema.partial();

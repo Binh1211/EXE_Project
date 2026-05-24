@@ -49,6 +49,12 @@ export async function getChapterBySlug(slug: string) {
   return chapter;
 }
 
+export async function getChaptersByTimelineId(timelineId: string) {
+  validateObjectId(timelineId);
+  const chapters = await Chapter.find({ timelineId }).sort({ order: 1 });
+  return chapters;
+}
+
 export async function getChapterById(id: string) {
   validateObjectId(id);
   const chapter = await Chapter.findById(id);
@@ -63,6 +69,7 @@ export async function createChapter(input: {
   description?: string;
   coverImageUrl?: string;
   order: number;
+  timelineId: string;
   requiredLevel?: 1 | 2 | 3;
   isPublished?: boolean;
   slug?: string;
@@ -75,6 +82,7 @@ export async function createChapter(input: {
     description: input.description?.trim() || "",
     coverImageUrl: input.coverImageUrl?.trim() || "",
     order: input.order,
+    timelineId: input.timelineId,
     requiredLevel: input.requiredLevel ?? 1,
     isPublished: input.isPublished ?? false,
     slug: uniqueSlug,
@@ -90,6 +98,7 @@ export async function updateChapter(
     description?: string;
     coverImageUrl?: string;
     order?: number;
+    timelineId?: string;
     requiredLevel?: 1 | 2 | 3;
     isPublished?: boolean;
     slug?: string;
@@ -118,6 +127,9 @@ export async function updateChapter(
   }
   if (updates.order !== undefined) {
     chapter.order = updates.order;
+  }
+  if (updates.timelineId !== undefined) {
+    chapter.timelineId = updates.timelineId as any;
   }
   if (updates.requiredLevel !== undefined) {
     chapter.requiredLevel = updates.requiredLevel;

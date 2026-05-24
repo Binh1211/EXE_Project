@@ -3,6 +3,7 @@ import {
   createLessonHandler,
   deleteLessonHandler,
   getLesson,
+  getLessonDetailHandler,
   listLessons,
   updateLessonHandler,
 } from "../controllers/lesson.controller.js";
@@ -11,6 +12,7 @@ import { asyncHandler } from "../utils/async-handler.js";
 const router = Router();
 
 router.get("/", asyncHandler(listLessons));
+router.get("/:id/detail", asyncHandler(getLessonDetailHandler));
 router.get("/:id", asyncHandler(getLesson));
 router.post("/", asyncHandler(createLessonHandler));
 router.put("/:id", asyncHandler(updateLessonHandler));

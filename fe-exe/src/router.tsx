@@ -35,9 +35,9 @@ function Router() {
           <Route path="/" element={<HomePage />} />
           <Route path="/news" element={<NewsPage />} />
           <Route path="/contact" element={<ContactPage />} />
-          <Route path="/course" element={<CoursePage />} />
-          <Route path="/course/:id" element={<CourseDetailPage />} />
-          <Route path="/course/:id/learning" element={<CourseLearningPage />} />
+          <Route path="/course/:slug" element={<CoursePage />} />
+          <Route path="/course/:slug/chapter/:chapterSlug/learn" element={<CourseLearningPage />} />
+          <Route path="/course/:slug/chapter/:chapterSlug" element={<CourseDetailPage />} />
           <Route path="/game/:id" element={<GamePage />} />
           <Route path="/time-line" element={<TimeLinePage />} />
           <Route

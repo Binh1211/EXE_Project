@@ -165,7 +165,7 @@ export default function HostRoomView() {
 
   return (
     <div className="max-w-4xl mx-auto py-10 px-4">
-      <h1 className="text-3xl font-bold text-[#5f3713] mb-6">Tạo Phòng Flashcard (Assignment)</h1>
+      <h1 className="text-3xl font-bold text-[#5f3713] mb-6">Tạo Phòng Flashcard </h1>
 
       {error && (
         <div className="bg-red-50 text-red-600 p-4 rounded-xl mb-6 border border-red-100">

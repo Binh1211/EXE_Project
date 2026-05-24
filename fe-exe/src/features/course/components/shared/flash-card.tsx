@@ -7,22 +7,32 @@ import {
 } from "lucide-react";
 
 type FlashCardItem = {
-    year: string;
-    content: string;
+  front?: string;
+  back?: string;
+  year?: string;
+  content?: string;
 };
 
 type FlashCardsProps = {
-    cards: FlashCardItem[];
+  cards: FlashCardItem[];
 };
 
-export default function FlashCards({
-    cards,
-}: FlashCardsProps) {
+function getFront(card: FlashCardItem) {
+  return card.front ?? card.year ?? "";
+}
+
+function getBack(card: FlashCardItem) {
+  return card.back ?? card.content ?? "";
+}
+
+export default function FlashCards({ cards }: FlashCardsProps) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [flipped, setFlipped] = useState(false);
     const [isFullscreen, setIsFullscreen] = useState(false);
 
-    const currentCard = cards[currentIndex];
+  const currentCard = cards[currentIndex];
+  const frontLabel = getFront(currentCard);
+  const backLabel = getBack(currentCard);
 
     const nextCard = () => {
         setFlipped(false);
@@ -153,7 +163,7 @@ export default function FlashCards({
                                 className="text-[120px] md:text-[180px]
                 font-black text-white leading-none"
                             >
-                                {currentCard.year}
+                                {frontLabel}
                             </h1>
 
                             {/* PROGRESS */}
@@ -188,14 +198,14 @@ export default function FlashCards({
                                 className="text-6xl md:text-7xl
                 font-black text-zinc-900 mb-10"
                             >
-                                {currentCard.year}
+                                {frontLabel}
                             </h2>
 
                             <p
                                 className="text-zinc-700 text-xl md:text-2xl
                 leading-relaxed max-w-3xl"
                             >
-                                {currentCard.content}
+                                {backLabel}
                             </p>
                         </div>
                     </div>

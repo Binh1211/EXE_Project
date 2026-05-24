@@ -268,7 +268,7 @@ export default function Header() {
                 Time Line Lịch sử
               </Link>
               <Link
-                to="/course"
+                to="/course/all"
                 className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
               >
                 Kho học liệu
