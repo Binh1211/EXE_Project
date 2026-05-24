@@ -187,19 +187,12 @@ export async function updateProfile(userId: string, fullName: string) {
   return toAuthUser(user);
 }
 
-export async function uploadAvatar(userId: string, base64Avatar: string) {
+export async function uploadAvatar(userId: string, avatarUrl: string) {
   const user = await User.findById(userId);
   if (!user) {
     throw new AuthError(404, "Không tìm thấy người dùng.");
   }
 
-  // Delete old avatar if exists
-  if (user.avatarUrl) {
-    deleteOldAvatar(user.avatarUrl);
-  }
-
-  // Save new avatar
-  const avatarUrl = saveBase64Avatar(base64Avatar, userId);
   user.avatarUrl = avatarUrl;
   await user.save();
 

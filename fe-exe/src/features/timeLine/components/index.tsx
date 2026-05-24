@@ -1,51 +1,27 @@
-import { useState } from "react";
-
-const timelineData = [
-  {
-    year: "2018",
-    title: "Foundation",
-    image:
-      "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200&auto=format&fit=crop",
-    link: "/course",
-  },
-  {
-    year: "2019",
-    title: "First Product",
-    image:
-      "https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=1200&auto=format&fit=crop",
-    link: "/course",
-  },
-  {
-    year: "2020",
-    title: "Expansion",
-    image:
-      "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1200&auto=format&fit=crop",
-    link: "/course",
-  },
-  {
-    year: "2021",
-    title: "Innovation",
-    image:
-      "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=1200&auto=format&fit=crop",
-    link: "/course",
-  },
-  {
-    year: "2022",
-    title: "Future Vision",
-    image:
-      "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1200&auto=format&fit=crop",
-    link: "/course",
-  },
-];
+import { useEffect, useState } from "react";
+import { timelineApi } from "../api/timeline-api";
+import type { Timeline } from "../types";
 
 export default function PremiumTimeline() {
   const [activeIndex, setActiveIndex] = useState<number>(0);
+  const [timelines, setTimelines] = useState<Timeline[]>([]);
+
+  useEffect(() => {
+    timelineApi.getTimelines()
+      .then((data) => setTimelines(data))
+      .catch((error) => console.error("Failed to fetch timelines:", error));
+  }, []);
+
+  if (timelines.length === 0) {
+    return <div className="h-[90vh] bg-black" />;
+  }
+
 
   return (
     <div className="relative w-full h-[90vh] bg-black overflow-hidden mb-[-80px]">
       {/* TIMELINE YEARS */}
       <div className="absolute top-7 left-1/2 -translate-x-1/2 z-50 flex gap-10">
-        {timelineData.map((item, index) => {
+        {timelines.map((item, index) => {
           const isActive = index === activeIndex;
 
           return (
@@ -61,7 +37,7 @@ export default function PremiumTimeline() {
                     : "text-gray-500"
                   }`}
               >
-                {item.year}
+                {item.displayTime}
               </span>
 
               <div
@@ -78,13 +54,13 @@ export default function PremiumTimeline() {
 
       {/* SECTIONS */}
       <div className="flex w-full h-full">
-        {timelineData.map((item, index) => {
+        {timelines.map((item, index) => {
           const isActive = index === activeIndex;
 
           return (
             <a
               key={index}
-              href={item.link}
+              href={"/course"}
               target="_self"
               rel="noopener noreferrer"
               onMouseEnter={() => setActiveIndex(index)}
@@ -105,7 +81,7 @@ export default function PremiumTimeline() {
 
               {/* IMAGE */}
               <img
-                src={item.image}
+                src={item.imageUrl}
                 alt={item.title}
                 className={`w-full h-full object-cover transition-all duration-700
                 ${isActive
@@ -132,7 +108,7 @@ export default function PremiumTimeline() {
                       : "text-gray-500"
                     }`}
                 >
-                  {item.year}
+                  {item.displayTime}
                 </p>
 
                 <h2
@@ -148,12 +124,12 @@ export default function PremiumTimeline() {
                 <div
                   className={`overflow-hidden transition-all duration-700
                   ${isActive
-                      ? "max-h-40 opacity-100 mt-4"
+                      ? "max-h-60 opacity-100 mt-4"
                       : "max-h-0 opacity-0"
                     }`}
                 >
-                  <p className="text-gray-200 max-w-xs leading-relaxed">
-                    Click to explore more about this milestone.
+                  <p className="text-gray-200 max-w-xs leading-relaxed line-clamp-4">
+                    {item.description || "Click to explore more about this milestone."}
                   </p>
                 </div>
               </div>

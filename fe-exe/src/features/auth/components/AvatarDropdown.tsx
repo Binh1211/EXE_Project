@@ -104,6 +104,31 @@ export default function AvatarDropdown() {
             <span>Đổi mật khẩu</span>
           </button>
 
+          {/* Flashcard Room items */}
+          <button
+            onClick={() => {
+              navigate("/flashcard-rooms/join");
+              setIsOpen(false);
+            }}
+            className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[#5f3713] hover:bg-[#f9f5ed] transition-colors"
+          >
+            <User className="w-4 h-4" />
+            <span>Vào phòng thi</span>
+          </button>
+
+          {user?.level === 3 && (
+            <button
+              onClick={() => {
+                navigate("/flashcard-rooms/host");
+                setIsOpen(false);
+              }}
+              className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[#d87c32] hover:bg-[#f9f5ed] transition-colors font-medium"
+            >
+              <Upload className="w-4 h-4" />
+              <span>Tạo phòng Flashcard</span>
+            </button>
+          )}
+
           {/* Logout */}
           <button
             onClick={handleLogout}

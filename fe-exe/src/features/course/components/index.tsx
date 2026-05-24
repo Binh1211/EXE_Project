@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Home,
   MessageSquare,
@@ -17,6 +17,7 @@ import {
   BookMarked,
   MapPin,
   PlayCircle,
+  Lock,
 } from "lucide-react";
 import { useNavigate } from "react-router";
 import { useAuthUser } from "@/features/auth/hooks/useAuthUser";
@@ -26,6 +27,8 @@ import {
 } from "@/features/auth/lib/auth-session";
 import { API_BASE_URL } from "@/lib/api-client";
 
+const ITEMS_PER_PAGE = 4;
+
 const SidebarItem = ({
   icon: Icon,
   text,
@@ -34,13 +37,13 @@ const SidebarItem = ({
 }: any) => {
   return (
     <div
-      className={`flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-colors ${
-        active ? "bg-[#5c3a21] text-white" : "text-gray-700 hover:bg-white/50"
-      }`}
+      className={`flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-colors ${active ? "bg-[#5c3a21] text-white" : "text-gray-700 hover:bg-white/50"
+        }`}
     >
       <Icon size={20} className={active ? "text-white" : "text-gray-600"} />
       <span
-        className={`font-medium text-sm flex-1 ${active ? "text-white" : "text-gray-800"}`}
+        className={`font-medium text-sm flex-1 ${active ? "text-white" : "text-gray-800"
+          }`}
       >
         {text}
       </span>
@@ -72,22 +75,41 @@ const StatCard = ({ icon: Icon, title, value, iconBg, cardBg }: any) => {
 };
 
 const CourseRow = ({
-  id,
-  image,
-  title,
-  description,
-  tag,
-  views,
-  price,
-  students,
-}: any) => {
+  course,
+  absoluteIndex,
+  userLevel,
+}: {
+  course: any;
+  absoluteIndex: number;
+  userLevel: number;
+}) => {
   const navigate = useNavigate();
+  const { user } = useAuthUser();
+
+  const { id, image, title, description } = course;
+
+  // Level 1 chỉ được phép click vào 2 khóa đầu tiên (absoluteIndex 0 và 1)
+  const isLocked = userLevel <= 1 && absoluteIndex >= 2;
+  const isPremium = absoluteIndex >= 2;
+
+  const handleClick = () => {
+    if (isLocked) return;
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+    navigate(`/course/${id}`);
+  };
+
   return (
     <div
-      onClick={() => navigate(`/course/${id}`)}
-      className="grid grid-cols-12 gap-4 items-center py-4 border-b border-gray-200 hover:bg-white/50 transition-colors px-4 cursor-pointer"
+      onClick={handleClick}
+      className={`grid grid-cols-12 gap-4 items-center py-4 border-b border-gray-200 transition-colors px-4 ${isLocked
+        ? "opacity-50 cursor-not-allowed"
+        : "hover:bg-white/50 cursor-pointer"
+        }`}
     >
-      <div className="col-span-6 flex gap-4 pr-4">
+      <div className="col-span-8 flex gap-4 pr-4">
         <img
           src={image}
           alt={title}
@@ -100,21 +122,18 @@ const CourseRow = ({
           )}
         </div>
       </div>
-      <div className="col-span-2 flex items-center">
-        {tag && (
-          <span className="text-[10px] bg-[#fdf2e9] text-[#d97706] px-2 py-1 rounded-full font-semibold whitespace-nowrap">
-            {tag}
+
+      <div className="col-span-4 flex items-center">
+        {isLocked ? (
+          <span className="text-sm font-bold text-white bg-gray-500 px-3 py-1 rounded-full flex items-center gap-1">
+            <Lock size={12} />
+            Cần nâng cấp
           </span>
-        )}
-      </div>
-      <div className="col-span-1 text-sm font-medium text-gray-700">
-        {views}
-      </div>
-      <div className="col-span-2 text-sm font-bold text-emerald-500">
-        {price}
-      </div>
-      <div className="col-span-1 text-sm font-medium text-gray-700 text-center">
-        {students}
+        ) : isPremium ? (
+          <span className="text-sm font-bold text-white bg-[#b45309] px-3 py-1 rounded-full">
+            Premium
+          </span>
+        ) : null}
       </div>
     </div>
   );
@@ -147,6 +166,7 @@ export default function CoursePage() {
   const stored = getStoredUser();
   const displayName = user?.fullName || stored?.fullName || "User";
   const rawAvatarUrl = user?.avatarUrl || stored?.avatarUrl;
+
   // Construct full URL if it's a relative path
   const avatarUrl = rawAvatarUrl?.startsWith("http")
     ? rawAvatarUrl
@@ -154,9 +174,101 @@ export default function CoursePage() {
       ? `${API_BASE_URL}${rawAvatarUrl}`
       : undefined;
 
+  // Lấy level của user, mặc định là 1 nếu chưa có
+  const userLevel: number = user?.level ?? stored?.level ?? 1;
+
+  const initialCourses = [
+    {
+      id: "ww2",
+      image: "/img/news1.png",
+      title: "Chiến Tranh Thế Giới II",
+      description:
+        "Hiểu rõ nguyên nhân dẫn đến Chiến tranh Thế giới II, các sự kiện quan trọng và tác động của các cuộc chiến đối với thế giới hiện đại.",
+      views: "17,913",
+      students: "62",
+    },
+    {
+      id: "civilizations",
+      image: "/img/news2.png",
+      title: "Các Nền Văn Minh Lớn Trong Lịch Sử",
+      description:
+        "Tìm hiểu cách các nền văn minh phát triển, giao thương và ảnh hưởng đến thế giới hiện đại.",
+      views: "64,142",
+      students: "21",
+    },
+    {
+      id: "ww1-ww2",
+      image: "/img/news3.png",
+      title: "Chiến Tranh Thế Giới I & II",
+      description:
+        "Phân tích nguyên nhân, diễn biến và hậu quả của hai cuộc chiến lớn nhất trong lịch sử nhân loại.",
+      views: "38,841",
+      students: "43",
+    },
+    {
+      id: "vn-history",
+      image: "/img/news1.png",
+      title: "Lịch Sử Việt Nam Từ Cổ Đại Đến Hiện Đại",
+      description:
+        "Hành trình qua các triều đại, các cuộc kháng chiến và sự phát triển của Việt Nam.",
+      views: "53,814",
+      students: "181",
+    },
+    {
+      id: "empires",
+      image: "/img/news2.png",
+      title: "Các Đế Chế Lớn Trong Lịch Sử Nhân Loại",
+      description:
+        "Tìm hiểu về đế chế La Mã, Mông Cổ, Ottoman và cách họ thay đổi thế giới.",
+      views: "21,741",
+      students: "73",
+    },
+    {
+      id: "liberation",
+      image: "/img/news3.png",
+      title: "Phong Trào Giải Phóng Dân Tộc Trên Thế Giới",
+      description:
+        "Khám phá các cuộc đấu tranh giành độc lập của nhiều quốc gia trên thế giới.",
+      views: "18,853",
+      students: "31",
+    },
+  ];
+
+  const [courses, setCourses] = useState<any[]>(initialCourses);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const totalPages = Math.ceil(courses.length / ITEMS_PER_PAGE);
+
+  // Slice danh sách khóa học theo trang hiện tại
+  const pagedCourses = courses.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  useEffect(() => {
+    let mounted = true;
+    const fetchCourses = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/courses`);
+        if (!res.ok) return;
+        const data = await res.json();
+        if (mounted && Array.isArray(data)) {
+          setCourses(data);
+          setCurrentPage(1); // reset về trang 1 khi fetch xong
+        }
+      } catch (err) {
+        // giữ fallback courses
+      }
+    };
+    fetchCourses();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
   return (
     <div
-      className="min-h-screen font-sans  flex overflow-hidden "
+      className="min-h-screen font-sans flex overflow-hidden"
       style={{
         backgroundImage:
           'url("https://www.transparenttextures.com/patterns/cream-paper.png")',
@@ -203,157 +315,69 @@ export default function CoursePage() {
                 Hãy cùng nhau học thêm nhiều kiến thức mới nào!
               </p>
             </div>
-            <div className="flex items-center gap-4">
-              <button className="flex items-center gap-2 bg-[#5c3a21] text-white px-5 py-2.5 rounded-2xl font-medium text-sm hover:bg-[#4a2e1a] transition-colors">
-                <Video size={18} />
-                Khóa học mới
-              </button>
-              <button className="p-2.5 rounded-2xl bg-white/50 border border-black/5 hover:bg-white text-gray-600 transition-colors relative">
-                <Bell size={20} />
-                <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border border-[#f4ebd8]"></span>
-              </button>
-            </div>
-          </div>
-
-          {/* Stats Row */}
-          <div className="grid grid-cols-4 gap-6 mb-10">
-            <StatCard
-              icon={BookMarked}
-              title="Khóa học mới"
-              value="168"
-              iconBg="bg-[#3b82f6]"
-              cardBg="bg-[#eef2ff]"
-            />
-            <StatCard
-              icon={CheckCircle2}
-              title="Khóa học đã hoàn thành"
-              value="$13,851"
-              iconBg="bg-[#14b8a6]"
-              cardBg="bg-[#e6fffa]"
-            />
-            <StatCard
-              icon={GraduationCap}
-              title="Tổng học viên"
-              value="5,622"
-              iconBg="bg-[#f43f5e]"
-              cardBg="bg-[#fff1f2]"
-            />
-            <StatCard
-              icon={Eye}
-              title="Người học mới hôm nay"
-              value="110"
-              iconBg="bg-[#eab308]"
-              cardBg="bg-[#fefce8]"
-            />
           </div>
 
           {/* Course List */}
           <div>
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="font-bold text-gray-800 text-lg">
-                Các khóa học hiện có
-              </h3>
-              <div className="flex gap-4">
-                <button className="flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-gray-900">
-                  Phân loại <ChevronDown size={16} />
-                </button>
-                <button className="flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-gray-900">
-                  Theo lớp <ChevronDown size={16} />
-                </button>
-              </div>
-            </div>
-
             <div className="bg-white/40 rounded-2xl overflow-hidden border border-black/5 shadow-sm">
               {/* Table Header */}
               <div className="bg-[#5c3a21] text-white grid grid-cols-12 gap-4 px-4 py-3 rounded-t-2xl">
-                <div className="col-span-6 font-semibold text-sm pl-4">
+                <div className="col-span-8 font-semibold text-sm pl-4">
                   Tên khóa học
                 </div>
-                <div className="col-span-2"></div>
-                <div className="col-span-1 font-semibold text-sm">Lượt xem</div>
-                <div className="col-span-2 font-semibold text-sm">Giá</div>
-                <div className="col-span-1 font-semibold text-sm text-center">
-                  Học viên
+                <div className="col-span-4 font-semibold text-sm">
+                  Trạng thái
                 </div>
               </div>
-              <CourseRow
-                id="ww2"
-                image="/img/news1.png"
-                title="Chiến Tranh Thế Giới II"
-                description="Hiểu rõ nguyên nhân dẫn đến Chiến tranh Thế giới II, các sự kiện quan trọng và tác động của các cuộc chiến đối với thế giới hiện đại."
-                tag="Dùng thử miễn phí"
-                views="17,913"
-                price="0đ"
-                students="62"
-              />
-              <CourseRow
-                id="civilizations"
-                image="/img/news2.png"
-                title="Các Nền Văn Minh Lớn Trong Lịch Sử"
-                description="Tìm hiểu cách các nền văn minh phát triển, giao thương và ảnh hưởng đến thế giới hiện đại."
-                tag="Dùng thử miễn phí"
-                views="64,142"
-                price="99.000đ"
-                students="21"
-              />
-              <CourseRow
-                id="ww1-ww2"
-                image="/img/news3.png"
-                title="Chiến Tranh Thế Giới I & II"
-                description="Phân tích nguyên nhân, diễn biến và hậu quả của hai cuộc chiến lớn nhất trong lịch sử nhân loại."
-                views="38,841"
-                price="119.000đ"
-                students="43"
-              />
-              <CourseRow
-                id="vn-history"
-                image="/img/news1.png"
-                title="Lịch Sử Việt Nam Từ Cổ Đại Đến Hiện Đại"
-                description="Hành trình qua các triều đại, các cuộc kháng chiến và sự phát triển của Việt Nam."
-                views="53,814"
-                price="149.000đ"
-                students="181"
-              />
-              <CourseRow
-                id="empires"
-                image="/img/news2.png"
-                title="Các Đế Chế Lớn Trong Lịch Sử Nhân Loại"
-                description="Tìm hiểu về đế chế La Mã, Mông Cổ, Ottoman và cách họ thay đổi thế giới."
-                tag="Dùng thử miễn phí"
-                views="21,741"
-                price="99.000đ"
-                students="73"
-              />
-              <CourseRow
-                id="liberation"
-                image="/img/news3.png"
-                title="Phong Trào Giải Phóng Dân Tộc Trên Thế Giới"
-                description="Khám phá các cuộc đấu tranh giành độc lập của nhiều quốc gia trên thế giới."
-                views="18,853"
-                price="79.000đ"
-                students="31"
-              />
+
+              {pagedCourses.map((c, idx) => {
+                // absoluteIndex = vị trí thực trong toàn bộ danh sách (không phụ thuộc trang)
+                const absoluteIndex =
+                  (currentPage - 1) * ITEMS_PER_PAGE + idx;
+                return (
+                  <CourseRow
+                    key={c.id}
+                    course={c}
+                    absoluteIndex={absoluteIndex}
+                    userLevel={userLevel}
+                  />
+                );
+              })}
 
               {/* Pagination */}
               <div className="p-4 flex justify-center items-center gap-4 border-t border-gray-200">
-                <button className="text-gray-400 hover:text-gray-600">
+                <button
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="text-gray-400 hover:text-gray-600 disabled:opacity-30 disabled:cursor-not-allowed transition-opacity"
+                >
                   <ChevronLeft size={18} />
                 </button>
+
                 <div className="flex items-center gap-3 text-sm font-medium">
-                  <button className="w-6 h-6 rounded-full bg-gray-200 text-gray-800 flex items-center justify-center">
-                    1
-                  </button>
-                  <button className="w-6 h-6 rounded-full hover:bg-gray-100 text-gray-600 flex items-center justify-center">
-                    2
-                  </button>
-                  <button className="w-6 h-6 rounded-full hover:bg-gray-100 text-gray-600 flex items-center justify-center">
-                    3
-                  </button>
-                  <button className="w-6 h-6 rounded-full hover:bg-gray-100 text-gray-600 flex items-center justify-center">
-                    4
-                  </button>
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                    (page) => (
+                      <button
+                        key={page}
+                        onClick={() => setCurrentPage(page)}
+                        className={`w-6 h-6 rounded-full flex items-center justify-center transition-colors ${page === currentPage
+                          ? "bg-[#5c3a21] text-white"
+                          : "hover:bg-gray-100 text-gray-600"
+                          }`}
+                      >
+                        {page}
+                      </button>
+                    )
+                  )}
                 </div>
-                <button className="text-gray-600 hover:text-gray-800">
+
+                <button
+                  onClick={() =>
+                    setCurrentPage((p) => Math.min(totalPages, p + 1))
+                  }
+                  disabled={currentPage === totalPages}
+                  className="text-gray-600 hover:text-gray-800 disabled:opacity-30 disabled:cursor-not-allowed transition-opacity"
+                >
                   <ChevronRight size={18} />
                 </button>
               </div>

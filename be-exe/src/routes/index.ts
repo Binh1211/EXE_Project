@@ -14,6 +14,8 @@ import paymentRoutes from "./payment.routes.js";
 import groupGameSessionRoutes from "./group-game-session.routes.js";
 import leaderboardEntryRoutes from "./leaderboard-entry.routes.js";
 
+import flashcardRoomRoutes from "./flashcard-room.routes.js";
+
 const router = Router();
 
 router.use("/auth", authRoutes);
@@ -30,5 +32,6 @@ router.use("/groups", groupRoutes);
 router.use("/payments", paymentRoutes);
 router.use("/group-game-sessions", groupGameSessionRoutes);
 router.use("/leaderboard-entries", leaderboardEntryRoutes);
+router.use("/flashcard-rooms", flashcardRoomRoutes);
 
 export default router;
