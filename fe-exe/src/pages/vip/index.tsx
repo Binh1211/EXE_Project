@@ -52,7 +52,7 @@ function formatVnd(value: number) {
 
 export default function VipPage() {
   const navigate = useNavigate();
-  const { user, isLoggedIn } = useAuthUser();
+  const { isLoggedIn } = useAuthUser();
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 

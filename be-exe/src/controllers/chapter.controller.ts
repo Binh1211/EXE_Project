@@ -5,6 +5,7 @@ import {
   deleteChapter,
   getAllChapters,
   getChapterBySlug,
+  getChaptersByTimelineId,
   updateChapter,
 } from "../services/chapter.service.js";
 
@@ -13,6 +14,7 @@ const chapterSchema = z.object({
   description: z.string().optional(),
   coverImageUrl: z.string().optional(),
   order: z.number().int().min(0, "Thứ tự chương phải là số nguyên không âm."),
+  timelineId: z.string().min(1, "ID timeline không được để trống."),
   requiredLevel: z.union([z.literal(1), z.literal(2), z.literal(3)]).optional(),
   isPublished: z.boolean().optional(),
   slug: z.string().optional(),
@@ -22,6 +24,12 @@ const chapterUpdateSchema = chapterSchema.partial();
 
 export async function listChapters(_req: Request, res: Response) {
   const chapters = await getAllChapters();
+  res.json(chapters);
+}
+
+export async function getChaptersByTimeline(req: Request, res: Response) {
+  const timelineId = Array.isArray(req.params.timelineId) ? req.params.timelineId[0] : req.params.timelineId;
+  const chapters = await getChaptersByTimelineId(timelineId);
   res.json(chapters);
 }
 

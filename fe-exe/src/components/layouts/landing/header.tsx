@@ -137,7 +137,7 @@ export default function Header() {
                   Time Line Lịch sử
                 </Link>
                 <Link
-                  to="/course"
+                  to="/course/all"
                   className="flex items-center px-2 py-3 text-sm hover:bg-[#f3e2d3] hover:border-l-2 border-[#623715] rounded-xl transition-all"
                 >
                   Kho học liệu

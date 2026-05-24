@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import {
     Star,
-    Clock,
     FileText,
     Video,
     User,
@@ -19,10 +18,8 @@ import {
 } from 'lucide-react';
 import {
     CourseBreadcrumb,
-    CourseAccordionItem,
     RelatedCourseCard,
     CourseProgressCard,
-    CourseOutcome
 } from './shared';
 
 // Shared components are imported from './shared'
