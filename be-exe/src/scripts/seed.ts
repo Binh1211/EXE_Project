@@ -83,6 +83,20 @@ async function seed() {
         order: 1,
         isFree: true,
         isPublished: true,
+        videos: [
+          {
+            title: "Tổng quan vị trí địa lý",
+            url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+            provider: "youtube",
+            order: 1,
+            durationSec: 600,
+          },
+        ],
+        quiz: {
+          title: "Quiz cuối bài: Vị trí địa lý",
+          passingScore: 80,
+          questions: [],
+        },
         xpReward: 10,
       },
       {
@@ -91,6 +105,20 @@ async function seed() {
         order: 2,
         isFree: true,
         isPublished: true,
+        videos: [
+          {
+            title: "Các khu vực chính trong Hoàng thành",
+            url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+            provider: "youtube",
+            order: 1,
+            durationSec: 720,
+          },
+        ],
+        quiz: {
+          title: "Quiz cuối bài: Kiến trúc Hoàng thành",
+          passingScore: 80,
+          questions: [],
+        },
         xpReward: 10,
       },
       {
@@ -99,6 +127,20 @@ async function seed() {
         order: 3,
         isFree: false,
         isPublished: true,
+        videos: [
+          {
+            title: "Đời sống trong cung đình triều Nguyễn",
+            url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+            provider: "youtube",
+            order: 1,
+            durationSec: 900,
+          },
+        ],
+        quiz: {
+          title: "Quiz cuối bài: Đời sống cung đình",
+          passingScore: 80,
+          questions: [],
+        },
         xpReward: 15,
       },
     ]);

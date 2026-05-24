@@ -8,7 +8,7 @@ export const timelineApi = {
     return apiRequest<Timeline[]>(TIMELINE_PREFIX);
   },
   
-  getTimeline(slug: string) {
+  getTimelineBySlug(slug: string) {
     return apiRequest<Timeline>(`${TIMELINE_PREFIX}/${slug}`);
   }
 };

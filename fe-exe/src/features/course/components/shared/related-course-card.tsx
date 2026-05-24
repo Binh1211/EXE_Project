@@ -1,4 +1,4 @@
-import { Clock, Star, Heart } from 'lucide-react';
+import { Star, Heart } from 'lucide-react';
 
 interface RelatedCourseCardProps {
     image: string;
