@@ -60,7 +60,7 @@
     height: 150px;
     margin: 40px auto;
     max-width: 100%;
-    background-image: url("/img/bg.jpg");
+    background-image: url("https://res.cloudinary.com/duq6whfxw/image/upload/v1779595643/vistory/bg.jpg");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;

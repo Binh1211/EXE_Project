@@ -23,6 +23,8 @@ import HostRoomView from "@/features/flashcard-room/components/HostRoomView";
 import JoinRoomView from "@/features/flashcard-room/components/JoinRoomView";
 import PlayRoomView from "@/features/flashcard-room/components/PlayRoomView";
 import LeaderboardView from "@/features/flashcard-room/components/LeaderboardView";
+import { RequireAdmin } from "@/features/admin/components/RequireAdmin";
+import { AdminDashboard } from "@/features/admin/components/AdminDashboard";
 
 function Router() {
   return (
@@ -82,6 +84,11 @@ function Router() {
           }
         />
         <Route path="/flashcard-rooms/:code/leaderboard" element={<LeaderboardView />} />
+
+        {/* Admin Routes */}
+        <Route path="/admin" element={<RequireAdmin />}>
+          <Route index element={<AdminDashboard />} />
+        </Route>
       </Routes>
     </>
   );

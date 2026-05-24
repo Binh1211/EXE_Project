@@ -10,6 +10,7 @@ import {
   authLabelClass,
   authPrimaryBtnClass,
 } from "@/features/auth/constants";
+import { IMG } from "@/lib/images";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
@@ -44,7 +45,7 @@ export default function ForgotPassword() {
   return (
     <AuthCard
       title="Quên mật khẩu"
-      bannerSrc="/img/login_banner.png"
+      bannerSrc={IMG.loginBanner}
       bannerAlt="Cổng Hoàng Thành Huế"
       footer={
         <p className="mt-5 text-center text-sm text-gray-500">

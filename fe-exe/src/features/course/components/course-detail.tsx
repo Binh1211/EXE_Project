@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import {
     Star,
-    Clock,
     FileText,
     Video,
     User,
@@ -19,11 +18,10 @@ import {
 } from 'lucide-react';
 import {
     CourseBreadcrumb,
-    CourseAccordionItem,
     RelatedCourseCard,
     CourseProgressCard,
-    CourseOutcome
 } from './shared';
+import { IMG } from '@/lib/images';
 
 // Shared components are imported from './shared'
 
@@ -145,7 +143,7 @@ const CourseDetailPage = () => {
                     <div className="col-span-12 lg:col-span-5 relative mt-8 lg:mt-0 pr-4">
                         <div className="relative rounded-[32px] overflow-hidden shadow-2xl shadow-black/40 aspect-[4/3]">
                             <img
-                                src="/img/news1.png"
+                                src={IMG.news1}
                                 alt="Course Preview"
                                 className="w-full h-full object-cover"
                             />
@@ -167,8 +165,8 @@ const CourseDetailPage = () => {
     return (
         <div className="min-h-screen font-sans overflow-x-hidden">
             {/* Dark Paper Pattern Texture Base */}
-            <div className="fixed pointer-events-none z-0"
-                style={{ backgroundImage: 'url("/img/paper-texture.png")' }}></div>
+            <div className="fixed inset-0 pointer-events-none z-0 bg-cover"
+                style={{ backgroundImage: `url(${IMG.paperTexture})` }}></div>
 
             <div className="relative z-10">
                 <Hero />
@@ -487,19 +485,19 @@ const CourseDetailPage = () => {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
                             <RelatedCourseCard
-                                image="/img/news1.png"
+                                image={IMG.news1}
                                 title="Lịch Sử Việt Nam Qua Các Thời Kỳ"
                                 rating="5.0"
                                 description="Tìm hiểu hành trình phát triển của Việt Nam từ thời kỳ dựng nước qua các triều đại lịch sử."
                             />
                             <RelatedCourseCard
-                                image="/img/news2.png"
+                                image={IMG.news2}
                                 title="Những Cuộc Chiến Tranh Lớn Trong Lịch Sử"
                                 rating="5.0"
                                 description="Phân tích nguyên nhân, diễn biến và kết quả của các cuộc chiến lớn thay đổi lịch sử thế giới."
                             />
                             <RelatedCourseCard
-                                image="/img/news3.png"
+                                image={IMG.news3}
                                 title="Các Nền Văn Minh Cổ Đại"
                                 rating="5.0"
                                 description="Khám phá các nền văn minh lớn của bộ lạc Ai Cập, Lưỡng Hà, Hy Lạp và La Mã để thấy chúng đã định hình thế giới hiện đại."

@@ -1,13 +1,14 @@
 import { Link } from "react-router";
 import { Badge } from "@/components/ui/badge";
 import { Facebook, Github, Youtube } from "lucide-react";
+import { IMG } from "@/lib/images";
 
 function Footer() {
   return (
     <footer className="bg-[#281510] h-[50vh] py-16 mt-20">
       <div className="text-white grid grid-cols-6 gap-8 px-[15%] mb-20">
         <div className="col-span-2 flex flex-col gap-6 mr-14">
-          <img className="w-20 h-20" src="/img/logo_white.png" alt="Logo" />
+          <img className="w-20 h-20" src={IMG.logoWhite} alt="Logo" />
           <p className="text-white text-sm text-wrap">
             Học qua bài giảng ngắn gọn, minigame và hệ thống ôn tập thông minh —
             giúp ghi nhớ dễ hơn, hiểu sâu hơn.

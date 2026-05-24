@@ -1,50 +1,67 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { authApi } from "@/features/auth/api/auth-api";
 import { saveAuthSession } from "@/features/auth/lib/auth-session";
-import type { AuthResponse, AuthUser } from "@/features/auth/types";
+import type { AuthUser } from "@/features/auth/types";
 
 /**
  * Trang callback sau khi BE xử lý Google OAuth và redirect về FE.
- * BE có thể trả query: ?access_token=...&user=... (JSON encoded)
- * hoặc chỉ ?access_token=... — tùy implementation phía server.
+ * Query: ?access_token=...&user=... hoặc ?error=...
  */
 export default function GoogleCallbackPage() {
   const navigate = useNavigate();
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const accessToken = params.get("access_token");
-    const errorMessage = params.get("error");
+    async function finishGoogleAuth() {
+      const params = new URLSearchParams(window.location.search);
+      const accessToken = params.get("access_token");
+      const errorMessage = params.get("error");
 
-    if (errorMessage) {
-      setError(decodeURIComponent(errorMessage));
-      return;
-    }
-
-    if (!accessToken) {
-      setError("Không nhận được token từ server.");
-      return;
-    }
-
-    let user: AuthUser | null = null;
-    const userParam = params.get("user");
-    if (userParam) {
-      try {
-        user = JSON.parse(decodeURIComponent(userParam)) as AuthUser;
-      } catch {
-        setError("Dữ liệu người dùng không hợp lệ.");
+      if (errorMessage) {
+        setError(decodeURIComponent(errorMessage));
         return;
+      }
+
+      if (!accessToken) {
+        setError("Không nhận được token từ server.");
+        return;
+      }
+
+      let user: AuthUser | null = null;
+      const userParam = params.get("user");
+      if (userParam) {
+        try {
+          user = JSON.parse(decodeURIComponent(userParam)) as AuthUser;
+        } catch {
+          setError("Dữ liệu người dùng không hợp lệ.");
+          return;
+        }
+      }
+
+      saveAuthSession({
+        accessToken,
+        user: user ?? { id: "", email: "", fullName: "" },
+      });
+
+      if (!user?.id) {
+        try {
+          user = await authApi.getMe();
+          saveAuthSession({ accessToken, user });
+        } catch {
+          setError("Không lấy được thông tin người dùng.");
+          return;
+        }
+      }
+
+      if (user.role === "admin") {
+        navigate("/admin", { replace: true });
+      } else {
+        navigate("/", { replace: true });
       }
     }
 
-    const session: AuthResponse = {
-      accessToken,
-      user: user ?? { id: "", email: "", fullName: "" },
-    };
-
-    saveAuthSession(session);
-    navigate("/", { replace: true });
+    void finishGoogleAuth();
   }, [navigate]);
 
   return (

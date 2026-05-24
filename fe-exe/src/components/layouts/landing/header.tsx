@@ -1,4 +1,5 @@
-import { Link } from "react-router";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Search } from "lucide-react";
 import { Button } from "../../ui/button";
 import {
@@ -9,191 +10,322 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../../ui/select";
-import { useNavigate } from "react-router-dom";
 import { AUTH_ROUTES } from "@/features/auth/constants";
 import { useAuthUser } from "@/features/auth/hooks/useAuthUser";
 import AvatarDropdown from "@/features/auth/components/AvatarDropdown";
+import { IMG } from "@/lib/images";
+import { timelineApi } from "@/features/timeLine/api/timeline-api";
+import type { Timeline } from "@/features/timeLine/types";
+import { API_BASE_URL } from "@/lib/api-client";
+
+type SearchScope = "all" | "timeline" | "course";
+
+type CourseHit = { id: string; title: string };
 
 export default function Header() {
-  const navigator = useNavigate();
+  const navigate = useNavigate();
   const { isLoggedIn } = useAuthUser();
+  const searchRef = useRef<HTMLDivElement>(null);
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchScope, setSearchScope] = useState<SearchScope>("all");
+  const [showResults, setShowResults] = useState(false);
+  const [timelines, setTimelines] = useState<Timeline[]>([]);
+  const [courses, setCourses] = useState<CourseHit[]>([]);
+
+  useEffect(() => {
+    timelineApi
+      .getTimelines()
+      .then(setTimelines)
+      .catch(() => setTimelines([]));
+
+    fetch(`${API_BASE_URL}/courses`)
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setCourses(
+            data.map((c: { id: string; title: string }) => ({
+              id: c.id,
+              title: c.title,
+            }))
+          );
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+        setShowResults(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const q = searchQuery.trim().toLowerCase();
+
+  const timelineResults = useMemo(() => {
+    if (!q || searchScope === "course") return [];
+    return timelines.filter(
+      (t) =>
+        t.title.toLowerCase().includes(q) ||
+        t.displayTime.toLowerCase().includes(q) ||
+        (t.description?.toLowerCase().includes(q) ?? false)
+    );
+  }, [q, timelines, searchScope]);
+
+  const courseResults = useMemo(() => {
+    if (!q || searchScope === "timeline") return [];
+    return courses.filter((c) => c.title.toLowerCase().includes(q));
+  }, [q, courses, searchScope]);
+
+  const hasResults = timelineResults.length > 0 || courseResults.length > 0;
+
+  const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && q) {
+      if (timelineResults[0]) {
+        navigate(`/time-line?slug=${timelineResults[0].slug}`);
+      } else if (courseResults[0]) {
+        navigate(`/course/${courseResults[0].id}`);
+      } else if (searchScope === "timeline" || searchScope === "all") {
+        navigate("/time-line");
+      } else {
+        navigate("/course");
+      }
+      setShowResults(false);
+    }
+  };
+
   return (
-    <>
-      <header className="sticky top-0 z-50 w-full  bg-[#fbf0ce]  backdrop-blur ">
-        <div className=" px-6 mx-auto flex gap-7 h-20 items-center justify-between ">
-          <div className="flex items-center gap-2" onClick={() => navigator("/")}>
-            <img
-              src="/img/logo.png"
-              alt="EXE"
-              className="h-16 w-auto object-contain"
-            />
-          </div>
+    <header className="sticky top-0 z-[200] isolate w-full bg-[#fbf0ce] backdrop-blur shadow-sm">
+      <div className="relative z-[200] mx-auto flex h-20 items-center justify-between gap-7 px-6">
+        <button
+          type="button"
+          className="flex shrink-0 cursor-pointer items-center gap-2"
+          onClick={() => navigate("/")}
+          aria-label="Về trang chủ"
+        >
+          <img src={IMG.logo} alt="EXE" className="h-16 w-auto object-contain" />
+        </button>
 
-          {/* Mobile menu button */}
-          {/* <button
-            className="block md:hidden"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          >
-            {isMenuOpen ? (
-              <X className="h-6 w-6" />
-            ) : (
-              <Menu className="h-6 w-6" />
-            )}
-          </button> */}
-
-          <div className="bg-white rounded-xl flex items-center px-1 py-5 w-[40%] h-10 ">
-            <Search className="w-4 h-4 ml-4 inline text-gray-400" />
+        <div ref={searchRef} className="relative z-[210] w-[40%]">
+          <div className="flex h-10 items-center rounded-xl bg-white px-1 py-5">
+            <Search className="ml-4 inline h-4 w-4 text-gray-400" />
             <input
-              className="w-full focus:outline-none text-sm"
+              className="w-full text-sm focus:outline-none"
               type="text"
-              placeholder={" Tìm kiếm khóa học..."}
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setShowResults(true);
+              }}
+              onFocus={() => setShowResults(true)}
+              onKeyDown={handleSearchKeyDown}
+              placeholder="Tìm timeline, khóa học..."
             />
-            <Select>
+            <Select
+              value={searchScope}
+              onValueChange={(v) => setSearchScope(v as SearchScope)}
+            >
               <SelectTrigger
-                className=" h-8
-                            w-[25%]
-                            rounded-xl
-                            bg-[#fff3e9]
-                            border-none
-                            text-[#5f3713]
-                            [&>span]:text-[#5f3713]
-                            [&>span[data-placeholder]]:text-[#5f3713]"
+                className="h-8 w-[28%] rounded-xl border-none bg-[#fff3e9] text-[#5f3713] [&>span]:text-[#5f3713] [&>span[data-placeholder]]:text-[#5f3713]"
               >
-                <SelectValue placeholder="Khám phá" />
+                <SelectValue placeholder="Tất cả" />
               </SelectTrigger>
-              <SelectContent className="bg-[#fff3e9] text-[#5f3713] rounded-xl">
+              <SelectContent className="z-[300] rounded-xl bg-[#fff3e9] text-[#5f3713]">
                 <SelectGroup>
                   <SelectItem
-                    className="data-[highlighted]:bg-[#f3e2d3] data-[highlighted]:border-l-2 border-[#623715]    rounded-xl"
-                    value="light"
+                    value="all"
+                    className="rounded-xl data-[highlighted]:border-l-2 data-[highlighted]:border-[#623715] data-[highlighted]:bg-[#f3e2d3]"
                   >
-                    hehe
+                    Tất cả
                   </SelectItem>
                   <SelectItem
-                    className="data-[highlighted]:bg-[#f3e2d3] data-[highlighted]:border-l-2 border-[#623715]    rounded-xl"
-                    value="dark"
+                    value="timeline"
+                    className="rounded-xl data-[highlighted]:border-l-2 data-[highlighted]:border-[#623715] data-[highlighted]:bg-[#f3e2d3]"
                   >
-                    chua tay dau
+                    Timeline
                   </SelectItem>
                   <SelectItem
-                    className="data-[highlighted]:bg-[#f3e2d3] data-[highlighted]:border-l-2 border-[#623715]    rounded-xl"
-                    value="system"
+                    value="course"
+                    className="rounded-xl data-[highlighted]:border-l-2 data-[highlighted]:border-[#623715] data-[highlighted]:bg-[#f3e2d3]"
                   >
-                    nà ná na na
+                    Khóa học
                   </SelectItem>
                 </SelectGroup>
               </SelectContent>
             </Select>
           </div>
 
-          {/* Desktop navigation */}
-          <nav className="hidden md:flex items-center gap-4">
-            <div className="relative group inline-block">
-              <button
-                className="text-sm font-medium hover:text-[#5f3713]"
-                onClick={() => navigator("/")}
-              >
-                Trang chủ
-              </button>
-              <div className="absolute left-0 mt-2 w-40 bg-[#fff3e9] shadow-lg rounded-xl p-1 opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all duration-200">
-                <Link
-                  to="#"
-                  className="flex items-center px-2 py-3 text-sm hover:bg-[#f3e2d3] hover:border-l-2 border-[#623715] rounded-xl transition-all"
-                >
-                  Về Vistory
-                </Link>
-                <Link
-                  to="#"
-                  className="flex items-center px-2 py-3 text-sm hover:bg-[#f3e2d3] hover:border-l-2 border-[#623715] rounded-xl transition-all"
-                >
-                  Thành phần
-                </Link>
-                <Link
-                  to="#"
-                  className="flex items-center px-2 py-3 text-sm hover:bg-[#f3e2d3] hover:border-l-2 border-[#623715] rounded-xl transition-all"
-                >
-                  Tính năng
-                </Link>
-                <Link
-                  to="#"
-                  className="flex items-center px-2 py-3 text-sm hover:bg-[#f3e2d3] hover:border-l-2 border-[#623715] rounded-xl transition-all"
-                >
-                  Lợi ích
-                </Link>
-              </div>
+          {showResults && q && (
+            <div className="absolute left-0 right-0 top-full z-[300] mt-1 max-h-72 overflow-y-auto rounded-xl border border-[#e8d5c4] bg-white py-2 shadow-xl">
+              {!hasResults && (
+                <p className="px-4 py-3 text-sm text-gray-500">
+                  Không tìm thấy kết quả
+                </p>
+              )}
+              {timelineResults.length > 0 && (
+                <div>
+                  <p className="px-4 py-1 text-xs font-semibold uppercase tracking-wide text-[#a88d7a]">
+                    Timeline
+                  </p>
+                  {timelineResults.map((t) => (
+                    <button
+                      key={t._id}
+                      type="button"
+                      className="block w-full px-4 py-2.5 text-left text-sm hover:bg-[#f3e2d3]"
+                      onClick={() => {
+                        navigate(`/time-line?slug=${t.slug}`);
+                        setShowResults(false);
+                        setSearchQuery("");
+                      }}
+                    >
+                      <span className="font-medium text-[#5f3713]">{t.title}</span>
+                      <span className="ml-2 text-xs text-gray-500">
+                        {t.displayTime}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              )}
+              {courseResults.length > 0 && (
+                <div>
+                  <p className="px-4 py-1 text-xs font-semibold uppercase tracking-wide text-[#a88d7a]">
+                    Khóa học
+                  </p>
+                  {courseResults.map((c) => (
+                    <button
+                      key={c.id}
+                      type="button"
+                      className="block w-full px-4 py-2.5 text-left text-sm hover:bg-[#f3e2d3]"
+                      onClick={() => {
+                        navigate(`/course/${c.id}`);
+                        setShowResults(false);
+                        setSearchQuery("");
+                      }}
+                    >
+                      <span className="font-medium text-[#5f3713]">{c.title}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
-            <div className="relative group inline-block">
-              <button
-                className="text-sm font-medium hover:text-[#5f3713]"
-                onClick={() => navigator("/time-line")}
-              >
-                Khóa học
-              </button>
-              <div className="absolute left-0 mt-2 w-40 bg-[#fff3e9] shadow-lg rounded-xl p-1 opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all duration-200">
-                <Link
-                  to="/time-line"
-                  className="flex items-center px-2 py-3 text-sm hover:bg-[#f3e2d3] hover:border-l-2 border-[#623715] rounded-xl transition-all"
-                >
-                  Time Line Lịch sử
-                </Link>
-                <Link
-                  to="/course"
-                  className="flex items-center px-2 py-3 text-sm hover:bg-[#f3e2d3] hover:border-l-2 border-[#623715] rounded-xl transition-all"
-                >
-                  Kho học liệu
-                </Link>
-                <Link
-                  to="#"
-                  className="flex items-center px-2 py-3 text-sm hover:bg-[#f3e2d3] hover:border-l-2 border-[#623715] rounded-xl transition-all"
-                >
-                  Ôn thi
-                </Link>
-                <Link
-                  to="#"
-                  className="flex items-center px-2 py-3 text-sm hover:bg-[#f3e2d3] hover:border-l-2 border-[#623715] rounded-xl transition-all"
-                >
-                  Lớp học
-                </Link>
-                <Link
-                  to="#"
-                  className="flex items-center px-2 py-3 text-sm hover:bg-[#f3e2d3] hover:border-l-2 border-[#623715] rounded-xl transition-all"
-                >
-                  Sách
-                </Link>
-              </div>
-            </div>
-            <Link to="/vip" className="text-sm font-medium hover:text-[#5f3713]">
-              Mua VIP
-            </Link>
-            <Link to="/contact" className="text-sm font-medium hover:text-[#5f3713]">
-              Liên hệ
-            </Link>
-            <Link to="/news" className="text-sm font-medium hover:text-[#5f3713]">
-              Tin tức
-            </Link>
-          </nav>
-          <div className="flex items-center gap-2">
-            {isLoggedIn ? (
-              <AvatarDropdown />
-            ) : (
-              <>
-                <Button
-                  className="w-24 text-sm shadow-none rounded-xl font-medium text-black hover:text-[#5f3713] hover:rounded-xl"
-                  onClick={() => navigator(AUTH_ROUTES.login)}
-                >
-                  Đăng nhập
-                </Button>
-                <Button
-                  className="w-24 text-sm rounded-xl font-medium bg-[#5f3713] text-white hover:scale-105 ring-0 hover:ring-2 hover:ring-[#f7f7f7] hover:bg-[#5f3713] hover:rounded-xl"
-                  onClick={() => navigator(AUTH_ROUTES.register)}
-                >
-                  Đăng ký
-                </Button>
-              </>
-            )}
-          </div>
+          )}
         </div>
-      </header>
-    </>
+
+        <nav className="relative z-[210] hidden items-center gap-4 md:flex">
+          <div className="group relative inline-block">
+            <button
+              type="button"
+              className="text-sm font-medium hover:text-[#5f3713]"
+              onClick={() => navigate("/")}
+            >
+              Trang chủ
+            </button>
+            <div className="invisible absolute left-0 z-[220] mt-2 w-40 rounded-xl bg-[#fff3e9] p-1 opacity-0 shadow-lg transition-all duration-200 group-hover:visible group-hover:opacity-100">
+              <Link
+                to="/"
+                className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
+              >
+                Về Vistory
+              </Link>
+              <Link
+                to="/#team"
+                className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
+              >
+                Thành phần
+              </Link>
+              <Link
+                to="/#features"
+                className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
+              >
+                Tính năng
+              </Link>
+              <Link
+                to="/#benefits"
+                className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
+              >
+                Lợi ích
+              </Link>
+            </div>
+          </div>
+
+          <div className="group relative inline-block">
+            <button
+              type="button"
+              className="text-sm font-medium hover:text-[#5f3713]"
+              onClick={() => navigate("/time-line")}
+            >
+              Khóa học
+            </button>
+            <div className="invisible absolute left-0 z-[220] mt-2 w-44 rounded-xl bg-[#fff3e9] p-1 opacity-0 shadow-lg transition-all duration-200 group-hover:visible group-hover:opacity-100">
+              <Link
+                to="/time-line"
+                className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
+              >
+                Time Line Lịch sử
+              </Link>
+              <Link
+                to="/course"
+                className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
+              >
+                Kho học liệu
+              </Link>
+              <Link
+                to="/flashcard-rooms/join"
+                className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
+              >
+                Ôn thi
+              </Link>
+              <Link
+                to="/flashcard-rooms/join"
+                className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
+              >
+                Lớp học
+              </Link>
+              <Link
+                to="/news"
+                className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
+              >
+                Sách
+              </Link>
+            </div>
+          </div>
+
+          <Link to="/vip" className="text-sm font-medium hover:text-[#5f3713]">
+            Mua VIP
+          </Link>
+          <Link to="/contact" className="text-sm font-medium hover:text-[#5f3713]">
+            Liên hệ
+          </Link>
+          <Link to="/news" className="text-sm font-medium hover:text-[#5f3713]">
+            Tin tức
+          </Link>
+        </nav>
+
+        <div className="relative z-[210] flex items-center gap-2">
+          {isLoggedIn ? (
+            <AvatarDropdown />
+          ) : (
+            <>
+              <Button
+                className="w-24 rounded-xl text-sm font-medium text-black shadow-none hover:rounded-xl hover:text-[#5f3713]"
+                onClick={() => navigate(AUTH_ROUTES.login)}
+              >
+                Đăng nhập
+              </Button>
+              <Button
+                className="w-24 rounded-xl bg-[#5f3713] text-sm font-medium text-white shadow-none ring-0 hover:scale-105 hover:rounded-xl hover:bg-[#5f3713] hover:ring-2 hover:ring-[#f7f7f7]"
+                onClick={() => navigate(AUTH_ROUTES.register)}
+              >
+                Đăng ký
+              </Button>
+            </>
+          )}
+        </div>
+      </div>
+    </header>
   );
 }

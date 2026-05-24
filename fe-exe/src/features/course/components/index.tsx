@@ -1,42 +1,40 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState, type ComponentType } from "react";
 import {
   Home,
-  MessageSquare,
   BookOpen,
   Activity,
   Star,
   User,
-  Video,
-  Bell,
-  CheckCircle2,
-  GraduationCap,
-  Eye,
-  ChevronDown,
   ChevronLeft,
   ChevronRight,
-  BookMarked,
   MapPin,
   PlayCircle,
   Lock,
 } from "lucide-react";
-import { useNavigate } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import { useAuthUser } from "@/features/auth/hooks/useAuthUser";
-import {
-  clearAuthSession,
-  getStoredUser,
-} from "@/features/auth/lib/auth-session";
+import { getStoredUser } from "@/features/auth/lib/auth-session";
 import { API_BASE_URL } from "@/lib/api-client";
+import { IMG } from "@/lib/images";
 
 const ITEMS_PER_PAGE = 4;
 
 const SidebarItem = ({
   icon: Icon,
   text,
+  to,
   active = false,
   isPro = false,
-}: any) => {
+}: {
+  icon: ComponentType<{ size?: number; className?: string }>;
+  text: string;
+  to: string;
+  active?: boolean;
+  isPro?: boolean;
+}) => {
   return (
-    <div
+    <Link
+      to={to}
       className={`flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-colors ${active ? "bg-[#5c3a21] text-white" : "text-gray-700 hover:bg-white/50"
         }`}
     >
@@ -52,27 +50,11 @@ const SidebarItem = ({
           PRO
         </span>
       )}
-    </div>
+    </Link>
   );
 };
 
-const StatCard = ({ icon: Icon, title, value, iconBg, cardBg }: any) => {
-  return (
-    <div
-      className={`p-6 rounded-2xl flex flex-col items-center justify-center gap-4 ${cardBg} shadow-sm border border-black/5`}
-    >
-      <div
-        className={`w-12 h-12 rounded-full flex items-center justify-center text-white ${iconBg}`}
-      >
-        <Icon size={24} />
-      </div>
-      <div className="text-center">
-        <p className="text-sm text-gray-600 font-medium mb-1">{title}</p>
-        <h3 className="text-2xl font-bold text-gray-800">{value}</h3>
-      </div>
-    </div>
-  );
-};
+
 
 const CourseRow = ({
   course,
@@ -139,29 +121,11 @@ const CourseRow = ({
   );
 };
 
-const RegionBar = ({ name, users, percentage, color }: any) => {
-  return (
-    <div className="flex items-center gap-2 mb-3">
-      <span className="text-xs font-medium text-gray-600 w-24 truncate">
-        {name}
-      </span>
-      <div className="flex-1 bg-gray-100 rounded-full h-6 flex items-center relative overflow-hidden">
-        <div
-          className={`h-full ${color} opacity-20 absolute left-0 top-0`}
-          style={{ width: percentage }}
-        ></div>
-        <div className="flex items-center justify-center w-full relative z-10 gap-1 text-[10px] font-medium text-gray-700">
-          <MapPin size={10} /> {users}
-        </div>
-      </div>
-      <span className="text-xs font-medium text-gray-500 w-8 text-right">
-        {percentage}
-      </span>
-    </div>
-  );
-};
+
 
 export default function CoursePage() {
+  const location = useLocation();
+  const navigate = useNavigate();
   const { user } = useAuthUser();
   const stored = getStoredUser();
   const displayName = user?.fullName || stored?.fullName || "User";
@@ -180,7 +144,7 @@ export default function CoursePage() {
   const initialCourses = [
     {
       id: "ww2",
-      image: "/img/news1.png",
+      image: IMG.news1,
       title: "Chiến Tranh Thế Giới II",
       description:
         "Hiểu rõ nguyên nhân dẫn đến Chiến tranh Thế giới II, các sự kiện quan trọng và tác động của các cuộc chiến đối với thế giới hiện đại.",
@@ -189,7 +153,7 @@ export default function CoursePage() {
     },
     {
       id: "civilizations",
-      image: "/img/news2.png",
+      image: IMG.news2,
       title: "Các Nền Văn Minh Lớn Trong Lịch Sử",
       description:
         "Tìm hiểu cách các nền văn minh phát triển, giao thương và ảnh hưởng đến thế giới hiện đại.",
@@ -198,7 +162,7 @@ export default function CoursePage() {
     },
     {
       id: "ww1-ww2",
-      image: "/img/news3.png",
+      image: IMG.news3,
       title: "Chiến Tranh Thế Giới I & II",
       description:
         "Phân tích nguyên nhân, diễn biến và hậu quả của hai cuộc chiến lớn nhất trong lịch sử nhân loại.",
@@ -207,7 +171,7 @@ export default function CoursePage() {
     },
     {
       id: "vn-history",
-      image: "/img/news1.png",
+      image: IMG.news1,
       title: "Lịch Sử Việt Nam Từ Cổ Đại Đến Hiện Đại",
       description:
         "Hành trình qua các triều đại, các cuộc kháng chiến và sự phát triển của Việt Nam.",
@@ -216,7 +180,7 @@ export default function CoursePage() {
     },
     {
       id: "empires",
-      image: "/img/news2.png",
+      image: IMG.news2,
       title: "Các Đế Chế Lớn Trong Lịch Sử Nhân Loại",
       description:
         "Tìm hiểu về đế chế La Mã, Mông Cổ, Ottoman và cách họ thay đổi thế giới.",
@@ -225,7 +189,7 @@ export default function CoursePage() {
     },
     {
       id: "liberation",
-      image: "/img/news3.png",
+      image: IMG.news3,
       title: "Phong Trào Giải Phóng Dân Tộc Trên Thế Giới",
       description:
         "Khám phá các cuộc đấu tranh giành độc lập của nhiều quốc gia trên thế giới.",
@@ -276,16 +240,25 @@ export default function CoursePage() {
     >
       {/* Left Sidebar */}
       <aside className="w-[260px] flex-shrink-0 flex flex-col items-center py-8 px-6 border-r border-black/5">
-        <div className="flex flex-col items-center mb-10">
-          <img src="/img/logo.png" alt="EXE" />
-        </div>
+        <Link to="/" className="mb-10 flex flex-col items-center">
+          <img src={IMG.logo} alt="EXE" />
+        </Link>
 
         <nav className="w-full flex-1 flex flex-col gap-2">
-          <SidebarItem icon={Home} text="Trang chủ" active />
-          <SidebarItem icon={BookOpen} text="Khóa học của bạn" />
-          <SidebarItem icon={Activity} text="Tình trạng" isPro />
-          <SidebarItem icon={Star} text="Đánh giá" isPro />
-          <SidebarItem icon={User} text="Tài khoản" />
+          <SidebarItem icon={Home} text="Trang chủ" to="/" />
+          <SidebarItem
+            icon={BookOpen}
+            text="Khóa học của bạn"
+            to="/course"
+            active={location.pathname === "/course"}
+          />
+          <SidebarItem icon={Activity} text="Tình trạng" to="/vip" isPro />
+          <SidebarItem icon={Star} text="Đánh giá" to="/vip" isPro />
+          <SidebarItem
+            icon={User}
+            text="Tài khoản"
+            to={user ? "/profile" : "/login"}
+          />
         </nav>
 
         <div className="w-full bg-[#fdf8e7] rounded-xl p-5 mt-auto text-center border border-black/5">
@@ -296,7 +269,11 @@ export default function CoursePage() {
             Khám phá các tính năng mới thông qua việc đăng ký các gói nâng cấp
             của chúng tôi
           </p>
-          <button className="w-full bg-[#5c3a21] text-white text-xs font-bold py-2.5 rounded-lg hover:bg-[#4a2e1a] transition-colors">
+          <button
+            type="button"
+            onClick={() => navigate("/vip")}
+            className="w-full bg-[#5c3a21] text-white text-xs font-bold py-2.5 rounded-lg hover:bg-[#4a2e1a] transition-colors"
+          >
             Nâng cấp ngay
           </button>
         </div>
@@ -478,7 +455,7 @@ export default function CoursePage() {
           </div>
           <div className="rounded-2xl overflow-hidden shadow-md relative group cursor-pointer">
             <img
-              src="/img/news1.png"
+              src={IMG.news1}
               alt="Roman Empire"
               className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500"
             />

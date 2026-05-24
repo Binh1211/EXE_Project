@@ -2,6 +2,7 @@ import FloatingInput from "@/components/ui/FloatingInput";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Facebook, Instagram, Youtube } from "lucide-react";
+import { IMG } from "@/lib/images";
 
 function ContactContent() {
   const [formData, setFormData] = useState({
@@ -182,7 +183,7 @@ Hoặc hãy cho chúng tôi biết nhu cầu của bạn..."
             target="_blank"
             rel="noopener noreferrer"
           >
-            <img src="img/address_pic.png" alt="address" />
+            <img src={IMG.addressPic} alt="address" />
           </a>
         </div>
       </div>

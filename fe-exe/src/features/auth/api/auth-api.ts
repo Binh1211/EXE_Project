@@ -90,6 +90,11 @@ export const authApi = {
     });
   },
 
+  /** GET /api/auth/google/status */
+  getGoogleOAuthStatus() {
+    return apiRequest<{ enabled: boolean }>(`${AUTH_PREFIX}/google/status`);
+  },
+
   /**
    * GET /api/auth/google?mode=login|register&redirect_uri=...
    * BE redirect sang Google OAuth, sau đó về /auth/google/callback

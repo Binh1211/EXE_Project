@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import "./Game.css";
+import { IMG } from "@/lib/images";
 
 type Question = {
   question: string;
@@ -255,7 +256,7 @@ export default function App() {
           <div className="resultContent">
             <div className="pixelSoldier">
               <div className="soldier">
-                <img className="main" src="/img/main.jpg" />
+                <img className="main" src={IMG.main} />
               </div>
             </div>
             <div className="resultInfo">
@@ -372,7 +373,7 @@ export default function App() {
           <div className="world">
             <div className="hearts">
               {Array.from({ length: lives }).map((_, i) => (
-                <img key={i} src="/img/heart.jpg" className="heart" />
+                <img key={i} src={IMG.heart} className="heart" />
               ))}
             </div>
 
@@ -380,15 +381,15 @@ export default function App() {
               className={`character ${jump ? "jump" : ""}`}
               style={{ left: position }}
             >
-              <img className="main" src="/img/main.jpg" />
+              <img className="main" src={IMG.main} />
             </div>
 
             {obstacles.map((o, i) => (
               <div key={i} className="obstacle" style={{ left: o }}>
                 {destroyed[i] ? (
-                  <img className="block" src="/img/un_stumbling_block.jpg" />
+                  <img className="block" src={IMG.unStumblingBlock} />
                 ) : (
-                  <img className="block" src="/img/stumbling_block.jpg" />
+                  <img className="block" src={IMG.stumblingBlock} />
                 )}
               </div>
             ))}
@@ -412,7 +413,7 @@ export default function App() {
                   </div>
 
                   <div className="questionImage">
-                    <img src="/img/bg.jpg" alt="question" />
+                    <img src={IMG.bg} alt="question" />
                   </div>
 
                   <h3 className="questionText">{q.question}</h3>

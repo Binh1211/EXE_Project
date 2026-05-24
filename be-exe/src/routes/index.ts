@@ -15,6 +15,7 @@ import groupGameSessionRoutes from "./group-game-session.routes.js";
 import leaderboardEntryRoutes from "./leaderboard-entry.routes.js";
 
 import flashcardRoomRoutes from "./flashcard-room.routes.js";
+import adminRoutes from "./admin.routes.js";
 
 const router = Router();
 
@@ -33,5 +34,6 @@ router.use("/payments", paymentRoutes);
 router.use("/group-game-sessions", groupGameSessionRoutes);
 router.use("/leaderboard-entries", leaderboardEntryRoutes);
 router.use("/flashcard-rooms", flashcardRoomRoutes);
+router.use("/admin", adminRoutes);
 
 export default router;

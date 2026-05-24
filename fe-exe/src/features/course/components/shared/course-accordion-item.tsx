@@ -1,4 +1,4 @@
-import { ChevronDown, PlayCircle, BookOpen, Gamepad2, Lock } from 'lucide-react';
+import { ChevronDown, BookOpen, Gamepad2, Lock } from 'lucide-react';
 
 interface Lesson {
     name: string;

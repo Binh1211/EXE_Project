@@ -19,7 +19,7 @@ import {
   getGoogleAuthorizationUrl,
   handleGoogleCallback,
 } from "../services/google-oauth.service.js";
-import { isGoogleOAuthEnabled } from "../config/env.js";
+import { env, isGoogleOAuthEnabled } from "../config/env.js";
 
 const registerSchema = z.object({
   fullName: z.string().min(1, "Họ và tên không được để trống."),
@@ -109,6 +109,10 @@ export async function logoutHandler(req: AuthRequest, res: Response) {
   res.json(result);
 }
 
+export async function googleOAuthStatusHandler(_req: AuthRequest, res: Response) {
+  res.json({ enabled: isGoogleOAuthEnabled });
+}
+
 export async function googleRedirect(req: AuthRequest, res: Response) {
   if (!isGoogleOAuthEnabled) {
     throw new AuthError(503, "Google OAuth chưa được cấu hình.");
@@ -116,7 +120,7 @@ export async function googleRedirect(req: AuthRequest, res: Response) {
 
   const mode = (req.query.mode as string) === "register" ? "register" : "login";
   const redirectUri =
-    (req.query.redirect_uri as string) || "http://localhost:5173/auth/google/callback";
+    (req.query.redirect_uri as string) || `${env.clientUrl}/auth/google/callback`;
 
   const url = getGoogleAuthorizationUrl({ mode, redirectUri });
   res.redirect(url);
@@ -125,26 +129,36 @@ export async function googleRedirect(req: AuthRequest, res: Response) {
 export async function googleCallback(req: AuthRequest, res: Response) {
   const code = req.query.code as string | undefined;
   const stateRaw = req.query.state as string | undefined;
-  const error = req.query.error as string | undefined;
+  const oauthError = req.query.error as string | undefined;
 
-  if (error || !code || !stateRaw) {
-    const { redirectUri } = stateRaw
-      ? decodeGoogleState(stateRaw)
-      : { redirectUri: "http://localhost:5173/auth/google/callback" };
-    return res.redirect(
-      `${redirectUri}?error=${encodeURIComponent(error ?? "Đăng nhập Google thất bại.")}`,
-    );
+  let redirectUri = `${env.clientUrl}/auth/google/callback`;
+
+  try {
+    if (stateRaw) {
+      redirectUri = decodeGoogleState(stateRaw).redirectUri;
+    }
+
+    if (oauthError || !code || !stateRaw) {
+      return res.redirect(
+        `${redirectUri}?error=${encodeURIComponent(oauthError ?? "Đăng nhập Google thất bại.")}`,
+      );
+    }
+
+    const state = decodeGoogleState(stateRaw);
+    redirectUri = state.redirectUri;
+    const profile = await handleGoogleCallback(code);
+    const { accessToken, user } = await findOrCreateGoogleUser(profile, state.mode);
+
+    const params = new URLSearchParams({
+      access_token: accessToken,
+      user: encodeURIComponent(JSON.stringify(user)),
+    });
+
+    return res.redirect(`${redirectUri}?${params.toString()}`);
+  } catch (err) {
+    const message =
+      err instanceof AuthError ? err.message : "Đăng nhập Google thất bại.";
+    return res.redirect(`${redirectUri}?error=${encodeURIComponent(message)}`);
   }
-
-  const state = decodeGoogleState(stateRaw);
-  const profile = await handleGoogleCallback(code);
-  const { accessToken, user } = await findOrCreateGoogleUser(profile);
-
-  const params = new URLSearchParams({
-    access_token: accessToken,
-    user: encodeURIComponent(JSON.stringify(user)),
-  });
-
-  res.redirect(`${state.redirectUri}?${params.toString()}`);
 }
 
