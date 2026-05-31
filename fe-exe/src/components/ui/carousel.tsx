@@ -85,6 +85,15 @@ const Carousel = React.forwardRef<
     const [selectedIndex, setSelectedIndex] = React.useState(0);
     const [scrollSnaps, setScrollSnaps] = React.useState<number[]>([]);
 
+    const _onSelect = React.useCallback((api: CarouselApi) => {
+      if (!api) return;
+
+      setCanScrollPrev(api.canScrollPrev());
+      setCanScrollNext(api.canScrollNext());
+      setSelectedIndex(api.selectedScrollSnap());
+    }, []);
+    void _onSelect;
+
     const scrollPrev = React.useCallback(() => {
       api?.scrollPrev();
     }, [api]);

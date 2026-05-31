@@ -4,6 +4,7 @@ import {
   forgotPasswordHandler,
   getMe,
   googleCallback,
+  googleOAuthStatusHandler,
   googleRedirect,
   login,
   logoutHandler,
@@ -22,6 +23,7 @@ router.post("/login", asyncHandler(login));
 router.post("/forgot-password", asyncHandler(forgotPasswordHandler));
 router.post("/reset-password", asyncHandler(resetPasswordHandler));
 
+router.get("/google/status", asyncHandler(googleOAuthStatusHandler));
 router.get("/google", asyncHandler(googleRedirect));
 router.get("/google/callback", asyncHandler(googleCallback));
 

@@ -23,6 +23,8 @@ import HostRoomView from "@/features/flashcard-room/components/HostRoomView";
 import JoinRoomView from "@/features/flashcard-room/components/JoinRoomView";
 import PlayRoomView from "@/features/flashcard-room/components/PlayRoomView";
 import LeaderboardView from "@/features/flashcard-room/components/LeaderboardView";
+import { RequireAdmin } from "@/features/admin/components/RequireAdmin";
+import { AdminDashboard } from "@/features/admin/components/AdminDashboard";
 
 function Router() {
   return (
@@ -34,8 +36,8 @@ function Router() {
           <Route path="/news" element={<NewsPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/course/:slug" element={<CoursePage />} />
+          <Route path="/course/:slug/chapter/:chapterSlug/learn" element={<CourseLearningPage />} />
           <Route path="/course/:slug/chapter/:chapterSlug" element={<CourseDetailPage />} />
-          <Route path="/course/:slug/learning" element={<CourseLearningPage />} />
           <Route path="/game/:id" element={<GamePage />} />
           <Route path="/time-line" element={<TimeLinePage />} />
           <Route
@@ -82,6 +84,11 @@ function Router() {
           }
         />
         <Route path="/flashcard-rooms/:code/leaderboard" element={<LeaderboardView />} />
+
+        {/* Admin Routes */}
+        <Route path="/admin" element={<RequireAdmin />}>
+          <Route index element={<AdminDashboard />} />
+        </Route>
       </Routes>
     </>
   );

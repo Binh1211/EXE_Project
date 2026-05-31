@@ -1,5 +1,5 @@
 import { apiRequest } from "@/lib/api-client";
-import type { Lesson } from "../types";
+import type { Lesson, LessonDetail } from "../types";
 
 const LESSON_PREFIX = "/api/lessons";
 
@@ -10,5 +10,9 @@ export const lessonApi = {
 
   getLesson(id: string) {
     return apiRequest<Lesson>(`${LESSON_PREFIX}/${id}`);
+  },
+
+  getLessonDetail(id: string) {
+    return apiRequest<LessonDetail>(`${LESSON_PREFIX}/${id}/detail`);
   },
 };

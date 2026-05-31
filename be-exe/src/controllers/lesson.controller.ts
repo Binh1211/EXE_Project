@@ -1,5 +1,4 @@
 import type { Request, Response } from "express";
-import { User } from "../models/User.js";
 import { verifyAccessToken } from "../utils/jwt.js";
 import { z } from "zod";
 import {
@@ -7,6 +6,7 @@ import {
   deleteLesson,
   getAllLessons,
   getLessonById,
+  getLessonDetail,
   updateLesson,
 } from "../services/lesson.service.js";
 
@@ -77,28 +77,13 @@ export async function listLessons(req: Request, res: Response) {
 export async function getLesson(req: Request, res: Response) {
   const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
   const lesson = await getLessonById(id, getOptionalUserId(req));
-
-  if (!lesson.isFree) {
-    const header = req.headers.authorization;
-    if (!header?.startsWith("Bearer ")) {
-      res.status(401).json({ message: "Yêu cầu đăng nhập để xem bài học này." });
-      return;
-    }
-    try {
-      const token = header.slice(7);
-      const payload = verifyAccessToken(token);
-      const user = await User.findById(payload.sub);
-      if (user?.subscription?.plan !== "level2" && user?.subscription?.plan !== "level3") {
-        res.status(403).json({ message: "Bạn cần nâng cấp VIP để xem bài học này." });
-        return;
-      }
-    } catch {
-      res.status(401).json({ message: "Token không hợp lệ hoặc đã hết hạn." });
-      return;
-    }
-  }
-
   res.json(lesson);
+}
+
+export async function getLessonDetailHandler(req: Request, res: Response) {
+  const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  const detail = await getLessonDetail(id, getOptionalUserId(req));
+  res.json(detail);
 }
 
 export async function createLessonHandler(req: Request, res: Response) {

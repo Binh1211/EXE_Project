@@ -53,10 +53,15 @@ export async function apiRequest<T>(
       `Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối mạng của bạn và thử lại.`,);
   }
 
-  const data = (await response.json().catch(() => null)) as
-    | T
-    | ApiErrorBody
-    | null;
+  const text = await response.text();
+  let data: T | ApiErrorBody | null = null;
+  if (text) {
+    try {
+      data = JSON.parse(text) as T | ApiErrorBody;
+    } catch {
+      data = null;
+    }
+  }
 
   if (!response.ok) {
     const message =
@@ -64,6 +69,10 @@ export async function apiRequest<T>(
       response.statusText ??
       "Đã có lỗi xảy ra.";
     throw new ApiError(response.status, message);
+  }
+
+  if (response.status === 204 || data === null) {
+    return undefined as T;
   }
 
   return data as T;

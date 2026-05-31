@@ -14,6 +14,7 @@ import {
   authLabelClass,
   authPrimaryBtnClass,
 } from "@/features/auth/constants";
+import { IMG } from "@/lib/images";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -57,7 +58,7 @@ export default function Register() {
   return (
     <AuthCard
       title="Tạo tài khoản"
-      bannerSrc="/img/register_banner.png"
+      bannerSrc={IMG.registerBanner}
       bannerAlt="Lối đi Hoàng Thành Huế"
       footer={
         <p className="mt-5 text-center text-sm text-gray-500">
@@ -148,7 +149,7 @@ export default function Register() {
         </span>
       </div>
 
-      <GoogleAuthButton mode="register" label="Google" disabled={isLoading} />
+      <GoogleAuthButton mode="register" disabled={isLoading} />
     </AuthCard>
   );
 }

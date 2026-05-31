@@ -22,7 +22,9 @@ export interface Lesson {
   isPublished?: boolean;
   coverImageUrl?: string;
   videos?: LessonVideo[];
-  quiz?: LessonQuiz;
+  quiz?: string | LessonQuiz;
+  flashcardSetId?: string;
+  faqId?: string;
   progress?: LessonProgress;
   isLocked?: boolean;
   unlockRequirement?: {
@@ -32,6 +34,42 @@ export interface Lesson {
   };
   createdAt: string;
   updatedAt: string;
+}
+
+export interface FlashcardSet {
+  _id: string;
+  lessonId: string;
+  title: string;
+  cards: FlashcardItem[];
+}
+
+export interface FlashcardItem {
+  _id?: string;
+  cardId?: string;
+  front: string;
+  back: string;
+  imageUrl?: string;
+  order?: number;
+}
+
+export interface FaqItem {
+  _id: string;
+  lessonId: string;
+  question: string;
+  answer: string;
+  order?: number;
+  isActive?: boolean;
+}
+
+export interface LessonDetail extends Lesson {
+  quizData?: LessonQuizDocument | null;
+  flashcardSet?: FlashcardSet | null;
+  faqItems?: FaqItem[];
+}
+
+export interface LessonQuizDocument extends LessonQuiz {
+  _id: string;
+  lessonId: string;
 }
 
 export interface LessonVideo {
@@ -53,6 +91,7 @@ export interface LessonQuiz {
 
 export interface LessonQuizQuestion {
   _id?: string;
+  questionId?: string;
   type: "mc" | "truefalse";
   text: string;
   imageUrl?: string;

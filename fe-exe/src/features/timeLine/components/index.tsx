@@ -1,17 +1,26 @@
 import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { timelineApi } from "../api/timeline-api";
 import type { Timeline } from "../types";
+import { resolveImageUrl } from "@/lib/images";
 
 export default function PremiumTimeline() {
+  const [searchParams] = useSearchParams();
   const [activeIndex, setActiveIndex] = useState<number>(0);
   const [timelines, setTimelines] = useState<Timeline[]>([]);
 
   useEffect(() => {
-    timelineApi
-      .getTimelines()
-      .then((data) => setTimelines(data))
+    timelineApi.getTimelines()
+      .then((data) => {
+        setTimelines(data);
+        const slug = searchParams.get("slug");
+        if (slug) {
+          const idx = data.findIndex((t) => t.slug === slug);
+          if (idx >= 0) setActiveIndex(idx);
+        }
+      })
       .catch((error) => console.error("Failed to fetch timelines:", error));
-  }, []);
+  }, [searchParams]);
 
   if (timelines.length === 0) {
     return <div className="h-[90vh] bg-black" />;
@@ -20,7 +29,7 @@ export default function PremiumTimeline() {
   return (
     <div className="relative w-full h-[90vh] bg-black overflow-hidden mb-[-80px]">
       {/* TIMELINE YEARS */}
-      <div className="absolute top-7 left-1/2 -translate-x-1/2 z-50 flex flex-nowrap gap-10">
+      <div className="absolute top-7 left-1/2 z-30 flex -translate-x-1/2 flex-nowrap gap-10">
         {timelines.map((item, index) => {
           const isActive = index === activeIndex;
 
@@ -32,7 +41,10 @@ export default function PremiumTimeline() {
             >
               <span
                 className={`whitespace-nowrap text-sm md:text-lg font-semibold tracking-wider transition-all duration-500
-                ${isActive ? "text-white" : "text-gray-500"}`}
+                ${isActive
+                    ? "text-white"
+                    : "text-gray-500"
+                  }`}
               >
                 {item.displayTime}
               </span>
@@ -73,7 +85,7 @@ export default function PremiumTimeline() {
 
               {/* IMAGE */}
               <img
-                src={item.imageUrl}
+                src={resolveImageUrl(item.imageUrl)}
                 alt={item.title}
                 className={`w-full h-full object-cover transition-all duration-700
                 ${
@@ -125,6 +137,6 @@ export default function PremiumTimeline() {
           );
         })}
       </div>
-    </div>
+    </div >
   );
 }

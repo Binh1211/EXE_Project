@@ -1,5 +1,12 @@
 import mongoose from "mongoose";
-import { Chapter, Lesson, UserLessonProgress } from "../models/index.js";
+import {
+  Chapter,
+  FaqItem,
+  FlashcardSet,
+  Lesson,
+  Quiz,
+  UserLessonProgress,
+} from "../models/index.js";
 
 export class LessonError extends Error {
   status: number;
@@ -43,6 +50,8 @@ type LessonInput = {
   videos?: LessonVideoInput[];
   video?: LessonVideoInput;
   quiz?: string;
+  flashcardSetId?: string;
+  faqId?: string;
 };
 
 type LessonUpdateInput = Partial<LessonInput>;
@@ -156,6 +165,47 @@ export async function getLessonById(id: string, userId?: string) {
   return lesson;
 }
 
+export async function getLessonDetail(id: string, userId?: string) {
+  validateObjectId(id);
+
+  const lesson = await Lesson.findById(id).lean();
+  if (!lesson) {
+    throw new LessonError(404, "Không tìm thấy bài học.");
+  }
+
+  await assertLessonUnlocked(lesson, userId);
+
+  const lessonObjectId = new mongoose.Types.ObjectId(id);
+
+  const [quiz, flashcardSet, faqItems, progress] = await Promise.all([
+    lesson.quiz
+      ? Quiz.findById(lesson.quiz).lean()
+      : Quiz.findOne({ lessonId: lessonObjectId }).lean(),
+    lesson.flashcardSetId
+      ? FlashcardSet.findById(lesson.flashcardSetId).lean()
+      : FlashcardSet.findOne({ lessonId: lessonObjectId }).lean(),
+    FaqItem.find({ lessonId: lessonObjectId, isActive: { $ne: false } })
+      .sort({ order: 1 })
+      .lean(),
+    userId
+      ? UserLessonProgress.findOne({
+          userId: new mongoose.Types.ObjectId(userId),
+          lessonId: lessonObjectId,
+        }).lean()
+      : null,
+  ]);
+
+  const [decorated] = await decorateLessonsWithLocks([lesson], userId);
+
+  return {
+    ...decorated,
+    quizData: quiz ?? null,
+    flashcardSet: flashcardSet ?? null,
+    faqItems: faqItems ?? [],
+    progress: progress ?? decorated.progress ?? null,
+  };
+}
+
 export async function createLesson(input: LessonInput) {
   validateObjectId(input.chapterId);
   await ensureChapterExists(input.chapterId);
@@ -170,6 +220,8 @@ export async function createLesson(input: LessonInput) {
     coverImageUrl: input.coverImageUrl?.trim() || "",
     videos: normalizeVideos(input) ?? [],
     quiz: input.quiz,
+    flashcardSetId: input.flashcardSetId,
+    faqId: input.faqId,
   });
 
   return lesson;
@@ -213,6 +265,12 @@ export async function updateLesson(id: string, updates: LessonUpdateInput) {
   }
   if (updates.quiz !== undefined) {
     updatesToApply.quiz = updates.quiz;
+  }
+  if (updates.flashcardSetId !== undefined) {
+    updatesToApply.flashcardSetId = updates.flashcardSetId;
+  }
+  if (updates.faqId !== undefined) {
+    updatesToApply.faqId = updates.faqId;
   }
 
   lesson.set(updatesToApply);

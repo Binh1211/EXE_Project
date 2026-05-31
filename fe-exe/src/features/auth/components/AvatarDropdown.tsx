@@ -71,7 +71,7 @@ export default function AvatarDropdown() {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-200 z-50 py-1">
+        <div className="absolute right-0 z-[300] mt-2 w-48 rounded-xl border border-gray-200 bg-white py-1 shadow-lg">
           {/* Profile section */}
           <div className="px-4 py-3 border-b border-gray-100">
             <p className="text-xs text-gray-500">Tài khoản</p>

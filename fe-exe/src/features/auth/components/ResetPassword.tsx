@@ -10,6 +10,7 @@ import {
   authLabelClass,
   authPrimaryBtnClass,
 } from "@/features/auth/constants";
+import { IMG } from "@/lib/images";
 
 export default function ResetPassword() {
   const navigate = useNavigate();
@@ -74,7 +75,7 @@ export default function ResetPassword() {
   return (
     <AuthCard
       title="Đặt lại mật khẩu"
-      bannerSrc="/img/login_banner.png"
+      bannerSrc={IMG.loginBanner}
       bannerAlt="Cổng Hoàng Thành Huế"
       footer={
         <p className="mt-5 text-center text-sm text-gray-500">

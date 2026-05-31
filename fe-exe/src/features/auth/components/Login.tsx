@@ -14,6 +14,7 @@ import {
   authLabelClass,
   authPrimaryBtnClass,
 } from "@/features/auth/constants";
+import { IMG } from "@/lib/images";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -33,8 +34,12 @@ export default function Login() {
 
     setIsLoading(true);
     try {
-      await loginAndSave({ email, password });
-      navigate("/");
+      const res = await loginAndSave({ email, password });
+      if (res.user.role === "admin") {
+        navigate("/admin");
+      } else {
+        navigate("/");
+      }
     } catch (err) {
       setError(getAuthErrorMessage(err));
     } finally {
@@ -45,7 +50,7 @@ export default function Login() {
   return (
     <AuthCard
       title="Đăng Nhập"
-      bannerSrc="/img/login_banner.png"
+      bannerSrc={IMG.loginBanner}
       bannerAlt="Cổng Hoàng Thành Huế"
       footer={
         <p className="mt-5 text-center text-sm text-gray-500">
@@ -118,7 +123,7 @@ export default function Login() {
         </span>
       </div>
 
-      <GoogleAuthButton mode="login" label="Google" disabled={isLoading} />
+      <GoogleAuthButton mode="login" disabled={isLoading} />
     </AuthCard>
   );
 }

@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { IMG } from "@/lib/images";
 
 type AuthCardProps = {
   title: string;
@@ -16,7 +17,10 @@ export default function AuthCard({
   footer,
 }: AuthCardProps) {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[url('/img/paper-texture.png')] bg-cover bg-center bg-[#fbf0ce] px-4 py-8 font-sans selection:bg-[#5f3713] selection:text-white">
+    <div
+      className="flex min-h-screen items-center justify-center bg-cover bg-center bg-[#fbf0ce] px-4 py-8 font-sans selection:bg-[#5f3713] selection:text-white"
+      style={{ backgroundImage: `url(${IMG.paperTexture})` }}
+    >
       <div className="w-full max-w-[400px] rounded-2xl bg-white p-4 shadow-[0_8px_30px_rgba(0,0,0,0.12)]">
         {bannerSrc && (
           <div className="mb-4 overflow-hidden rounded-xl">

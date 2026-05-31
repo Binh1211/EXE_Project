@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ComponentType } from "react";
 import {
   Home,
   BookOpen,
@@ -11,6 +11,8 @@ import {
   PlayCircle,
   Lock,
 } from "lucide-react";
+import { Link, useLocation } from "react-router";
+import { IMG } from "@/lib/images";
 import { useNavigate, useParams } from "react-router";
 import { useAuthUser } from "@/features/auth/hooks/useAuthUser";
 import { getStoredUser } from "@/features/auth/lib/auth-session";
@@ -19,15 +21,26 @@ import { chapterApi } from "../api/course-api";
 import { timelineApi } from "@/features/timeLine/api/timeline-api";
 import type { Timeline } from "@/features/timeLine/types";
 import type { Chapter } from "../types";
+import {
+  getEffectiveRequiredLevel,
+  isChapterLevelLocked,
+} from "../hooks/useChapterAccess";
 
 const ITEMS_PER_PAGE = 4;
 
 const SidebarItem = ({
   icon: Icon,
   text,
+  to,
   active = false,
   isPro = false,
-}: any) => {
+}: {
+  icon: ComponentType<{ size?: number; className?: string }>;
+  text: string;
+  to: string;
+  active?: boolean;
+  isPro?: boolean;
+}) => {
   return (
     <div
       className={`flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-colors ${
@@ -55,19 +68,20 @@ const CourseRow = ({
   course,
   userLevel,
   timeLineSlug,
+  chapterIndex,
 }: {
   course: Chapter;
   userLevel: number;
   timeLineSlug: string;
+  chapterIndex: number;
 }) => {
   const navigate = useNavigate();
   const { user } = useAuthUser();
 
-  const { slug, coverImageUrl, title, description, requiredLevel } = course;
+  const { slug, coverImageUrl, title, description } = course;
 
-  const levelRequired = requiredLevel ?? 1;
-
-  const isLocked = userLevel < levelRequired;
+  const levelRequired = getEffectiveRequiredLevel(chapterIndex);
+  const isLocked = isChapterLevelLocked(chapterIndex, userLevel);
   const isPremium = levelRequired >= 2;
 
   const handleClick = () => {
@@ -126,6 +140,8 @@ const CourseRow = ({
 };
 
 export default function CoursePage() {
+  const location = useLocation();
+  const navigate = useNavigate();
   const { user } = useAuthUser();
   const stored = getStoredUser();
   const displayName = user?.fullName || stored?.fullName || "User";
@@ -196,16 +212,25 @@ export default function CoursePage() {
     >
       {/* Left Sidebar */}
       <aside className="w-[260px] flex-shrink-0 flex flex-col items-center py-8 px-6 border-r border-black/5">
-        <div className="flex flex-col items-center mb-10">
-          <img src="/img/logo.png" alt="EXE" />
-        </div>
+        <Link to="/" className="mb-10 flex flex-col items-center">
+          <img src={IMG.logo} alt="EXE" />
+        </Link>
 
         <nav className="w-full flex-1 flex flex-col gap-2">
-          <SidebarItem icon={Home} text="Trang chủ" active />
-          <SidebarItem icon={BookOpen} text="Khóa học của bạn" />
-          <SidebarItem icon={Activity} text="Tình trạng" isPro />
-          <SidebarItem icon={Star} text="Đánh giá" isPro />
-          <SidebarItem icon={User} text="Tài khoản" />
+          <SidebarItem icon={Home} text="Trang chủ" to="/" />
+          <SidebarItem
+            icon={BookOpen}
+            text="Khóa học của bạn"
+            to="/course"
+            active={location.pathname === "/course"}
+          />
+          <SidebarItem icon={Activity} text="Tình trạng" to="/vip" isPro />
+          <SidebarItem icon={Star} text="Đánh giá" to="/vip" isPro />
+          <SidebarItem
+            icon={User}
+            text="Tài khoản"
+            to={user ? "/profile" : "/login"}
+          />
         </nav>
 
         <div className="w-full bg-[#fdf8e7] rounded-xl p-5 mt-auto text-center border border-black/5">
@@ -216,7 +241,11 @@ export default function CoursePage() {
             Khám phá các tính năng mới thông qua việc đăng ký các gói nâng cấp
             của chúng tôi
           </p>
-          <button className="w-full bg-[#5c3a21] text-white text-xs font-bold py-2.5 rounded-lg hover:bg-[#4a2e1a] transition-colors">
+          <button
+            type="button"
+            onClick={() => navigate("/vip")}
+            className="w-full bg-[#5c3a21] text-white text-xs font-bold py-2.5 rounded-lg hover:bg-[#4a2e1a] transition-colors"
+          >
             Nâng cấp ngay
           </button>
         </div>
@@ -251,12 +280,14 @@ export default function CoursePage() {
               </div>
 
               {pagedCourses.map((c) => {
+                const chapterIndex = courses.findIndex((ch) => ch._id === c._id);
                 return (
                   <CourseRow
                     key={c._id}
                     course={c}
                     timeLineSlug={slugTimeline}
                     userLevel={userLevel}
+                    chapterIndex={chapterIndex >= 0 ? chapterIndex : 0}
                   />
                 );
               })}

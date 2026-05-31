@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import {
   AUTH_SESSION_EVENT,
   getStoredUser,
+  isAuthenticated as hasAuthToken,
 } from "@/features/auth/lib/auth-session";
 import type { AuthUser } from "@/features/auth/types";
 
@@ -22,5 +23,10 @@ export function useAuthUser() {
     };
   }, [refresh]);
 
-  return { user, isLoggedIn: Boolean(user), refresh };
+  return {
+    user,
+    isLoggedIn: Boolean(user),
+    isAuthenticated: Boolean(user) || hasAuthToken(),
+    refresh,
+  };
 }

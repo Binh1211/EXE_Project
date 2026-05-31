@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { IMG } from "@/lib/images";
 import {
   Card,
   CardDescription,
@@ -22,34 +23,34 @@ import {
 } from "@/components/ui/carousel";
 const team = [
   {
-    name: "Hoàng Công BÌnh ",
+    name: "Hoàng Công Bình ",
     role: "Dev",
-    image: "/img/home1.png",
+    image: "",
   },
   {
     name: "Nguyễn Lưu Gia Huy",
     role: "Truyền thông",
-    image: "/img/home2.png",
+    image: "",
   },
   {
     name: "Mai Anh Kiệt",
     role: "Design",
-    image: "/img/home4.png",
+    image: "",
   },
   {
     name: "Lê Trịnh Thụy Vy",
     role: "Truyền thông",
-    image: "/img/home3.png",
+    image: "",
   },
   {
     name: "Trần Tuấn Anh",
     role: "Dev",
-    image: "/img/home5.png",
+    image: "",
   },
 ];
 const features = [
   {
-    imge: "/img/home1.png",
+    imge: IMG.VL_AL,
     title: "Bài học ngắn, dễ hiểu",
     desc: "Tóm lược theo mốc sự kiện, nhân vật, bối cảnh – kèm hình ảnh, bản đồ.",
     icon: BookOpenCheck,
@@ -58,7 +59,7 @@ const features = [
     comment: "Bài học dễ hiểu, hình ảnh minh họa rõ ràng.",
   },
   {
-    imge: "/img/home2.png",
+    imge: IMG.bacThuoc,
     title: "Dòng thời gian trực quan",
     desc: "Xem lịch sử theo timeline rõ ràng, dễ ghi nhớ.",
     icon: Clock,
@@ -67,7 +68,7 @@ const features = [
     comment: "Timeline giúp mình nhớ sự kiện theo trình tự dễ dàng hơn.",
   },
   {
-    imge: "/img/home3.png",
+    imge: IMG.thoiBinh,
     title: "Nhân vật nổi bật",
     desc: "Tìm hiểu tiểu sử và đóng góp quan trọng.",
     icon: Users,
@@ -76,7 +77,7 @@ const features = [
     comment: "Giúp mình hiểu rõ hơn về các nhân vật lịch sử quan trọng.",
   },
   {
-    imge: "/img/home4.png",
+    imge: IMG.nam1945,
     title: "Bản đồ & hình ảnh",
     desc: "Minh họa trực quan giúp hiểu sâu hơn.",
     icon: Map,
@@ -86,7 +87,7 @@ const features = [
       "Hình ảnh và bản đồ giúp mình hình dung rõ hơn về bối cảnh lịch sử.",
   },
   {
-    imge: "/img/home5.png",
+    imge: IMG.thongNhat,
     title: "Ôn tập nhanh",
     desc: "Tóm tắt kiến thức trọng tâm trước khi kiểm tra.",
     icon: ClipboardCheck,
@@ -127,7 +128,7 @@ export default function Home() {
           </div>
           <div className="absolute left-1/2 top-[70%] w-96 h-96 -translate-x-1/2 -translate-y-1/2 z-10">
             <img
-              src="/img/home1.png"
+              src={IMG.home1}
               alt="Homepage image"
               className="w-full h-full object-contain rounded-full"
             />
@@ -136,7 +137,7 @@ export default function Home() {
             style={{ border: "1px solid #000" }}
             className="absolute left-1/2 top-[70%]  translate-x-[-240px] translate-y-[-110px] w-36 h-16 bg-white rounded-xl flex justify-between items-center gap-3 shadow-md z-20"
           >
-            <img src="/img/home2.png" className=" ml-5 w-11 h-11 rounded-xl" />
+            <img src={IMG.home2} className=" ml-5 w-11 h-11 rounded-xl" />
             <div className="mr-5">
               <h2 className="text-lg font-bold text-[#000000]">15+</h2>
               <h3 className="text-sm text-gray-400">Minigame</h3>
@@ -147,7 +148,7 @@ export default function Home() {
             className="absolute left-1/2 top-[70%]  translate-x-[150px] translate-y-[-110px] w-20 h-28 bg-white rounded-xl  gap-3 shadow-md z-20 "
           >
             <img
-              src="/img/home3.png"
+              src={IMG.home3}
               className="ml-5  w-11 h-11 rounded-full mt-3"
             />
             <div className="ml-4">
@@ -159,7 +160,7 @@ export default function Home() {
             style={{ border: "1px solid #000" }}
             className="absolute left-1/2 top-[70%]  translate-x-[0px] translate-y-[140px] w-36 h-16 bg-white rounded-xl flex justify-between items-center gap-3 shadow-md z-20"
           >
-            <img src="/img/home4.png" className=" ml-5 w-11 h-11 rounded-xl" />
+            <img src={IMG.home4} className=" ml-5 w-11 h-11 rounded-xl" />
             <div className="mr-2">
               <h3 className="text-xs text-gray-400">Giảng viên</h3>
               <h2 className="ml-1 text-lg font-bold text-[#000000]">100+</h2>
@@ -167,7 +168,7 @@ export default function Home() {
           </div>
         </div>
       </div>
-      <div>
+      <div id="features">
         <div className="text-center mt-10">
           <h1 className="text-3xl font-bold ">
             Vistory giúp bạn học sử dễ hơn – vui hơn – nhớ lâu hơn
@@ -251,7 +252,7 @@ export default function Home() {
           </Carousel>
         </div>
       </div>
-      <div className="">
+      <div id="team" className="">
         <div>
           <h1 className="text-3xl font-bold text-center mt-10">
             Đội ngũ xây dựng Vistory
@@ -287,7 +288,7 @@ export default function Home() {
           </div>
         </div>
       </div>
-      <div className="bg-[#fff3e9]">
+      <div id="benefits" className="bg-[#fff3e9]">
         <Carousel
           className="mt-5 w-[80%] max-w-7xl mx-auto  relative  "
           opts={{ align: "start", loop: true }}
@@ -297,7 +298,7 @@ export default function Home() {
               return (
                 <CarouselItem key={index} className=" basis-full  ">
                   <div className="flex flex-col items-center justify-center text-center">
-                    <img src="/img/logo.png" className="w-40 h-40 " />
+                    <img src={IMG.logo} className="w-40 h-40 " />
                     <div className="text-lg mt-4">{item.comment}</div>
                     <img
                       src={item.imge}

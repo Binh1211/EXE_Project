@@ -1,5 +1,11 @@
+import { useEffect, useState } from "react";
 import type { GoogleAuthMode } from "@/features/auth/types";
 import { authApi } from "@/features/auth/api/auth-api";
+
+const LABELS: Record<GoogleAuthMode, string> = {
+  login: "Đăng nhập bằng Google",
+  register: "Đăng ký bằng Google",
+};
 
 function GoogleIcon() {
   return (
@@ -26,24 +32,33 @@ function GoogleIcon() {
 
 type GoogleAuthButtonProps = {
   mode: GoogleAuthMode;
-  label: string;
   disabled?: boolean;
 };
 
 export default function GoogleAuthButton({
   mode,
-  label,
   disabled = false,
 }: GoogleAuthButtonProps) {
+  const [enabled, setEnabled] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    authApi
+      .getGoogleOAuthStatus()
+      .then((res) => setEnabled(res.enabled))
+      .catch(() => setEnabled(false));
+  }, []);
+
+  if (enabled === false) return null;
+
   return (
     <button
       type="button"
-      disabled={disabled}
+      disabled={disabled || enabled === null}
       onClick={() => authApi.startGoogleAuth(mode)}
       className="flex w-full items-center justify-center gap-2 rounded-xl bg-gray-100 py-2.5 text-sm text-gray-700 transition-colors hover:bg-gray-200 disabled:opacity-70"
     >
       <GoogleIcon />
-      {label}
+      {enabled === null ? "Đang tải..." : LABELS[mode]}
     </button>
   );
 }

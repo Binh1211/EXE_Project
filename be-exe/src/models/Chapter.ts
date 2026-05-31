@@ -8,6 +8,7 @@ const chapterSchema = new Schema({
   timelineId: { type: Schema.Types.ObjectId, ref: "Timeline", required: true },
   order: { type: Number, required: true, index: true },
   requiredLevel: { type: Number, enum: [1, 2, 3], default: 1 },
+  timelineId: { type: Schema.Types.ObjectId, ref: "Timeline" },
   isPublished: { type: Boolean, default: false },
 }, { timestamps: true });
 

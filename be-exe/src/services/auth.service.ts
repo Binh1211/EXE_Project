@@ -226,12 +226,15 @@ export async function logoutUser(userId: string) {
   return { message: "Đăng xuất thành công." };
 }
 
-export async function findOrCreateGoogleUser(profile: {
-  googleId: string;
-  email: string;
-  displayName: string;
-  avatarUrl?: string;
-}) {
+export async function findOrCreateGoogleUser(
+  profile: {
+    googleId: string;
+    email: string;
+    displayName: string;
+    avatarUrl?: string;
+  },
+  mode: "login" | "register" = "login",
+) {
   const email = profile.email.toLowerCase();
 
   let user = await User.findOne({
@@ -262,6 +265,11 @@ export async function findOrCreateGoogleUser(profile: {
     await user.save();
     user = await User.findById(user._id);
     if (!user) throw new AuthError(500, "Lỗi tải lại người dùng.");
+  } else if (mode === "login") {
+    throw new AuthError(
+      404,
+      "Chưa có tài khoản với email Google này. Vui lòng đăng ký trước.",
+    );
   } else {
     user = await User.create({
       email,
@@ -274,11 +282,17 @@ export async function findOrCreateGoogleUser(profile: {
     });
   }
 
+  if (!user.isActive) {
+    throw new AuthError(403, "Tài khoản đã bị khóa.");
+  }
+
   const accessToken = signAccessToken({
     sub: user._id.toString(),
     email: user.email,
     role: user.role,
   });
+  const refreshToken = signRefreshToken(user._id.toString());
+  await storeRefreshToken(user._id.toString(), refreshToken);
 
   return { accessToken, user: toAuthUser(user) };
 }

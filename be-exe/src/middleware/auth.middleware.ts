@@ -1,5 +1,6 @@
 import type { NextFunction, Request, Response } from "express";
 import { verifyAccessToken } from "../utils/jwt.js";
+
 export type AuthRequest = Request & {
   userId?: string;
   userRole?: string;
@@ -20,4 +21,11 @@ export function requireAuth(req: AuthRequest, res: Response, next: NextFunction)
   } catch {
     return res.status(401).json({ message: "Token không hợp lệ hoặc đã hết hạn." });
   }
+}
+
+export function requireAdmin(req: AuthRequest, res: Response, next: NextFunction) {
+  if (req.userRole !== "admin") {
+    return res.status(403).json({ message: "Access denied: Admins only." });
+  }
+  next();
 }
