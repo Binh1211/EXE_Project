@@ -315,7 +315,7 @@ export default function Header() {
           </div>
 
           <Link to="/vip" className="text-sm font-medium hover:text-[#5f3713]">
-            Mua VIP
+            Nâng cấp Pro
           </Link>
           <Link to="/contact" className="text-sm font-medium hover:text-[#5f3713]">
             Liên hệ

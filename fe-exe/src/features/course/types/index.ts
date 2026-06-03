@@ -53,19 +53,35 @@ export interface FlashcardItem {
   order?: number;
 }
 
-export interface FaqItem {
+export interface MindmapItem {
+  label?: string;
+  content: string;
+  icon?: string;
+}
+
+export interface MindmapTopic {
+  title: string;
+  illustrationUrl?: string;
+  items: MindmapItem[];
+}
+
+export interface MindmapSection {
+  title: string;
+  layoutType: "rect" | "scroll";
+  topics: MindmapTopic[];
+}
+
+export interface Mindmap {
   _id: string;
   lessonId: string;
-  question: string;
-  answer: string;
-  order?: number;
-  isActive?: boolean;
+  title: string;
+  sections: MindmapSection[];
 }
 
 export interface LessonDetail extends Lesson {
   quizData?: LessonQuizDocument | null;
   flashcardSet?: FlashcardSet | null;
-  faqItems?: FaqItem[];
+  mindmap?: Mindmap | null;
 }
 
 export interface LessonQuizDocument extends LessonQuiz {

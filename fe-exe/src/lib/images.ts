@@ -70,6 +70,13 @@ const LOCAL_TO_CLOUDINARY: Record<string, string> = {
   "/img/stumbling_block.png": IMG.stumblingBlock,
   "/img/un_stumbling_block.jpg": IMG.unStumblingBlock,
   "/img/un_stumbling_block.png": IMG.unStumblingBlock,
+  "/I_1.png": "https://res.cloudinary.com/duq6whfxw/image/upload/v1780492406/vistory/I_1.png",
+  "/I_2.png": "https://res.cloudinary.com/duq6whfxw/image/upload/v1780492407/vistory/I_2.png",
+  "/I_3.png": "https://res.cloudinary.com/duq6whfxw/image/upload/v1780492408/vistory/I_3.png",
+  "/II.png": "https://res.cloudinary.com/duq6whfxw/image/upload/v1780492409/vistory/II.png",
+  "/bg_mindmap.png": "https://res.cloudinary.com/duq6whfxw/image/upload/v1780492411/vistory/bg_mindmap.png",
+  "/frame.png": "https://res.cloudinary.com/duq6whfxw/image/upload/v1780492413/vistory/frame.png",
+  "/title.png": "https://res.cloudinary.com/duq6whfxw/image/upload/v1780492413/vistory/title.png",
 };
 
 /**

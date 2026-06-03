@@ -29,7 +29,6 @@ const lessonSchema = new Schema(
     videos: [videoSchema],
     quiz: { type: Schema.Types.ObjectId, ref: "Quiz" },
     flashcardSetId: { type: Schema.Types.ObjectId, ref: "FlashcardSet" },
-    faqId: { type: Schema.Types.ObjectId, ref: "FaqItem" },
   },
   { timestamps: true },
 );
