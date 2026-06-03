@@ -22,8 +22,13 @@ const chapterSchema = z.object({
 
 const chapterUpdateSchema = chapterSchema.partial();
 
-export async function listChapters(_req: Request, res: Response) {
-  const chapters = await getAllChapters();
+export async function listChapters(req: Request, res: Response) {
+  const classParam = req.query.class;
+  const filters: { class?: number } = {};
+  if (typeof classParam === "string" && !isNaN(Number(classParam))) {
+    filters.class = Number(classParam);
+  }
+  const chapters = await getAllChapters(filters);
   res.json(chapters);
 }
 

@@ -56,7 +56,6 @@ export async function createTimeline(input: {
   displayTime: string;
   slug?: string;
   order: number;
-  chapters?: string[];
 }) {
   const slugValue = normalizeSlug(input.slug ?? input.title);
   const uniqueSlug = await ensureSlugIsUnique(slugValue);
@@ -68,7 +67,6 @@ export async function createTimeline(input: {
     displayTime: input.displayTime.trim(),
     slug: uniqueSlug,
     order: input.order,
-    chapters: input.chapters || [],
   });
 
   return timeline;
@@ -83,7 +81,6 @@ export async function updateTimeline(
     displayTime?: string;
     slug?: string;
     order?: number;
-    chapters?: string[];
   },
 ) {
   validateObjectId(id);
@@ -112,9 +109,6 @@ export async function updateTimeline(
   }
   if (updates.order !== undefined) {
     timeline.order = updates.order;
-  }
-  if (updates.chapters !== undefined) {
-    timeline.chapters = updates.chapters as any[];
   }
 
   await timeline.save();

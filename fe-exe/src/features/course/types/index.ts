@@ -7,6 +7,7 @@ export interface Chapter {
   timelineId: string;
   order: number;
   requiredLevel: 1 | 2 | 3;
+  class?: 10 | 11 | 12 | 0;
   isPublished?: boolean;
   createdAt: string;
   updatedAt: string;

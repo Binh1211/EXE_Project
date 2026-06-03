@@ -37,8 +37,12 @@ function validateObjectId(id: string) {
   }
 }
 
-export async function getAllChapters() {
-  return await Chapter.find().sort({ order: 1, createdAt: -1 });
+export async function getAllChapters(filters: { class?: number } = {}) {
+  const query: Record<string, unknown> = {};
+  if (filters.class !== undefined) {
+    query.class = filters.class;
+  }
+  return await Chapter.find(query).sort({ order: 1, createdAt: -1 });
 }
 
 export async function getChapterBySlug(slug: string) {

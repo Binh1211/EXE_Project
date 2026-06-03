@@ -39,6 +39,25 @@ type LessonVideoInput = {
   thumbnailUrl?: string;
 };
 
+type LessonQuizInput = {
+  title: string;
+  passingScore?: number;
+  timeLimitSec?: number;
+  questions?: Array<{
+    _id?: string;
+    type: "mc" | "truefalse";
+    text: string;
+    imageUrl?: string;
+    options?: Array<{
+      _id?: string;
+      text: string;
+    }>;
+    correctOptionId?: string;
+    explanation?: string;
+    points?: number;
+  }>;
+};
+
 type LessonInput = {
   chapterId: string;
   title: string;
@@ -49,7 +68,7 @@ type LessonInput = {
   coverImageUrl?: string;
   videos?: LessonVideoInput[];
   video?: LessonVideoInput;
-  quiz?: string;
+  quiz?: string | LessonQuizInput;
   flashcardSetId?: string;
   faqId?: string;
 };
@@ -210,7 +229,7 @@ export async function createLesson(input: LessonInput) {
   validateObjectId(input.chapterId);
   await ensureChapterExists(input.chapterId);
 
-  const lesson = await Lesson.create({
+  const lesson = new Lesson({
     chapterId: input.chapterId,
     title: input.title.trim(),
     description: input.description?.trim() || "",
@@ -219,11 +238,24 @@ export async function createLesson(input: LessonInput) {
     isPublished: input.isPublished ?? false,
     coverImageUrl: input.coverImageUrl?.trim() || "",
     videos: normalizeVideos(input) ?? [],
-    quiz: input.quiz,
     flashcardSetId: input.flashcardSetId,
     faqId: input.faqId,
   });
 
+  if (input.quiz && typeof input.quiz === "object") {
+    const quiz = await Quiz.create({
+      lessonId: lesson._id,
+      title: input.quiz.title.trim(),
+      passingScore: input.quiz.passingScore ?? 90,
+      timeLimitSec: input.quiz.timeLimitSec,
+      questions: input.quiz.questions ?? [],
+    });
+    lesson.quiz = quiz._id;
+  } else if (typeof input.quiz === "string") {
+    lesson.quiz = new mongoose.Types.ObjectId(input.quiz);
+  }
+
+  await lesson.save();
   return lesson;
 }
 
@@ -264,7 +296,33 @@ export async function updateLesson(id: string, updates: LessonUpdateInput) {
     updatesToApply.videos = normalizeVideos(updates) ?? [];
   }
   if (updates.quiz !== undefined) {
-    updatesToApply.quiz = updates.quiz;
+    if (typeof updates.quiz === "string") {
+      updatesToApply.quiz = new mongoose.Types.ObjectId(updates.quiz);
+    } else if (updates.quiz && typeof updates.quiz === "object") {
+      const existingQuiz = lesson.quiz
+        ? await Quiz.findById(lesson.quiz)
+        : await Quiz.findOne({ lessonId: lesson._id });
+
+      if (existingQuiz) {
+        if (updates.quiz.title !== undefined) existingQuiz.title = updates.quiz.title.trim();
+        if (updates.quiz.passingScore !== undefined) existingQuiz.passingScore = updates.quiz.passingScore;
+        if (updates.quiz.timeLimitSec !== undefined) existingQuiz.timeLimitSec = updates.quiz.timeLimitSec;
+        if (updates.quiz.questions !== undefined) existingQuiz.set("questions", updates.quiz.questions);
+        await existingQuiz.save();
+        updatesToApply.quiz = existingQuiz._id;
+      } else {
+        const newQuiz = await Quiz.create({
+          lessonId: lesson._id,
+          title: updates.quiz.title.trim(),
+          passingScore: updates.quiz.passingScore ?? 90,
+          timeLimitSec: updates.quiz.timeLimitSec,
+          questions: updates.quiz.questions ?? [],
+        });
+        updatesToApply.quiz = newQuiz._id;
+      }
+    } else {
+      updatesToApply.quiz = null;
+    }
   }
   if (updates.flashcardSetId !== undefined) {
     updatesToApply.flashcardSetId = updates.flashcardSetId;
