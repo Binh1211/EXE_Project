@@ -11,7 +11,7 @@ import {
   PlayCircle,
   Lock,
 } from "lucide-react";
-import { Link, useLocation } from "react-router";
+import { Link, useLocation, useSearchParams } from "react-router";
 import { IMG } from "@/lib/images";
 import { useNavigate, useParams } from "react-router";
 import { useAuthUser } from "@/features/auth/hooks/useAuthUser";
@@ -27,6 +27,12 @@ import {
 } from "../hooks/useChapterAccess";
 
 const ITEMS_PER_PAGE = 4;
+
+const CLASS_LABELS: Record<number, string> = {
+  10: "Lớp 10",
+  11: "Lớp 11",
+  12: "Lớp 12",
+};
 
 const SidebarItem = ({
   icon: Icon,
@@ -158,6 +164,9 @@ export default function CoursePage() {
   const userLevel: number = user?.level ?? stored?.level ?? 1;
 
   const slugTimeline = useParams().slug ?? "";
+  const [searchParams] = useSearchParams();
+  const classFilter = searchParams.get("class");
+  const classNum = classFilter ? Number(classFilter) : null;
 
   const [timeline, setTimeline] = useState<Timeline | null>(null);
 
@@ -185,12 +194,19 @@ export default function CoursePage() {
 
   useEffect(() => {
     if (slugTimeline === "all") {
-      chapterApi
-        .getAllChapters()
-        .then((data) => setCourses(data))
-        .catch((error) => console.error("Failed to fetch all chapters:", error));
+      if (classNum && [10, 11, 12].includes(classNum)) {
+        chapterApi
+          .getChaptersByClass(classNum)
+          .then((data) => setCourses(data))
+          .catch((error) => console.error("Failed to fetch chapters by class:", error));
+      } else {
+        chapterApi
+          .getAllChapters()
+          .then((data) => setCourses(data))
+          .catch((error) => console.error("Failed to fetch all chapters:", error));
+      }
     }
-  }, [slugTimeline]);
+  }, [slugTimeline, classNum]);
 
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -263,6 +279,20 @@ export default function CoursePage() {
               <p className="text-gray-500 text-sm">
                 Hãy cùng nhau học thêm nhiều kiến thức mới nào!
               </p>
+              {classNum && CLASS_LABELS[classNum] && (
+                <div className="mt-2 flex items-center gap-2">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-[#5c3a21] px-3 py-1 text-xs font-bold text-white">
+                    {CLASS_LABELS[classNum]}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => navigate("/course/all")}
+                    className="text-xs text-gray-500 hover:text-[#5c3a21] underline"
+                  >
+                    Xem tất cả
+                  </button>
+                </div>
+              )}
             </div>
           </div>
 

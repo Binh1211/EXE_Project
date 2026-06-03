@@ -23,12 +23,6 @@ const timelineSchema = new Schema({
     type: String,
     required: true,
   },
-  chapters: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: "Chapter",
-    },
-  ],
   order: {
     type: Number,
     required: true,
