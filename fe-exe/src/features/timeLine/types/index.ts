@@ -5,6 +5,7 @@ export interface Timeline {
   imageUrl: string;
   displayTime: string;
   slug: string;
+  funfacts?: string[];
   createdAt: string;
   updatedAt: string;
 }

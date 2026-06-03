@@ -6,7 +6,7 @@ export function ChapterEditor() {
   const [chapters, setChapters] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
-  const [formData, setFormData] = useState({ title: "", slug: "", description: "", order: 1, requiredLevel: 1 });
+  const [formData, setFormData] = useState({ title: "", slug: "", description: "", order: 1, requiredLevel: 1, timelineId: "" });
 
   const fetchChapters = () => {
     setLoading(true);
@@ -42,7 +42,7 @@ export function ChapterEditor() {
         <h2 className="text-xl font-bold text-white flex items-center gap-2">
           <BookOpen className="text-indigo-400" /> Quản lý Khóa học (Chapters)
         </h2>
-        <button 
+        <button
           onClick={() => setShowForm(!showForm)}
           className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition"
         >
@@ -55,9 +55,9 @@ export function ChapterEditor() {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm text-slate-400 mb-1">Tiêu đề</label>
-              <input 
-                required 
-                type="text" 
+              <input
+                required
+                type="text"
                 className="w-full bg-slate-800 border border-slate-600 rounded p-2 text-white"
                 value={formData.title}
                 onChange={e => setFormData({ ...formData, title: e.target.value })}
@@ -65,9 +65,9 @@ export function ChapterEditor() {
             </div>
             <div>
               <label className="block text-sm text-slate-400 mb-1">Slug</label>
-              <input 
-                required 
-                type="text" 
+              <input
+                required
+                type="text"
                 className="w-full bg-slate-800 border border-slate-600 rounded p-2 text-white"
                 value={formData.slug}
                 onChange={e => setFormData({ ...formData, slug: e.target.value })}
@@ -75,9 +75,9 @@ export function ChapterEditor() {
             </div>
             <div>
               <label className="block text-sm text-slate-400 mb-1">Thứ tự (Order)</label>
-              <input 
-                required 
-                type="number" 
+              <input
+                required
+                type="number"
                 className="w-full bg-slate-800 border border-slate-600 rounded p-2 text-white"
                 value={formData.order}
                 onChange={e => setFormData({ ...formData, order: Number(e.target.value) })}
@@ -85,7 +85,7 @@ export function ChapterEditor() {
             </div>
             <div>
               <label className="block text-sm text-slate-400 mb-1">Level yêu cầu</label>
-              <select 
+              <select
                 className="w-full bg-slate-800 border border-slate-600 rounded p-2 text-white"
                 value={formData.requiredLevel}
                 onChange={e => setFormData({ ...formData, requiredLevel: Number(e.target.value) })}
@@ -98,7 +98,7 @@ export function ChapterEditor() {
           </div>
           <div>
             <label className="block text-sm text-slate-400 mb-1">Mô tả</label>
-            <textarea 
+            <textarea
               className="w-full bg-slate-800 border border-slate-600 rounded p-2 text-white h-20"
               value={formData.description}
               onChange={e => setFormData({ ...formData, description: e.target.value })}
@@ -121,7 +121,7 @@ export function ChapterEditor() {
               <button className="p-2 bg-slate-800 text-slate-300 hover:text-white rounded">
                 <Edit className="w-4 h-4" />
               </button>
-              <button 
+              <button
                 onClick={() => handleDelete(chapter._id)}
                 className="p-2 bg-red-500/10 text-red-400 hover:bg-red-500/20 rounded"
               >

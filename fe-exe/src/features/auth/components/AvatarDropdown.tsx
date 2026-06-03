@@ -116,7 +116,7 @@ export default function AvatarDropdown() {
             <span>Vào phòng thi</span>
           </button>
 
-          {user?.level === 3 && (
+          {user?.level === 2 && (
             <button
               onClick={() => {
                 navigate("/flashcard-rooms/host");

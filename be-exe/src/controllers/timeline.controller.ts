@@ -15,6 +15,7 @@ const createTimelineSchema = z.object({
   displayTime: z.string().min(1, "Thời gian hiển thị không được để trống."),
   slug: z.string().optional(),
   order: z.number().min(0, "Thứ tự không được nhỏ hơn 0."),
+  funfacts: z.array(z.string()).optional(),
 });
 
 const updateTimelineSchema = createTimelineSchema.partial();
