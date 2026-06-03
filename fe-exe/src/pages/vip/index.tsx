@@ -34,7 +34,7 @@ const vipPlans = [
   {
     level: "VIP Cao cấp",
     price: 399000,
-    duration: "180 ngày",
+    duration: "90 ngày",
     description: "Trải nghiệm VIP toàn diện, kèm mentor, chứng chỉ và quà tặng độc quyền.",
     features: [
       "Tất cả ưu đãi VIP Nâng cao",
