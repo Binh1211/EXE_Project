@@ -279,12 +279,32 @@ export default function Header() {
               >
                 Ôn thi
               </Link>
-              <Link
-                to="/flashcard-rooms/join"
-                className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
-              >
-                Lớp học
-              </Link>
+              <div className="group/lophoc relative">
+                <div className="flex items-center justify-between rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3] cursor-pointer">
+                  Lớp học
+                  <svg className="ml-1 h-3 w-3" viewBox="0 0 12 12" fill="currentColor"><path d="M4.5 2l4 4-4 4" /></svg>
+                </div>
+                <div className="invisible absolute left-full top-0 z-[230] ml-1 w-36 rounded-xl bg-[#fff3e9] p-1 opacity-0 shadow-lg transition-all duration-200 group-hover/lophoc:visible group-hover/lophoc:opacity-100">
+                  <Link
+                    to="/course/all?class=10"
+                    className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
+                  >
+                    Lớp 10
+                  </Link>
+                  <Link
+                    to="/course/all?class=11"
+                    className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
+                  >
+                    Lớp 11
+                  </Link>
+                  <Link
+                    to="/course/all?class=12"
+                    className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
+                  >
+                    Lớp 12
+                  </Link>
+                </div>
+              </div>
               <Link
                 to="/news"
                 className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"

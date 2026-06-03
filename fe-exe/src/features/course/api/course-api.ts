@@ -10,6 +10,9 @@ export const chapterApi = {
   getAllChapters() {
     return apiRequest<Chapter[]>(`${TIMELINE_PREFIX}`);
   },
+  getChaptersByClass(classNum: number) {
+    return apiRequest<Chapter[]>(`${TIMELINE_PREFIX}?class=${classNum}`);
+  },
   getChapter(slug: string) {
     return apiRequest<Chapter>(`${TIMELINE_PREFIX}/${slug}`);
   },
