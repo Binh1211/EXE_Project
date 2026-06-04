@@ -13,6 +13,7 @@ import groupRoutes from "./group.routes.js";
 import paymentRoutes from "./payment.routes.js";
 import groupGameSessionRoutes from "./group-game-session.routes.js";
 import leaderboardEntryRoutes from "./leaderboard-entry.routes.js";
+import gameRoomRoutes from "./game-room.routes.js";
 
 import flashcardRoomRoutes from "./flashcard-room.routes.js";
 import adminRoutes from "./admin.routes.js";
@@ -33,6 +34,7 @@ router.use("/groups", groupRoutes);
 router.use("/payments", paymentRoutes);
 router.use("/group-game-sessions", groupGameSessionRoutes);
 router.use("/leaderboard-entries", leaderboardEntryRoutes);
+router.use("/game-rooms", gameRoomRoutes);
 router.use("/flashcard-rooms", flashcardRoomRoutes);
 router.use("/admin", adminRoutes);
 

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { useParams, useNavigate, useSearchParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Gamepad2, Loader2 } from "lucide-react";
 import "./Game.css";
 import { IMG } from "@/lib/images";
@@ -33,11 +33,8 @@ const OBSTACLE_GAP = 200;
 const MOVE_SPEED = 4;
 
 export default function HistoryMiniGame() {
-  const { id: timelineSlug } = useParams();
+  const { lessonId } = useParams();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const lessonId = searchParams.get("lesson");
-  const chapterSlug = searchParams.get("chapter");
 
   const [questions, setQuestions] = useState<GameQuestion[]>([]);
   const [quizTitle, setQuizTitle] = useState("");
@@ -73,12 +70,7 @@ export default function HistoryMiniGame() {
   const rafRef = useRef<number>(0);
   const questionCount = questions.length;
 
-  const backUrl =
-    timelineSlug && chapterSlug && lessonId
-      ? `/course/${timelineSlug}/chapter/${chapterSlug}/learn?lesson=${lessonId}`
-      : timelineSlug
-        ? `/course/${timelineSlug}`
-        : "/course";
+  const backUrl = "/game/vuot-rao";
 
   useEffect(() => {
     if (!lessonId) {
@@ -206,16 +198,16 @@ export default function HistoryMiniGame() {
         ]);
       }
       setLives((l) => l - 1);
-    setHurt(true);
-    setJump(true);
-    setTimeout(() => {
-      setJump(false);
-      setHurt(false);
-    }, 500);
-    pushWrongObstacle();
-    setShowQuestion(false);
-    setCurrent((c) => c + 1);
-  }, [pushWrongObstacle, q, queue, current]);
+      setHurt(true);
+      setJump(true);
+      setTimeout(() => {
+        setJump(false);
+        setHurt(false);
+      }, 500);
+      pushWrongObstacle();
+      setShowQuestion(false);
+      setCurrent((c) => c + 1);
+    }, [pushWrongObstacle, q, queue, current]);
 
   useEffect(() => {
     if (!started || showQuestion || questionCount === 0) return;
@@ -401,10 +393,6 @@ export default function HistoryMiniGame() {
                   <span className="scoreLabel">Thời gian</span>
                   <span className="scoreValue">{elapsedTime}</span>
                 </div>
-                <div className="scoreItem">
-                  <span className="scoreLabel">Yêu cầu đạt</span>
-                  <span className="scoreValue">{passingScore}%</span>
-                </div>
               </div>
               <div className="gradeBox">
                 <span className="gradeLabel">Đánh giá</span>
@@ -486,26 +474,28 @@ export default function HistoryMiniGame() {
 
   return (
     <div className="game">
-      <button type="button" className="game-back-btn" onClick={() => navigate(backUrl)}>
-        <ArrowLeft size={20} />
-        Quay lại bài học
-      </button>
-
-      <h1 className="game-title">
-        <Gamepad2 size={32} className="game-title-icon" />
-        {quizTitle}
-      </h1>
-      <p className="game-subtitle">{questionCount} câu hỏi từ quiz bài học</p>
-
       {!started && (
-        <button type="button" className="startBtn" onClick={() => setStarted(true)}>
-          Bắt đầu chơi
-        </button>
+        <>
+          <button type="button" className="game-back-btn" onClick={() => navigate(backUrl)}>
+            <ArrowLeft size={20} />
+            Quay lại bài học
+          </button>
+
+          <h1 className="game-title">
+            <Gamepad2 size={32} className="game-title-icon" />
+            {quizTitle}
+          </h1>
+          <p className="game-subtitle">{questionCount} câu hỏi từ quiz bài học</p>
+
+          <button type="button" className="startBtn" onClick={() => setStarted(true)}>
+            Bắt đầu chơi
+          </button>
+        </>
       )}
 
       {started && (
         <>
-          <div className="world">
+          <div className="world game-world">
             <div className="hearts">
               {Array.from({ length: lives }).map((_, i) => (
                 <img key={i} src={IMG.heart} className="heart" alt="" />
@@ -573,15 +563,14 @@ export default function HistoryMiniGame() {
                         key={o}
                         type="button"
                         disabled={Boolean(selectedOption)}
-                        className={`optionBtn ${
-                          selectedOption === o
-                            ? answerFeedback === "correct"
-                              ? "optionBtn--correct"
-                              : answerFeedback === "wrong"
-                                ? "optionBtn--wrong"
-                                : ""
-                            : ""
-                        }`}
+                        className={`optionBtn ${selectedOption === o
+                          ? answerFeedback === "correct"
+                            ? "optionBtn--correct"
+                            : answerFeedback === "wrong"
+                              ? "optionBtn--wrong"
+                              : ""
+                          : ""
+                          }`}
                         onClick={() => answer(o)}
                       >
                         <span className="optionLetter">

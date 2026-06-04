@@ -51,7 +51,7 @@ export default function Header() {
           );
         }
       })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   useEffect(() => {
@@ -313,7 +313,15 @@ export default function Header() {
               </Link>
             </div>
           </div>
-
+          <div className="group relative inline-block">
+            <button
+              type="button"
+              className="text-sm font-medium hover:text-[#5f3713]"
+              onClick={() => navigate("/game/list")}
+            >
+              Game
+            </button>
+          </div>
           <Link to="/vip" className="text-sm font-medium hover:text-[#5f3713]">
             Mua VIP
           </Link>

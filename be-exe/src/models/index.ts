@@ -10,6 +10,7 @@ export { UserLessonProgress } from "./UserLessonProgress.js";
 export { QuizAttempt } from "./QuizAttempt.js";
 export { Group } from "./Group.js";
 export { GroupGameSession } from "./GroupGameSession.js";
+export { GameRoom } from "./GameRoom.js";
 export { FlashcardRoom } from "./FlashcardRoom.js";
 export { LeaderboardEntry } from "./LeaderboardEntry.js";
 export { PaymentTransaction } from "./PaymentTransaction.js";

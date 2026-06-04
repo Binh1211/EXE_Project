@@ -7,7 +7,7 @@ import ContactPage from './pages/contact';
 import CoursePage from './pages/course';
 import CourseDetailPage from './pages/course-detail';
 import CourseLearningPage from './pages/course-learning';
-import GamePage from './pages/game';
+import GamePageVuotRao from './pages/game';
 import TimeLinePage from './pages/timeline';
 import LoginPage from './pages/login';
 import RegisterPage from './pages/register';
@@ -25,6 +25,12 @@ import PlayRoomView from "@/features/flashcard-room/components/PlayRoomView";
 import LeaderboardView from "@/features/flashcard-room/components/LeaderboardView";
 import { RequireAdmin } from "@/features/admin/components/RequireAdmin";
 import { AdminDashboard } from "@/features/admin/components/AdminDashboard";
+import GameListPage from "@/pages/game/list";
+import GameLessonSelectPage from "@/pages/game/lesson-select";
+import DragonRaceCreatePage from "@/features/game/pages/dragon-race-create";import DragonRaceHomePage from '@/features/game/pages/dragon-race-home';import DragonRaceJoinPage from "@/features/game/pages/dragon-race-join";
+import DragonRaceLobbyPage from "@/features/game/pages/dragon-race-lobby";
+import DragonRaceRacePage from "@/features/game/pages/dragon-race-race";
+import DragonRaceResultPage from "@/features/game/pages/dragon-race-result";
 
 function Router() {
   return (
@@ -38,7 +44,15 @@ function Router() {
           <Route path="/course/:slug" element={<CoursePage />} />
           <Route path="/course/:slug/chapter/:chapterSlug/learn" element={<CourseLearningPage />} />
           <Route path="/course/:slug/chapter/:chapterSlug" element={<CourseDetailPage />} />
-          <Route path="/game/:id" element={<GamePage />} />
+          <Route path="/game/list" element={<GameListPage />} />
+          <Route path="/game/dua-rong" element={<DragonRaceHomePage />} />
+          <Route path="/game/dua-rong/create" element={<DragonRaceCreatePage />} />
+          <Route path="/game/dua-rong/join" element={<DragonRaceJoinPage />} />
+          <Route path="/game/dua-rong/lobby/:roomCode" element={<DragonRaceLobbyPage />} />
+          <Route path="/game/dua-rong/race/:roomCode" element={<DragonRaceRacePage />} />
+          <Route path="/game/dua-rong/result/:roomCode" element={<DragonRaceResultPage />} />
+          <Route path="/game/:gameName" element={<GameLessonSelectPage />} />
+          <Route path="/game/vuot-rao/:lessonId" element={<GamePageVuotRao />} />
           <Route path="/time-line" element={<TimeLinePage />} />
           <Route
             path="/profile"
@@ -64,7 +78,7 @@ function Router() {
         <Route path="/forgot-password/reset" element={<ResetPasswordPage />} />
         <Route path="/auth" element={<AuthPage />} />
         <Route path="/auth/google/callback" element={<GoogleCallbackPage />} />
-        
+
         {/* Flashcard Rooms (No layout wrapper for full immersion) */}
         <Route
           path="/flashcard-rooms/host"

@@ -87,13 +87,13 @@ function Footer() {
         </div>
         <div className="flex gap-6 mt-4">
           <Link to="#" className="text-sm font-medium hover:text-primary">
-            <Facebook className="rounded-full bg-white size-8 p-1 text-[#281510]"/>
+            <Facebook className="rounded-full bg-white size-8 p-1 text-[#281510]" />
           </Link>
           <Link to="#" className="text-sm font-medium hover:text-primary">
-            <Github className="rounded-full bg-white size-8 p-1 text-[#281510]"/>
+            <Github className="rounded-full bg-white size-8 p-1 text-[#281510]" />
           </Link>
           <Link to="#" className="text-sm font-medium hover:text-primary">
-            <Youtube className="rounded-full bg-white size-8 p-1 text-[#281510]"/>
+            <Youtube className="rounded-full bg-white size-8 p-1 text-[#281510]" />
           </Link>
         </div>
       </div>

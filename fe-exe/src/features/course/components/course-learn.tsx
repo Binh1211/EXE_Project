@@ -43,7 +43,6 @@ const CourseLearningPage = () => {
   const [chapter, setChapter] = useState<Chapter | null>(null);
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [lessonDetail, setLessonDetail] = useState<LessonDetail | null>(null);
-  const [chapterIndex, setChapterIndex] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState("Overview");
   const [videoWatched, setVideoWatched] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -65,7 +64,7 @@ const CourseLearningPage = () => {
         name: lesson.title,
         type: lesson.videos?.length ? "video" : "book",
         time: formatLessonDuration(lesson.videos?.[0]?.durationSec),
-        isLocked: lesson.isLocked,
+        isLocked: false,
       })),
     [lessons],
   );
@@ -101,10 +100,7 @@ const CourseLearningPage = () => {
     [lessonDetail],
   );
 
-  const { isAuthenticated, levelLocked } = useChapterAccess(
-    chapter,
-    chapterIndex,
-  );
+  const { isAuthenticated, levelLocked } = useChapterAccess(chapter);
 
   const refreshLessons = useCallback(async () => {
     if (!chapter) return;
@@ -141,7 +137,7 @@ const CourseLearningPage = () => {
   );
 
   useEffect(() => {
-    if (loading || !chapter || chapterIndex === null) return;
+    if (loading || !chapter) return;
     if (!isAuthenticated) {
       navigate("/login");
       return;
@@ -149,7 +145,7 @@ const CourseLearningPage = () => {
     if (levelLocked) {
       navigate("/vip");
     }
-  }, [loading, chapter, chapterIndex, isAuthenticated, levelLocked, navigate]);
+  }, [loading, chapter, isAuthenticated, levelLocked, navigate]);
 
   const selectLesson = useCallback(
     (lesson: SidebarLesson) => {
@@ -172,13 +168,7 @@ const CourseLearningPage = () => {
       .then(([timelineData, chapterData]) => {
         setTimeline(timelineData);
         setChapter(chapterData);
-        return chapterApi
-          .getChaptersByTimelineId(timelineData._id)
-          .then((allChapters) => {
-            const idx = allChapters.findIndex((ch) => ch._id === chapterData._id);
-            setChapterIndex(idx >= 0 ? idx : 0);
-            return lessonApi.getLessonsByChapterId(chapterData._id);
-          });
+        return lessonApi.getLessonsByChapterId(chapterData._id);
       })
       .then((lessonList) => {
         const published = lessonList.filter((l) => l.isPublished !== false);
@@ -199,7 +189,7 @@ const CourseLearningPage = () => {
 
     if (hasValidLesson) return;
 
-    const targetId = lessons.find((l) => !l.isLocked)?._id ?? lessons[0]?._id;
+    const targetId = lessons[0]?._id;
     if (targetId) {
       setSearchParams({ lesson: targetId }, { replace: true });
     }
@@ -252,7 +242,19 @@ const CourseLearningPage = () => {
         playerVars: { rel: 0, modestbranding: 1 },
         events: {
           onStateChange: (event: { data: number }) => {
-            if (event.data === 0) setVideoWatched(true);
+            if (event.data === 0) {
+              setVideoWatched(true);
+              if (activeLesson?._id) {
+                lessonProgressApi
+                  .upsert({
+                    lessonId: activeLesson._id,
+                    status: "completed",
+                    videoWatchedPct: 100,
+                  })
+                  .then(() => refreshLessons())
+                  .catch(console.error);
+              }
+            }
           },
         },
       });
@@ -288,20 +290,9 @@ const CourseLearningPage = () => {
 
   const tabs = [
     { id: "Overview", label: "Tổng quan" },
-    { id: "Quiz", label: "Quiz" },
     { id: "Review", label: "Ôn tập" },
     { id: "FAQ", label: "Hỏi & Đáp" },
   ];
-
-  const quizPassed = Boolean(
-    lessonDetail?.progress?.quizPassed ||
-      activeLesson?.progress?.quizPassed ||
-      activeLesson?.progress?.status === "completed",
-  );
-  const nextLessonLocked = sidebarLessons.find(
-    (l, i) =>
-      sidebarLessons[i - 1]?.id === activeLesson?._id && l.isLocked,
-  );
 
   if (loading) {
     return (
@@ -321,7 +312,7 @@ const CourseLearningPage = () => {
             navigate(
               timelineSlug && chapterSlug
                 ? `/course/${timelineSlug}/chapter/${chapterSlug}`
-                : "/course",
+                : "/course/all",
             )
           }
           className="rounded-xl bg-[#5c3a21] px-5 py-2 text-white text-sm font-bold"
@@ -333,7 +324,7 @@ const CourseLearningPage = () => {
   }
 
   return (
-    <div className="min-h-screen font-sans">
+    <div className="flex-1 w-full flex flex-col font-sans">
       <div className="bg-[#4a321f] text-white px-8 py-3.5 flex items-center justify-between shadow-md relative z-20">
         <div className="flex items-center gap-8 min-w-0">
           <CourseBreadcrumb
@@ -362,15 +353,7 @@ const CourseLearningPage = () => {
 
       <div className="flex flex-col lg:flex-row lg:items-stretch bg-black">
         <div className="lg:w-[70%] aspect-video relative group overflow-hidden">
-          {activeLesson.isLocked ? (
-            <div className="w-full h-full flex flex-col items-center justify-center bg-black text-white gap-4">
-              <Lock size={48} className="text-white/60" />
-              <p className="text-sm text-white/70 px-6 text-center">
-                {activeLesson.unlockRequirement?.message ||
-                  "Hoàn thành bài học trước để mở khóa bài này."}
-              </p>
-            </div>
-          ) : activeVideoId ? (
+          {activeVideoId ? (
             <div className="w-full h-full bg-black">
               <div ref={ytContainerRef} className="w-full h-full" />
             </div>
@@ -387,21 +370,6 @@ const CourseLearningPage = () => {
               </p>
             </div>
           )}
-
-          {videoWatched && !quizPassed && (
-            <div className="absolute bottom-4 left-4 right-4 z-20 flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between">
-              <div className="bg-emerald-600/90 text-white text-sm font-bold px-4 py-2 rounded-xl">
-                Đã xem xong video ✓
-              </div>
-              <button
-                type="button"
-                onClick={() => setActiveTab("Quiz")}
-                className="bg-[#5c3a21] text-white text-sm font-bold px-4 py-2 rounded-xl hover:bg-[#4a2e1a]"
-              >
-                Làm Quiz để mở bài tiếp theo →
-              </button>
-            </div>
-          )}
         </div>
 
         <div
@@ -416,16 +384,6 @@ const CourseLearningPage = () => {
               <p className="text-[13px] text-gray-500 font-medium">
                 {lessons.length} bài học • {progressPct}% hoàn thành
               </p>
-              {!quizPassed && activeLesson.order === 1 && (
-                <p className="text-xs text-amber-700 mt-2 font-medium">
-                  Hoàn thành Quiz bài 1 để mở khóa bài 2
-                </p>
-              )}
-              {nextLessonLocked && (
-                <p className="text-xs text-gray-500 mt-1">
-                  Bài tiếp theo đang khóa
-                </p>
-              )}
             </div>
 
             <div className="space-y-2">
@@ -435,13 +393,12 @@ const CourseLearningPage = () => {
                   type="button"
                   disabled={lesson.isLocked}
                   onClick={() => selectLesson(lesson)}
-                  className={`w-full text-left flex items-center gap-3 p-3 rounded-xl transition-all ${
-                    lesson.id === activeLesson._id
-                      ? "bg-[#5c3a21] text-white"
-                      : lesson.isLocked
-                        ? "opacity-50 cursor-not-allowed text-gray-500"
-                        : "hover:bg-[#5c3a21]/10 text-[#5c3a21]"
-                  }`}
+                  className={`w-full text-left flex items-center gap-3 p-3 rounded-xl transition-all ${lesson.id === activeLesson._id
+                    ? "bg-[#5c3a21] text-white"
+                    : lesson.isLocked
+                      ? "opacity-50 cursor-not-allowed text-gray-500"
+                      : "hover:bg-[#5c3a21]/10 text-[#5c3a21]"
+                    }`}
                 >
                   {lesson.isLocked ? (
                     <Lock size={16} />
@@ -459,7 +416,7 @@ const CourseLearningPage = () => {
         </div>
       </div>
 
-      <div className="flex flex-col bg-[#FFF6F4] border-t border-black/5">
+      <div className="flex flex-col flex-1 bg-[#FFF6F4] border-t border-black/5">
         <div className="border-b border-black/5">
           <div className="flex gap-8 px-12">
             {tabs.map((tab) => (
@@ -467,11 +424,10 @@ const CourseLearningPage = () => {
                 key={tab.id}
                 type="button"
                 onClick={() => setActiveTab(tab.id)}
-                className={`py-6 text-[15px] font-bold transition-all relative ${
-                  activeTab === tab.id
-                    ? "text-[#5c3a21]"
-                    : "text-gray-400 hover:text-gray-600"
-                }`}
+                className={`py-6 text-[15px] font-bold transition-all relative ${activeTab === tab.id
+                  ? "text-[#5c3a21]"
+                  : "text-gray-400 hover:text-gray-600"
+                  }`}
               >
                 {tab.label}
                 {activeTab === tab.id && (
@@ -491,10 +447,9 @@ const CourseLearningPage = () => {
                   activeLesson.description
                     ? [activeLesson.description]
                     : [
-                        "Xem video bài giảng.",
-                        "Làm Quiz ở tab Quiz — đạt điểm yêu cầu để hoàn thành bài và mở khóa bài sau.",
-                        "Ôn tập flashcard và FAQ bot ở các tab tương ứng.",
-                      ]
+                      "Xem video bài giảng.",
+                      "Ôn tập flashcard và FAQ bot ở các tab tương ứng.",
+                    ]
                 }
               />
               <CourseProgressCard
@@ -503,47 +458,6 @@ const CourseLearningPage = () => {
               />
             </div>
           )}
-
-          {activeTab === "Quiz" && (
-            <div className="mt-6 mx-[7%] flex flex-col items-center pb-10 gap-6">
-              {detailLoading ? (
-                <p className="text-gray-500 py-12">Đang tải quiz...</p>
-              ) : lessonDetail?.quizData ? (
-                <>
-                  <LessonQuiz
-                    quiz={lessonDetail.quizData}
-                    onSubmit={handleQuizSubmit}
-                    previousBestScore={lessonDetail.progress?.quizBestScore}
-                    alreadyPassed={quizPassed}
-                  />
-                  {timelineSlug && chapterSlug && activeLesson && (
-                    <div className="w-full max-w-3xl rounded-2xl border border-[#5c3a21]/15 bg-white p-6 text-center">
-                      <p className="text-sm text-gray-600 mb-4">
-                        Hoặc ôn tập qua mini game với cùng bộ câu hỏi quiz
-                      </p>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          navigate(
-                            `/game/${timelineSlug}?lesson=${activeLesson._id}&chapter=${chapterSlug}`,
-                          )
-                        }
-                        className="inline-flex items-center gap-2 rounded-xl bg-[#5c3a21] px-6 py-3 text-sm font-bold text-white hover:bg-[#4a2e1a] transition-colors"
-                      >
-                        <Gamepad2 size={18} />
-                        Chơi game ôn tập
-                      </button>
-                    </div>
-                  )}
-                </>
-              ) : (
-                <p className="text-gray-500 py-12">
-                  Bài học này chưa có quiz.
-                </p>
-              )}
-            </div>
-          )}
-
           {activeTab === "Review" && (
             <div className="mt-6 mx-[7%] flex flex-col items-center pb-10">
               <div className="w-full mb-4">
