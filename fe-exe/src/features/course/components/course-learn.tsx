@@ -7,7 +7,7 @@ import {
   CourseOutcome,
 } from "./shared";
 import FlashCards from "./shared/flash-card";
-import FAQBot from "./shared/faq-bot";
+import Mindmap from "./shared/mindmap";
 import LessonQuiz from "./shared/lesson-quiz";
 import { IMG } from "@/lib/images";
 import { chapterApi } from "../api/course-api";
@@ -91,16 +91,9 @@ const CourseLearningPage = () => {
     }));
   }, [lessonDetail]);
 
-  const faqData = useMemo(
-    () =>
-      (lessonDetail?.faqItems ?? []).map((item) => ({
-        question: item.question,
-        answer: item.answer,
-      })),
-    [lessonDetail],
+  const { isAuthenticated, levelLocked } = useChapterAccess(
+    chapter,
   );
-
-  const { isAuthenticated, levelLocked } = useChapterAccess(chapter);
 
   const refreshLessons = useCallback(async () => {
     if (!chapter) return;
@@ -291,8 +284,18 @@ const CourseLearningPage = () => {
   const tabs = [
     { id: "Overview", label: "Tổng quan" },
     { id: "Review", label: "Ôn tập" },
-    { id: "FAQ", label: "Hỏi & Đáp" },
+    { id: "Mindmap", label: "Sơ đồ tư duy" },
   ];
+
+  const quizPassed = Boolean(
+    lessonDetail?.progress?.quizPassed ||
+    activeLesson?.progress?.quizPassed ||
+    activeLesson?.progress?.status === "completed",
+  );
+  const nextLessonLocked = sidebarLessons.find(
+    (l, i) =>
+      sidebarLessons[i - 1]?.id === activeLesson?._id && l.isLocked,
+  );
 
   if (loading) {
     return (
@@ -394,10 +397,10 @@ const CourseLearningPage = () => {
                   disabled={lesson.isLocked}
                   onClick={() => selectLesson(lesson)}
                   className={`w-full text-left flex items-center gap-3 p-3 rounded-xl transition-all ${lesson.id === activeLesson._id
-                    ? "bg-[#5c3a21] text-white"
-                    : lesson.isLocked
-                      ? "opacity-50 cursor-not-allowed text-gray-500"
-                      : "hover:bg-[#5c3a21]/10 text-[#5c3a21]"
+                      ? "bg-[#5c3a21] text-white"
+                      : lesson.isLocked
+                        ? "opacity-50 cursor-not-allowed text-gray-500"
+                        : "hover:bg-[#5c3a21]/10 text-[#5c3a21]"
                     }`}
                 >
                   {lesson.isLocked ? (
@@ -425,8 +428,8 @@ const CourseLearningPage = () => {
                 type="button"
                 onClick={() => setActiveTab(tab.id)}
                 className={`py-6 text-[15px] font-bold transition-all relative ${activeTab === tab.id
-                  ? "text-[#5c3a21]"
-                  : "text-gray-400 hover:text-gray-600"
+                    ? "text-[#5c3a21]"
+                    : "text-gray-400 hover:text-gray-600"
                   }`}
               >
                 {tab.label}
@@ -448,7 +451,8 @@ const CourseLearningPage = () => {
                     ? [activeLesson.description]
                     : [
                       "Xem video bài giảng.",
-                      "Ôn tập flashcard và FAQ bot ở các tab tương ứng.",
+                      "Làm Quiz ở tab Quiz — đạt điểm yêu cầu để hoàn thành bài và mở khóa bài sau.",
+                      "Ôn tập flashcard ở các tab tương ứng.",
                     ]
                 }
               />
@@ -482,15 +486,15 @@ const CourseLearningPage = () => {
             </div>
           )}
 
-          {activeTab === "FAQ" && (
-            <div className="mt-6 mx-[7%] flex flex-col items-center pb-10">
+          {activeTab === "Mindmap" && (
+            <div className="mt-6 mx-[7%] flex flex-col items-center pb-10 w-[86%]">
               {detailLoading ? (
-                <p className="text-gray-500 py-12">Đang tải FAQ...</p>
-              ) : faqData.length > 0 ? (
-                <FAQBot data={faqData} />
+                <p className="text-gray-500 py-12">Đang tải sơ đồ tư duy...</p>
+              ) : lessonDetail?.mindmap ? (
+                <Mindmap mindmap={lessonDetail.mindmap} />
               ) : (
                 <p className="text-gray-500 py-12">
-                  Chưa có câu hỏi FAQ cho bài học này.
+                  Chưa có sơ đồ tư duy cho bài học này.
                 </p>
               )}
             </div>

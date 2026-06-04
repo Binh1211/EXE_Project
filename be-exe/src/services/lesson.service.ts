@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import {
   Chapter,
-  FaqItem,
+  Mindmap,
   FlashcardSet,
   Lesson,
   Quiz,
@@ -148,16 +148,14 @@ export async function getLessonDetail(id: string, userId?: string) {
 
   const lessonObjectId = new mongoose.Types.ObjectId(id);
 
-  const [quiz, flashcardSet, faqItems, progress] = await Promise.all([
+  const [quiz, flashcardSet, mindmap, progress] = await Promise.all([
     lesson.quiz
       ? Quiz.findById(lesson.quiz).lean()
       : Quiz.findOne({ lessonId: lessonObjectId }).lean(),
     lesson.flashcardSetId
       ? FlashcardSet.findById(lesson.flashcardSetId).lean()
       : FlashcardSet.findOne({ lessonId: lessonObjectId }).lean(),
-    FaqItem.find({ lessonId: lessonObjectId, isActive: { $ne: false } })
-      .sort({ order: 1 })
-      .lean(),
+    Mindmap.findOne({ lessonId: lessonObjectId }).lean(),
     userId
       ? UserLessonProgress.findOne({
           userId: new mongoose.Types.ObjectId(userId),
@@ -172,7 +170,7 @@ export async function getLessonDetail(id: string, userId?: string) {
     ...decorated,
     quizData: quiz ?? null,
     flashcardSet: flashcardSet ?? null,
-    faqItems: faqItems ?? [],
+    mindmap: mindmap ?? null,
     progress: progress ?? decorated.progress ?? null,
   };
 }
@@ -191,7 +189,6 @@ export async function createLesson(input: LessonInput) {
     coverImageUrl: input.coverImageUrl?.trim() || "",
     videos: normalizeVideos(input) ?? [],
     flashcardSetId: input.flashcardSetId,
-    faqId: input.faqId,
   });
 
   if (input.quiz && typeof input.quiz === "object") {
@@ -278,9 +275,6 @@ export async function updateLesson(id: string, updates: LessonUpdateInput) {
   }
   if (updates.flashcardSetId !== undefined) {
     updatesToApply.flashcardSetId = updates.flashcardSetId;
-  }
-  if (updates.faqId !== undefined) {
-    updatesToApply.faqId = updates.faqId;
   }
 
   lesson.set(updatesToApply);

@@ -5,7 +5,7 @@ export { Chapter } from "./Chapter.js";
 export { Lesson } from "./Lesson.js";
 export { FlashcardSet } from "./FlashcardSet.js";
 export { Quiz } from "./Quiz.js";
-export { FaqItem } from "./FaqItem.js";
+export { Mindmap } from "./Mindmap.js";
 export { UserLessonProgress } from "./UserLessonProgress.js";
 export { QuizAttempt } from "./QuizAttempt.js";
 export { Group } from "./Group.js";

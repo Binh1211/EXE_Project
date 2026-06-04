@@ -28,6 +28,10 @@ const timelineSchema = new Schema({
     required: true,
     index: true,
   },
+  funfacts: {
+    type: [String],
+    default: [],
+  },
 }, { timestamps: true });
 
 export const Timeline = mongoose.model("Timeline", timelineSchema);

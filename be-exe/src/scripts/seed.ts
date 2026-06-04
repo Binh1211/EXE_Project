@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import { connectDatabase } from "../config/db.js";
 import {
   Chapter,
-  FaqItem,
+  Mindmap,
   FlashcardSet,
   Lesson,
   Quiz,
@@ -12,6 +12,181 @@ import {
   UserLessonProgress,
 } from "../models/index.js";
 import { hashPassword } from "../utils/hash.js";
+
+function buildSampleMindmap(lessonTitle: string) {
+  const titleLower = lessonTitle.toLowerCase();
+  if (titleLower.includes("cách mạng tháng tám") || titleLower.includes("1945") || titleLower.includes("bài 6") || titleLower.includes("bai 6")) {
+    return [
+      {
+        title: "I. Bối cảnh lịch sử",
+        layoutType: "rect",
+        topics: [
+          {
+            title: "1. Tình hình thế giới",
+            illustrationUrl: "https://res.cloudinary.com/duq6whfxw/image/upload/v1780492406/vistory/I_1.png",
+            items: [
+              {
+                content: "Chiến tranh thế giới thứ hai bước vào giai đoạn kết thúc: Đức bại trận ở châu Âu, Nhật chuẩn bị đầu hàng Đồng minh vô điều kiện."
+              }
+            ]
+          },
+          {
+            title: "2. Tình hình Việt Nam",
+            illustrationUrl: "https://res.cloudinary.com/duq6whfxw/image/upload/v1780492407/vistory/I_2.png",
+            items: [
+              {
+                content: "Chính quyền Nhật ở Việt Nam hoang mang dao động cực độ, nhân dân sục sôi khí thế cách mạng, sẵn sàng đứng lên khởi nghĩa."
+              }
+            ]
+          },
+          {
+            title: "3. Chủ trương trung ương Đảng",
+            illustrationUrl: "https://res.cloudinary.com/duq6whfxw/image/upload/v1780492408/vistory/I_3.png",
+            items: [
+              {
+                content: "Hội nghị toàn quốc của Đảng tại Tân Trào họp từ 13-15/8/1945 quyết định phát động Tổng khởi nghĩa giành chính quyền trong cả nước."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        title: "II. Diễn biến chính của cách mạng tháng Tám",
+        layoutType: "scroll",
+        topics: [
+          {
+            title: "Khởi nghĩa giành chính quyền ở các đô thị lớn",
+            illustrationUrl: "https://res.cloudinary.com/duq6whfxw/image/upload/v1780492409/vistory/II.png",
+            items: [
+              {
+                content: "Tổng khởi nghĩa nổ ra và giành thắng lợi rực rỡ: 19/8 tại Hà Nội, 23/8 tại Huế, 25/8 tại Sài Gòn. Ngày 2/9/1945 Chủ tịch Hồ Chí Minh đọc Tuyên ngôn Độc lập khai sinh nước Việt Nam Dân chủ Cộng hòa."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        title: "III. Nguyên nhân thắng lợi, ý nghĩa lịch sử và bài học kinh nghiệm",
+        layoutType: "rect",
+        topics: [
+          {
+            title: "1. Nguyên nhân thắng lợi:",
+            illustrationUrl: "https://res.cloudinary.com/duq6whfxw/image/upload/v1779595644/vistory/home1.png",
+            items: [
+              {
+                label: "a. Chủ quan",
+                content: "Sự lãnh đạo đúng đắn, sáng suốt của Đảng đứng đầu là Chủ tịch Hồ Chí Minh; tinh thần đoàn kết, yêu nước nồng nàn của nhân dân Việt Nam."
+              },
+              {
+                label: "b. Khách quan",
+                content: "Hồng quân Liên Xô và lực lượng Đồng minh đánh bại phát xít Đức, quân phiệt Nhật, tạo điều kiện thuận lợi ngàn năm có một cho dân tộc ta."
+              }
+            ]
+          },
+          {
+            title: "2. Ý nghĩa lịch sử:",
+            illustrationUrl: "https://res.cloudinary.com/duq6whfxw/image/upload/v1779595642/vistory/VL_AL.png",
+            items: [
+              {
+                label: "a. Đối với Việt Nam",
+                content: "Mở ra bước ngoặt vĩ đại, phá tan xiềng xích nô lệ của Pháp-Nhật, lật đổ chế độ quân chủ phong kiến, lập ra nước Việt Nam Dân chủ Cộng hòa."
+              },
+              {
+                label: "b. Đối với thế giới",
+                content: "Chọc thủng khâu yếu nhất trong hệ thống thuộc địa của chủ nghĩa đế quốc, cổ vũ mạnh mẽ phong trào giải phóng dân tộc toàn thế giới."
+              }
+            ]
+          },
+          {
+            title: "3. Bài học kinh nghiệm:",
+            illustrationUrl: "https://res.cloudinary.com/duq6whfxw/image/upload/v1779595641/vistory/Thoi_binh.jpg",
+            items: [
+              {
+                label: "Đảng lãnh đạo",
+                content: "Đảng phải có đường lối cách mạng đúng đắn, giương cao ngọn cờ giải phóng dân tộc và nắm bắt thời cơ khởi nghĩa chính xác."
+              },
+              {
+                label: "Khối liên minh",
+                content: "Xây dựng khối liên minh công nông vững chắc, đoàn kết mọi lực lượng yêu nước trong Mặt trận Việt Minh để tạo sức mạnh tổng hợp."
+              }
+            ]
+          }
+        ]
+      }
+    ];
+  }
+
+  return [
+    {
+      title: "I. Khái quát chung",
+      layoutType: "rect",
+      topics: [
+        {
+          title: "1. Bối cảnh hình thành",
+          items: [
+            {
+              content: `Hoàn cảnh lịch sử và điều kiện kinh tế - xã hội cụ thể thúc đẩy sự hình thành và phát triển của chủ đề: ${lessonTitle}.`
+            }
+          ]
+        },
+        {
+          title: "2. Đặc điểm nổi bật",
+          items: [
+            {
+              content: `Những nét đặc trưng độc đáo, cốt lõi nhất tạo nên giá trị và bản sắc lịch sử của thời kỳ/sự kiện: ${lessonTitle}.`
+            }
+          ]
+        }
+      ]
+    },
+    {
+      title: "II. Nội dung chính & Các giai đoạn phát triển",
+      layoutType: "scroll",
+      topics: [
+        {
+          title: "Tiến trình diễn biến lịch sử",
+          items: [
+            {
+              content: `Mô tả chi tiết quá trình phát triển qua các giai đoạn, các mốc sự kiện tiêu biểu và vai trò của các nhân vật chủ chốt trong: ${lessonTitle}.`
+            }
+          ]
+        }
+      ]
+    },
+    {
+      title: "III. Giá trị & Ý nghĩa lịch sử lâu dài",
+      layoutType: "rect",
+      topics: [
+        {
+          title: "1. Kết quả & Tác động",
+          items: [
+            {
+              label: "a. Đối với thời kỳ đó",
+              content: "Giải quyết các mâu thuẫn xã hội, củng cố nền độc lập tự chủ hoặc thúc đẩy giao thương, văn hóa phát triển vượt bậc."
+            },
+            {
+              label: "b. Đối với hậu thế",
+              content: "Để lại những di sản văn hóa vật thể, phi vật thể giá trị và bài học quý báu cho công cuộc dựng nước và giữ nước ngày nay."
+            }
+          ]
+        },
+        {
+          title: "2. Bài học kinh nghiệm cốt lõi",
+          items: [
+            {
+              label: "Chính trị & Quân sự",
+              content: "Bài học về sự đồng lòng nhất trí của nhân dân, tính linh hoạt và chủ động trong nghệ thuật tự chủ quốc gia."
+            },
+            {
+              label: "Kinh tế & Văn hóa",
+              content: "Bài học về phát triển sức sản xuất, củng cố nội lực kinh tế và gìn giữ truyền thống bản sắc văn hóa dân tộc."
+            }
+          ]
+        }
+      ]
+    }
+  ];
+}
 
 const VAN_LANG_CHAPTER_ID = "6a128cd2adb512d45cb30909";
 
@@ -369,13 +544,16 @@ async function seedClass10Lessons() {
       await flashcardSet.save();
     }
 
-    await FaqItem.deleteMany({ lessonId });
-    const faqDocs = await FaqItem.insertMany(item.faqItems.map((faq, i) => ({ lessonId, question: faq.question, answer: faq.answer, order: i + 1, isActive: true })));
-    const firstFaq = faqDocs[0];
+    // Seed Mindmap
+    await Mindmap.deleteMany({ lessonId });
+    await Mindmap.create({
+      lessonId,
+      title: item.title,
+      sections: buildSampleMindmap(item.title),
+    });
 
     lesson.quiz = quiz._id;
     lesson.flashcardSetId = flashcardSet._id;
-    lesson.faqId = firstFaq?._id;
     await lesson.save();
 
     // User progress demo
@@ -538,25 +716,17 @@ async function seedVanLangChapter() {
       await flashcardSet.save();
     }
 
-    // ── FAQ bot (nhiều FaqItem / lesson) ─────────────────────────────────────
-    await FaqItem.deleteMany({ lessonId });
-
-    const faqDocs = await FaqItem.insertMany(
-      item.faqItems.map((faq, index) => ({
-        lessonId,
-        question: faq.question,
-        answer: faq.answer,
-        order: index + 1,
-        isActive: true,
-      })),
-    );
-
-    const firstFaq = faqDocs[0];
+    // Seed Mindmap
+    await Mindmap.deleteMany({ lessonId });
+    await Mindmap.create({
+      lessonId,
+      title: item.title,
+      sections: buildSampleMindmap(item.title),
+    });
 
     // ── Liên kết lesson ───────────────────────────────────────────────────────
     lesson.quiz = quiz._id;
     lesson.flashcardSetId = flashcardSet._id;
-    lesson.faqId = firstFaq?._id;
     await lesson.save();
 
     // ── User lesson progress ──────────────────────────────────────────────────
