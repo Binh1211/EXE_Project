@@ -41,12 +41,6 @@ export async function listQuizzes(req: Request, res: Response) {
   res.json(quizzes);
 }
 
-export async function listQuizzesByLesson(req: Request, res: Response) {
-  const lessonId = Array.isArray(req.params.lessonId) ? req.params.lessonId[0] : req.params.lessonId;
-  const quizzes = await getQuizzesByLesson(lessonId);
-  res.json(quizzes);
-}
-
 export async function getQuiz(req: Request, res: Response) {
   const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
   const quiz = await getQuizById(id);

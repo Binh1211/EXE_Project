@@ -88,14 +88,6 @@ function normalizeVideos(input: { videos?: LessonVideoInput[]; video?: LessonVid
   }));
 }
 
-function isProgressCompleted(progress: { status?: string; completedAt?: unknown; quizPassed?: boolean } | undefined) {
-  return Boolean(
-    progress?.status === "completed" ||
-      progress?.completedAt ||
-      progress?.quizPassed,
-  );
-}
-
 async function decorateLessonsWithLocks(lessons: any[], userId?: string) {
   const lessonIds = lessons.map((lesson) => lesson._id);
   const progressByLessonId = new Map<string, any>();
@@ -111,52 +103,16 @@ async function decorateLessonsWithLocks(lessons: any[], userId?: string) {
     }
   }
 
-  return lessons.map((lesson, index) => {
-    const previousLesson = index > 0 ? lessons[index - 1] : undefined;
-    const previousProgress = previousLesson
-      ? progressByLessonId.get(String(previousLesson._id))
-      : undefined;
+  return lessons.map((lesson) => {
     const progress = progressByLessonId.get(String(lesson._id));
-    const isLocked = index > 0 && !isProgressCompleted(previousProgress);
 
     return {
       ...lesson,
       progress,
-      isLocked,
-      unlockRequirement:
-        isLocked && previousLesson
-          ? {
-              lessonId: previousLesson._id,
-              title: previousLesson.title,
-              message: "Hoàn thành bài học trước để mở khóa bài này.",
-            }
-          : undefined,
+      isLocked: false,
+      unlockRequirement: undefined,
     };
   });
-}
-
-async function assertLessonUnlocked(lesson: any, userId?: string) {
-  const previousLesson = await Lesson.findOne({
-    chapterId: lesson.chapterId,
-    order: { $lt: lesson.order },
-  })
-    .sort({ order: -1 })
-    .lean();
-
-  if (!previousLesson) return;
-
-  if (!userId) {
-    throw new LessonError(403, "Bạn cần hoàn thành bài học trước để mở khóa bài này.");
-  }
-
-  const previousProgress = await UserLessonProgress.findOne({
-    userId: new mongoose.Types.ObjectId(userId),
-    lessonId: previousLesson._id,
-  }).lean();
-
-  if (!isProgressCompleted(previousProgress ?? undefined)) {
-    throw new LessonError(403, "Bạn cần hoàn thành bài học trước để mở khóa bài này.");
-  }
 }
 
 export async function getAllLessons(filters: { chapterId?: string } = {}, userId?: string) {
@@ -171,15 +127,13 @@ export async function getAllLessons(filters: { chapterId?: string } = {}, userId
   return await decorateLessonsWithLocks(lessons, userId);
 }
 
-export async function getLessonById(id: string, userId?: string) {
+export async function getLessonById(id: string, _userId?: string) {
   validateObjectId(id);
 
   const lesson = await Lesson.findById(id);
   if (!lesson) {
     throw new LessonError(404, "Không tìm thấy bài học.");
   }
-
-  await assertLessonUnlocked(lesson, userId);
 
   return lesson;
 }
@@ -191,8 +145,6 @@ export async function getLessonDetail(id: string, userId?: string) {
   if (!lesson) {
     throw new LessonError(404, "Không tìm thấy bài học.");
   }
-
-  await assertLessonUnlocked(lesson, userId);
 
   const lessonObjectId = new mongoose.Types.ObjectId(id);
 

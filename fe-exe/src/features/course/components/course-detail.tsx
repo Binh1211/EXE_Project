@@ -39,16 +39,12 @@ const CourseDetailPage = () => {
   const [timeline, setTimeline] = useState<Timeline | null>(null);
   const [chapter, setChapter] = useState<Chapter | null>(null);
   const [lessons, setLessons] = useState<Lesson[]>([]);
-  const [chapterIndex, setChapterIndex] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const { isAuthenticated, levelLocked } = useChapterAccess(
-    chapter,
-    chapterIndex,
-  );
+  const { isAuthenticated, levelLocked } = useChapterAccess(chapter);
 
   useEffect(() => {
-    if (loading || !chapter || chapterIndex === null) return;
+    if (loading || !chapter) return;
     if (!isAuthenticated) {
       navigate("/login");
       return;
@@ -56,7 +52,7 @@ const CourseDetailPage = () => {
     if (levelLocked) {
       navigate("/vip");
     }
-  }, [loading, chapter, chapterIndex, isAuthenticated, levelLocked, navigate]);
+  }, [loading, chapter, isAuthenticated, levelLocked, navigate]);
 
   useEffect(() => {
     if (!timelineSlug || !chapterSlug) return;
@@ -71,11 +67,6 @@ const CourseDetailPage = () => {
       .then(async ([timelineData, chapterData]) => {
         setTimeline(timelineData);
         setChapter(chapterData);
-        const allChapters = await chapterApi.getChaptersByTimelineId(
-          timelineData._id,
-        );
-        const idx = allChapters.findIndex((ch) => ch._id === chapterData._id);
-        setChapterIndex(idx >= 0 ? idx : 0);
         return lessonApi.getLessonsByChapterId(chapterData._id);
       })
       .then(setLessons)
@@ -95,10 +86,10 @@ const CourseDetailPage = () => {
     ? Math.round((completedCount / publishedLessons.length) * 100)
     : 0;
 
-  const firstUnlocked = publishedLessons.find((l) => !l.isLocked);
+  const firstUnlocked = publishedLessons[0];
 
   const goToLesson = (lesson: Lesson) => {
-    if (levelLocked || lesson.isLocked || !timelineSlug || !chapterSlug) return;
+    if (levelLocked || !timelineSlug || !chapterSlug) return;
     navigate(buildLearnPath(timelineSlug, chapterSlug, lesson._id));
   };
 
@@ -116,7 +107,7 @@ const CourseDetailPage = () => {
         <p className="text-red-600">{error || "Không tìm thấy khóa học."}</p>
         <button
           type="button"
-          onClick={() => navigate("/course")}
+          onClick={() => navigate("/course/all")}
           className="rounded-xl bg-[#5c3a21] px-5 py-2 text-white text-sm font-bold"
         >
           Quay lại danh sách
@@ -128,13 +119,8 @@ const CourseDetailPage = () => {
   const coverImage = resolveImageUrl(chapter.coverImageUrl) || IMG.news1;
 
   return (
-    <div className="min-h-screen font-sans overflow-x-hidden">
-      <div
-        className="fixed inset-0 pointer-events-none z-0 bg-cover"
-        style={{ backgroundImage: `url(${IMG.paperTexture})` }}
-      />
-
-      <div className="relative z-10">
+    <div className="flex-1 w-full flex flex-col font-sans overflow-x-hidden">
+      <div className="relative z-10 flex-1">
         {/* Hero */}
         <div className="bg-[#5c3a21] text-white pt-5 pb-16 px-10 relative overflow-hidden">
           <div
@@ -250,38 +236,19 @@ const CourseDetailPage = () => {
                 const duration = formatLessonDuration(
                   lesson.videos?.[0]?.durationSec,
                 );
-                const locked = Boolean(lesson.isLocked);
 
                 return (
                   <div
                     key={lesson._id}
                     onClick={() => goToLesson(lesson)}
-                    className={`group flex items-center justify-between p-5 md:p-6 rounded-2xl border transition-all ${
-                      locked
-                        ? "border-gray-200 bg-gray-50 opacity-60 cursor-not-allowed"
-                        : "border-[#5c3a21]/10 bg-white hover:border-[#5c3a21]/30 hover:shadow-lg cursor-pointer"
-                    }`}
+                    className="group flex items-center justify-between p-5 md:p-6 rounded-2xl border transition-all border-[#5c3a21]/10 bg-white hover:border-[#5c3a21]/30 hover:shadow-lg cursor-pointer"
                   >
                     <div className="flex items-center gap-4 min-w-0">
-                      <div
-                        className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${
-                          locked ? "bg-gray-200" : "bg-[#5c3a21]/10"
-                        }`}
-                      >
-                        {locked ? (
-                          <Lock size={20} className="text-gray-500" />
-                        ) : (
-                          <PlayCircle size={22} className="text-[#5c3a21]" />
-                        )}
+                      <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 bg-[#5c3a21]/10">
+                        <PlayCircle size={22} className="text-[#5c3a21]" />
                       </div>
                       <div className="min-w-0">
-                        <p
-                          className={`font-medium text-lg truncate ${
-                            locked
-                              ? "text-gray-500"
-                              : "text-[#5c3a21] group-hover:underline"
-                          }`}
-                        >
+                        <p className="font-medium text-lg truncate text-[#5c3a21] group-hover:underline">
                           {lesson.title}
                         </p>
                         {lesson.description && (
@@ -296,24 +263,12 @@ const CourseDetailPage = () => {
                               Đã hoàn thành
                             </span>
                           )}
-                          {locked && (
-                            <span className="text-amber-700 font-semibold">
-                              Hoàn thành bài trước + quiz
-                            </span>
-                          )}
                         </div>
                       </div>
                     </div>
                   </div>
                 );
               })}
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 mt-16">
-              <CourseProgressCard
-                progressPercentage={progressPct}
-                variant="large"
-              />
             </div>
           </div>
         </div>

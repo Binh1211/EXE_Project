@@ -22,7 +22,7 @@ export const CourseBreadcrumb = ({
     >
       <span
         className="cursor-pointer hover:text-white transition-colors"
-        onClick={() => navigate("/course")}
+        onClick={() => navigate("/course/all")}
       >
         Khóa học
       </span>

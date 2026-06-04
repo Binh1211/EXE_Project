@@ -1,5 +1,5 @@
-import Game from "@/features/game/components";
+import GameVuotRao from "@/features/game/components";
 
-export default function GamePage() {
-    return <Game />;
+export default function GameVuotRaoPage() {
+    return <GameVuotRao />;
 }

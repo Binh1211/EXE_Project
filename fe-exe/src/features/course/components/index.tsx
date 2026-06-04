@@ -21,23 +21,13 @@ import { chapterApi } from "../api/course-api";
 import { timelineApi } from "@/features/timeLine/api/timeline-api";
 import type { Timeline } from "@/features/timeLine/types";
 import type { Chapter } from "../types";
-import {
-  getEffectiveRequiredLevel,
-  isChapterLevelLocked,
-} from "../hooks/useChapterAccess";
+import { isChapterLevelLocked } from "../hooks/useChapterAccess";
 
 const ITEMS_PER_PAGE = 4;
-
-const CLASS_LABELS: Record<number, string> = {
-  10: "Lớp 10",
-  11: "Lớp 11",
-  12: "Lớp 12",
-};
 
 const SidebarItem = ({
   icon: Icon,
   text,
-  to,
   active = false,
   isPro = false,
 }: {
@@ -49,15 +39,13 @@ const SidebarItem = ({
 }) => {
   return (
     <div
-      className={`flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-colors ${
-        active ? "bg-[#5c3a21] text-white" : "text-gray-700 hover:bg-white/50"
-      }`}
+      className={`flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-colors ${active ? "bg-[#5c3a21] text-white" : "text-gray-700 hover:bg-white/50"
+        }`}
     >
       <Icon size={20} className={active ? "text-white" : "text-gray-600"} />
       <span
-        className={`font-medium text-sm flex-1 ${
-          active ? "text-white" : "text-gray-800"
-        }`}
+        className={`font-medium text-sm flex-1 ${active ? "text-white" : "text-gray-800"
+          }`}
       >
         {text}
       </span>
@@ -74,21 +62,18 @@ const CourseRow = ({
   course,
   userLevel,
   timeLineSlug,
-  chapterIndex,
 }: {
   course: Chapter;
   userLevel: number;
   timeLineSlug: string;
-  chapterIndex: number;
 }) => {
   const navigate = useNavigate();
   const { user } = useAuthUser();
 
   const { slug, coverImageUrl, title, description } = course;
 
-  const levelRequired = getEffectiveRequiredLevel(chapterIndex);
-  const isLocked = isChapterLevelLocked(chapterIndex, userLevel);
-  const isPremium = levelRequired >= 2;
+  const levelRequired = course.requiredLevel ?? 1;
+  const isLocked = isChapterLevelLocked(course, userLevel);
 
   const handleClick = () => {
     if (isLocked) {
@@ -131,13 +116,9 @@ const CourseRow = ({
             <Lock size={12} />
             Level {levelRequired}
           </span>
-        ) : isPremium ? (
+        ) : (
           <span className="text-sm font-bold text-white bg-[#b45309] px-3 py-1 rounded-full">
             Level {levelRequired}
-          </span>
-        ) : (
-          <span className="text-sm font-bold text-white bg-green-600 px-3 py-1 rounded-full">
-            Free
           </span>
         )}
       </div>
@@ -169,18 +150,23 @@ export default function CoursePage() {
   const classNum = classFilter ? Number(classFilter) : null;
 
   const [timeline, setTimeline] = useState<Timeline | null>(null);
+  const [timelines, setTimelines] = useState<Timeline[]>([]);
 
   useEffect(() => {
-    if (!slugTimeline || slugTimeline === "all") return;
+    if (!slugTimeline) return;
 
-    timelineApi
-      .getTimelineBySlug(slugTimeline)
-      .then((data: Timeline) => {
-        setTimeline(data);
-      })
-      .catch((error: Error) => {
-        console.error("Failed to fetch timeline:", error);
-      });
+    if (slugTimeline === "all") {
+      timelineApi.getTimelines().then(setTimelines).catch(console.error);
+    } else {
+      timelineApi
+        .getTimelineBySlug(slugTimeline)
+        .then((data: Timeline) => {
+          setTimeline(data);
+        })
+        .catch((error: Error) => {
+          console.error("Failed to fetch timeline:", error);
+        });
+    }
   }, [slugTimeline]);
   const [courses, setCourses] = useState<Chapter[]>([]);
 
@@ -279,18 +265,29 @@ export default function CoursePage() {
               <p className="text-gray-500 text-sm">
                 Hãy cùng nhau học thêm nhiều kiến thức mới nào!
               </p>
-              {classNum && CLASS_LABELS[classNum] && (
-                <div className="mt-2 flex items-center gap-2">
-                  <span className="inline-flex items-center gap-1 rounded-full bg-[#5c3a21] px-3 py-1 text-xs font-bold text-white">
-                    {CLASS_LABELS[classNum]}
-                  </span>
+              {slugTimeline === "all" && (
+                <div className="mt-5 flex items-center gap-3">
                   <button
-                    type="button"
                     onClick={() => navigate("/course/all")}
-                    className="text-xs text-gray-500 hover:text-[#5c3a21] underline"
+                    className={`px-5 py-2 rounded-full text-sm font-bold transition-all shadow-sm ${!classNum
+                      ? "bg-[#5c3a21] text-white shadow-md"
+                      : "bg-white/80 text-gray-600 border border-gray-200 hover:border-[#5c3a21]/50 hover:bg-white"
+                      }`}
                   >
-                    Xem tất cả
+                    Tất cả
                   </button>
+                  {[10, 11, 12].map((cls) => (
+                    <button
+                      key={cls}
+                      onClick={() => navigate(`/course/all?class=${cls}`)}
+                      className={`px-5 py-2 rounded-full text-sm font-bold transition-all shadow-sm ${classNum === cls
+                        ? "bg-[#5c3a21] text-white shadow-md"
+                        : "bg-white/80 text-gray-600 border border-gray-200 hover:border-[#5c3a21]/50 hover:bg-white"
+                        }`}
+                    >
+                      Lớp {cls}
+                    </button>
+                  ))}
                 </div>
               )}
             </div>
@@ -310,14 +307,16 @@ export default function CoursePage() {
               </div>
 
               {pagedCourses.map((c) => {
-                const chapterIndex = courses.findIndex((ch) => ch._id === c._id);
+                const actualTimelineSlug =
+                  slugTimeline === "all"
+                    ? timelines.find((t) => t._id === c.timelineId)?.slug || "all"
+                    : slugTimeline;
                 return (
                   <CourseRow
                     key={c._id}
                     course={c}
-                    timeLineSlug={slugTimeline}
+                    timeLineSlug={actualTimelineSlug}
                     userLevel={userLevel}
-                    chapterIndex={chapterIndex >= 0 ? chapterIndex : 0}
                   />
                 );
               })}
@@ -338,11 +337,10 @@ export default function CoursePage() {
                       <button
                         key={page}
                         onClick={() => setCurrentPage(page)}
-                        className={`w-6 h-6 rounded-full flex items-center justify-center transition-colors ${
-                          page === currentPage
-                            ? "bg-[#5c3a21] text-white"
-                            : "hover:bg-gray-100 text-gray-600"
-                        }`}
+                        className={`w-6 h-6 rounded-full flex items-center justify-center transition-colors ${page === currentPage
+                          ? "bg-[#5c3a21] text-white"
+                          : "hover:bg-gray-100 text-gray-600"
+                          }`}
                       >
                         {page}
                       </button>

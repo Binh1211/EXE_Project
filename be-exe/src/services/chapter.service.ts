@@ -141,7 +141,6 @@ export async function updateChapter(
   if (updates.isPublished !== undefined) {
     chapter.isPublished = updates.isPublished;
   }
-
   await chapter.save();
   return chapter;
 }

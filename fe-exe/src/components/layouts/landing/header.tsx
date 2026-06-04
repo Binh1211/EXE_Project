@@ -1,6 +1,6 @@
+import { Search, ChevronRight } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Search } from "lucide-react";
 import { Button } from "../../ui/button";
 import {
   Select,
@@ -47,7 +47,7 @@ export default function Header() {
             data.map((c: { id: string; title: string }) => ({
               id: c.id,
               title: c.title,
-            }))
+            })),
           );
         }
       })
@@ -72,7 +72,7 @@ export default function Header() {
       (t) =>
         t.title.toLowerCase().includes(q) ||
         t.displayTime.toLowerCase().includes(q) ||
-        (t.description?.toLowerCase().includes(q) ?? false)
+        (t.description?.toLowerCase().includes(q) ?? false),
     );
   }, [q, timelines, searchScope]);
 
@@ -107,7 +107,11 @@ export default function Header() {
           onClick={() => navigate("/")}
           aria-label="Về trang chủ"
         >
-          <img src={IMG.logo} alt="EXE" className="h-16 w-auto object-contain" />
+          <img
+            src={IMG.logo}
+            alt="EXE"
+            className="h-16 w-auto object-contain"
+          />
         </button>
 
         <div ref={searchRef} className="relative z-[210] w-[40%]">
@@ -129,9 +133,7 @@ export default function Header() {
               value={searchScope}
               onValueChange={(v) => setSearchScope(v as SearchScope)}
             >
-              <SelectTrigger
-                className="h-8 w-[28%] rounded-xl border-none bg-[#fff3e9] text-[#5f3713] [&>span]:text-[#5f3713] [&>span[data-placeholder]]:text-[#5f3713]"
-              >
+              <SelectTrigger className="h-8 w-[28%] rounded-xl border-none bg-[#fff3e9] text-[#5f3713] [&>span]:text-[#5f3713] [&>span[data-placeholder]]:text-[#5f3713]">
                 <SelectValue placeholder="Tất cả" />
               </SelectTrigger>
               <SelectContent className="z-[300] rounded-xl bg-[#fff3e9] text-[#5f3713]">
@@ -182,7 +184,9 @@ export default function Header() {
                         setSearchQuery("");
                       }}
                     >
-                      <span className="font-medium text-[#5f3713]">{t.title}</span>
+                      <span className="font-medium text-[#5f3713]">
+                        {t.title}
+                      </span>
                       <span className="ml-2 text-xs text-gray-500">
                         {t.displayTime}
                       </span>
@@ -206,7 +210,9 @@ export default function Header() {
                         setSearchQuery("");
                       }}
                     >
-                      <span className="font-medium text-[#5f3713]">{c.title}</span>
+                      <span className="font-medium text-[#5f3713]">
+                        {c.title}
+                      </span>
                     </button>
                   ))}
                 </div>
@@ -282,7 +288,13 @@ export default function Header() {
               <div className="group/lophoc relative">
                 <div className="flex items-center justify-between rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3] cursor-pointer">
                   Lớp học
-                  <svg className="ml-1 h-3 w-3" viewBox="0 0 12 12" fill="currentColor"><path d="M4.5 2l4 4-4 4" /></svg>
+                  <svg
+                    className="ml-1 h-3 w-3"
+                    viewBox="0 0 12 12"
+                    fill="currentColor"
+                  >
+                    <path d="M4.5 2l4 4-4 4" />
+                  </svg>
                 </div>
                 <div className="invisible absolute left-full top-0 z-[230] ml-1 w-36 rounded-xl bg-[#fff3e9] p-1 opacity-0 shadow-lg transition-all duration-200 group-hover/lophoc:visible group-hover/lophoc:opacity-100">
                   <Link
@@ -305,6 +317,7 @@ export default function Header() {
                   </Link>
                 </div>
               </div>
+
               <Link
                 to="/news"
                 className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
@@ -313,11 +326,22 @@ export default function Header() {
               </Link>
             </div>
           </div>
-
+          <div className="group relative inline-block">
+            <button
+              type="button"
+              className="text-sm font-medium hover:text-[#5f3713]"
+              onClick={() => navigate("/game/list")}
+            >
+              Game
+            </button>
+          </div>
           <Link to="/vip" className="text-sm font-medium hover:text-[#5f3713]">
-            Nâng cấp Pro
+            Mua VIP
           </Link>
-          <Link to="/contact" className="text-sm font-medium hover:text-[#5f3713]">
+          <Link
+            to="/contact"
+            className="text-sm font-medium hover:text-[#5f3713]"
+          >
             Liên hệ
           </Link>
           <Link to="/news" className="text-sm font-medium hover:text-[#5f3713]">
