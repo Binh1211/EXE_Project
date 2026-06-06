@@ -9,13 +9,11 @@ import {
   Calendar,
   PlayCircle,
   Play,
-  Lock,
   BookOpen,
 } from "lucide-react";
 import {
   CourseBreadcrumb,
   RelatedCourseCard,
-  CourseProgressCard,
 } from "./shared";
 import { IMG, resolveImageUrl } from "@/lib/images";
 import { chapterApi } from "../api/course-api";
@@ -79,13 +77,6 @@ const CourseDetailPage = () => {
 
   const publishedLessons = lessons.filter((l) => l.isPublished !== false);
   const videoCount = publishedLessons.filter((l) => l.videos?.length).length;
-  const completedCount = publishedLessons.filter(
-    (l) => l.progress?.status === "completed",
-  ).length;
-  const progressPct = publishedLessons.length
-    ? Math.round((completedCount / publishedLessons.length) * 100)
-    : 0;
-
   const firstUnlocked = publishedLessons[0];
 
   const goToLesson = (lesson: Lesson) => {

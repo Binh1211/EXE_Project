@@ -54,6 +54,9 @@ export default function DragonRaceResultPage() {
             <div>
               <h1 className="text-4xl font-bold text-[#5c3a21]">Bảng xếp hạng</h1>
               <p className="mt-2 text-sm text-gray-500">Phòng {roomCode}</p>
+              {socketError && (
+                <p className="mt-2 text-sm font-medium text-red-600">{socketError}</p>
+              )}
             </div>
             <Medal className="text-amber-500" size={42} />
           </div>

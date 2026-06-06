@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { LessonQuizDocument } from "../types";
+import type { LessonQuizDocument } from "../../types";
 
 type LessonQuizProps = {
   quiz: LessonQuizDocument;
