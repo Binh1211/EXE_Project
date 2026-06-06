@@ -9,7 +9,6 @@ import {
   BookOpen,
   BarChart3,
   LogOut,
-  Home,
   LayoutDashboard,
 } from "lucide-react";
 import { authApi } from "@/features/auth/api/auth-api";

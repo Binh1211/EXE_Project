@@ -28,7 +28,6 @@ const getGrade = (correctCount: number, totalQuestions: number): string => {
   return "F";
 };
 
-const MAX_OBSTACLES = 6;
 const OBSTACLE_GAP = 200;
 const MOVE_SPEED = 4;
 
