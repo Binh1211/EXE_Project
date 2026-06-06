@@ -631,15 +631,16 @@
 
 /* Result Screen Styles */
 .resultScreen {
-    position: fixed;
-    inset: 0;
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    padding: 40px 20px 80px;
     background-image: url("/img/paper-texture.png");
     background-size: auto;
     background-color: #e8d5c4;
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 1000;
     animation: fadeIn 0.5s ease;
 }
 
@@ -958,15 +959,16 @@
 
 /* Game Over Screen */
 .gameoverScreen {
-    position: fixed;
-    inset: 0;
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    padding: 40px 20px 80px;
     background-image: url("/img/paper-texture.png");
     background-size: auto;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    z-index: 1000;
 }
 
 .gameoverScreen h1 {
@@ -1084,13 +1086,10 @@ button {
 
 .resultScreen,
 .gameoverScreen {
-    position: fixed;
-    inset: 0;
-
-    width: 100vw;
-    height: 100vh;
-
-    overflow-y: auto;
+    position: relative;
+    width: 100%;
+    height: auto;
+    overflow-y: visible;
 }
 
 .questionCard {

@@ -45,37 +45,24 @@ export default function GameLessonSelect() {
 
       try {
         const chapters = await chapterApi.getAllChapters();
+        const allQuizzes = await quizApi.getAllQuizzes();
+        const quizLessonIds = new Set(allQuizzes.map((quiz) => quiz.lessonId));
+
         const results = await Promise.all(
-          chapters
-            .filter((chapter) => chapter.isPublished !== false)
-            .map(async (chapter) => {
-              try {
-                const lessons = await lessonApi.getLessonsByChapterId(chapter._id);
-                const publishedLessons = lessons.filter((lesson) => lesson.isPublished !== false);
-                const lessonsWithQuiz = await Promise.all(
-                  publishedLessons.map(async (lesson) => {
-                    if (lesson.quiz) return lesson;
+          chapters.map(async (chapter) => {
+            try {
+              const lessons = await lessonApi.getLessonsByChapterId(chapter._id);
+              const lessonsWithQuiz = lessons.filter(
+                (lesson) => lesson.quiz || quizLessonIds.has(lesson._id),
+              );
 
-                    try {
-                      const quizzes = await quizApi.getQuizzesByLessonId(lesson._id);
-                      return quizzes.length > 0 ? lesson : null;
-                    } catch {
-                      return null;
-                    }
-                  }),
-                );
-
-                const playableLessons = lessonsWithQuiz.filter(
-                  (lesson): lesson is Lesson => lesson !== null,
-                );
-
-                return playableLessons.length > 0
-                  ? { chapter, lessons: playableLessons }
-                  : null;
-              } catch {
-                return null;
-              }
-            }),
+              return lessonsWithQuiz.length > 0
+                ? { chapter, lessons: lessonsWithQuiz }
+                : null;
+            } catch {
+              return null;
+            }
+          }),
         );
 
         const chaptersWithLessons = results.filter(
@@ -183,7 +170,7 @@ export default function GameLessonSelect() {
                 Vượt rào
               </h2>
               <p className="text-sm text-gray-500">
-                Chọn chapter, sau đó chọn lesson bên trong để bắt đầu
+                Danh sách đầy đủ bài quiz từ tất cả chapter và lesson có thể chơi.
               </p>
             </div>
           </div>

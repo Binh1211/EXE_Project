@@ -68,6 +68,8 @@ export default function HistoryMiniGame() {
   const [savingProgress, setSavingProgress] = useState(false);
 
   const rafRef = useRef<number>(0);
+  const worldRef = useRef<HTMLDivElement | null>(null);
+  const [worldWidth, setWorldWidth] = useState(0);
   const questionCount = questions.length;
 
   const backUrl = "/game/vuot-rao";
@@ -122,6 +124,31 @@ export default function HistoryMiniGame() {
   }, [started, initRun]);
 
   useEffect(() => {
+    const updateWidth = () => {
+      if (worldRef.current) {
+        setWorldWidth(worldRef.current.clientWidth);
+      } else {
+        setWorldWidth(Math.floor(window.innerWidth * 0.99));
+      }
+    };
+
+    updateWidth();
+    window.addEventListener("resize", updateWidth);
+    return () => window.removeEventListener("resize", updateWidth);
+  }, []);
+
+  const shiftScreen = useCallback(() => {
+    const nextQueue = queue.slice(current);
+    setQueue(nextQueue);
+    setObstacles(
+      Array.from({ length: nextQueue.length }, (_, idx) => 200 + idx * OBSTACLE_GAP),
+    );
+    setDestroyed((prev) => prev.slice(current));
+    setCurrent(0);
+    setPosition(0);
+  }, [current, queue]);
+
+  useEffect(() => {
     if (!showQuestion) return;
     setTimer(15);
     setSelectedOption(null);
@@ -142,7 +169,7 @@ export default function HistoryMiniGame() {
   }, [showQuestion, current]);
 
   useEffect(() => {
-    if (!started || questionCount === 0 || correctCount === questionCount) return;
+    if (!started || questionCount === 0 || correctCount === questionCount || current >= queue.length) return;
 
     const interval = setInterval(() => {
       const elapsed = Math.floor((Date.now() - startTime) / 1000);
@@ -152,7 +179,7 @@ export default function HistoryMiniGame() {
     }, 100);
 
     return () => clearInterval(interval);
-  }, [started, startTime, correctCount, questionCount]);
+  }, [started, startTime, correctCount, questionCount, current, queue.length]);
 
   const currentQuestionIndex = queue[current];
   const q =
@@ -167,20 +194,10 @@ export default function HistoryMiniGame() {
     });
 
     setObstacles((prev) => {
-      let next = [...prev, (prev[prev.length - 1] ?? 200) + OBSTACLE_GAP];
-      if (next.length > MAX_OBSTACLES) {
-        next = next.slice(0, MAX_OBSTACLES);
-        next = next.slice(1).map((v) => v - OBSTACLE_GAP);
-        setPosition((p) => Math.max(0, p - OBSTACLE_GAP));
-        setCurrent((c) => Math.max(0, c - 1));
-      }
-      return next;
+      return [...prev, (prev[prev.length - 1] ?? 200) + OBSTACLE_GAP];
     });
 
-    setDestroyed((prev) => {
-      const next = [...prev, false];
-      return next.length > MAX_OBSTACLES ? next.slice(1) : next;
-    });
+    setDestroyed((prev) => [...prev, false]);
   }, [current]);
 
   const handleWrongAnswer = useCallback(
@@ -216,11 +233,23 @@ export default function HistoryMiniGame() {
     const tick = () => {
       setPosition((prev) => {
         const next = prev + MOVE_SPEED;
-        if (next >= obstacles[current]) {
+        const currentObstacle = obstacles[current];
+
+        if (
+          worldWidth > 0 &&
+          currentObstacle > worldWidth - 120 &&
+          next >= worldWidth - 120
+        ) {
+          shiftScreen();
+          return 0;
+        }
+
+        if (next >= currentObstacle) {
           cancelAnimationFrame(rafRef.current);
           setShowQuestion(true);
-          return obstacles[current];
+          return currentObstacle;
         }
+
         return next;
       });
       rafRef.current = requestAnimationFrame(tick);
@@ -228,7 +257,7 @@ export default function HistoryMiniGame() {
 
     rafRef.current = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(rafRef.current);
-  }, [showQuestion, current, started, obstacles, queue, questionCount]);
+  }, [showQuestion, current, started, obstacles, queue, questionCount, worldWidth, shiftScreen]);
 
   const advanceAfterAnswer = useCallback(
     (isCorrect: boolean) => {
@@ -362,11 +391,13 @@ export default function HistoryMiniGame() {
     );
   }
 
+  const allQuestionsAnswered = started && current >= queue.length && questionCount > 0;
+
   if (
     started &&
     questionCount > 0 &&
-    correctCount === questionCount &&
-    lives > 0
+    lives > 0 &&
+    (correctCount === questionCount || allQuestionsAnswered)
   ) {
     const scorePct = Math.round((correctCount / questionCount) * 100);
     const passed = scorePct >= passingScore;
@@ -495,7 +526,7 @@ export default function HistoryMiniGame() {
 
       {started && (
         <>
-          <div className="world game-world">
+          <div className="world game-world" ref={worldRef}>
             <div className="hearts">
               {Array.from({ length: lives }).map((_, i) => (
                 <img key={i} src={IMG.heart} className="heart" alt="" />
