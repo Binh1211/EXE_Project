@@ -65,7 +65,7 @@ export async function registerUser(input: {
     passwordHash: await hashPassword(input.password),
     displayName: input.fullName.trim(),
     role: "user",
-    level: 1,
+    level: 2,
     subscription: { status: "free" },
   });
 
