@@ -59,13 +59,15 @@ export async function register(req: AuthRequest, res: Response) {
     // decode exp to set cookie maxAge
     const decoded: any = await import("jsonwebtoken").then((jwt) => jwt.default.decode(raw));
     const maxAge = decoded?.exp ? decoded.exp * 1000 - Date.now() : undefined;
-    res.cookie("refresh_token", raw, {
-      httpOnly: true,
-      secure: env.nodeEnv === "production",
-      sameSite: "lax",
-      path: "/",
-      ...(maxAge ? { maxAge } : {}),
-    });
+      const cookieOptions: any = {
+        httpOnly: true,
+        secure: env.nodeEnv === "production",
+        sameSite: env.nodeEnv === "production" ? "none" : "lax",
+        path: "/",
+        ...(maxAge ? { maxAge } : {}),
+      };
+      if (env.cookieDomain) cookieOptions.domain = env.cookieDomain;
+      res.cookie("refresh_token", raw, cookieOptions);
   }
   res.status(201).json({ accessToken: result.accessToken, user: result.user });
 }
@@ -77,13 +79,15 @@ export async function login(req: AuthRequest, res: Response) {
     const raw = (result as any).refreshToken as string;
     const decoded: any = await import("jsonwebtoken").then((jwt) => jwt.default.decode(raw));
     const maxAge = decoded?.exp ? decoded.exp * 1000 - Date.now() : undefined;
-    res.cookie("refresh_token", raw, {
-      httpOnly: true,
-      secure: env.nodeEnv === "production",
-      sameSite: "lax",
-      path: "/",
-      ...(maxAge ? { maxAge } : {}),
-    });
+      const cookieOptions: any = {
+        httpOnly: true,
+        secure: env.nodeEnv === "production",
+        sameSite: env.nodeEnv === "production" ? "none" : "lax",
+        path: "/",
+        ...(maxAge ? { maxAge } : {}),
+      };
+      if (env.cookieDomain) cookieOptions.domain = env.cookieDomain;
+      res.cookie("refresh_token", raw, cookieOptions);
   }
   res.json({ accessToken: result.accessToken, user: result.user });
 }
@@ -132,6 +136,10 @@ export async function uploadAvatarHandler(req: AuthRequest, res: Response) {
 
 export async function logoutHandler(req: AuthRequest, res: Response) {
   const result = await logoutUser(req.userId!);
+  // Clear refresh cookie on logout
+  const clearOptions: any = { path: "/" };
+  if (env.cookieDomain) clearOptions.domain = env.cookieDomain;
+  res.clearCookie("refresh_token", clearOptions);
   res.json(result);
 }
 
