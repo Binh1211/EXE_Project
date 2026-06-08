@@ -24,6 +24,7 @@ export const authApi = {
     return apiRequest<AuthResponse>(`${AUTH_PREFIX}/login`, {
       method: "POST",
       body: JSON.stringify(payload),
+      credentials: "include",
     });
   },
 
@@ -32,6 +33,7 @@ export const authApi = {
     return apiRequest<AuthResponse>(`${AUTH_PREFIX}/register`, {
       method: "POST",
       body: JSON.stringify(payload),
+      credentials: "include",
     });
   },
 

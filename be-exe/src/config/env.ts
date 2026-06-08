@@ -55,6 +55,8 @@ export const env = {
   port: appPort,
   mongodbUri: required("MONGODB_URI"),
   clientUrl: process.env.CLIENT_URL ?? "http://localhost:5173",
+  // Optional domain to use when setting cookies in production (e.g. ".example.com")
+  cookieDomain: process.env.COOKIE_DOMAIN ?? "",
   jwt: {
     accessSecret: productionSecret("JWT_ACCESS_SECRET", devAccessSecret),
     refreshSecret: productionSecret("JWT_REFRESH_SECRET", devRefreshSecret),

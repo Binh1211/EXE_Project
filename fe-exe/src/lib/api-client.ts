@@ -47,6 +47,7 @@ export async function apiRequest<T>(
     response = await fetch(`${API_BASE_URL}${path}`, {
       ...options,
       headers,
+      credentials: (options as any).credentials ?? "include",
     });
   } catch {
     throw new NetworkError(
@@ -64,6 +65,53 @@ export async function apiRequest<T>(
   }
 
   if (!response.ok) {
+    // Try refresh once on 401
+    if (response.status === 401) {
+      try {
+        const refreshRes = await fetch(`${API_BASE_URL}/api/auth/refresh`, {
+          method: "POST",
+          credentials: "include",
+        });
+        if (refreshRes.ok) {
+          const body = await refreshRes.json().catch(() => null) as any;
+          if (body?.accessToken) {
+            localStorage.setItem("access_token", body.accessToken);
+            // retry original request with new token
+            const retryHeaders = new Headers(options.headers);
+            if (
+              options.body &&
+              !(options.body instanceof FormData) &&
+              !retryHeaders.has("Content-Type")
+            ) {
+              retryHeaders.set("Content-Type", "application/json");
+            }
+            retryHeaders.set("Authorization", `Bearer ${body.accessToken}`);
+            const retryResp = await fetch(`${API_BASE_URL}${path}`, {
+              ...options,
+              headers: retryHeaders,
+              credentials: (options as any).credentials ?? "include",
+            });
+            const retryText = await retryResp.text();
+            let retryData: T | ApiErrorBody | null = null;
+            if (retryText) {
+              try {
+                retryData = JSON.parse(retryText) as T | ApiErrorBody;
+              } catch {
+                retryData = null;
+              }
+            }
+            if (!retryResp.ok) {
+              const message = (retryData as ApiErrorBody | null)?.message ?? retryResp.statusText ?? "Đã có lỗi xảy ra.";
+              throw new ApiError(retryResp.status, message);
+            }
+            return (retryResp.status === 204 || retryData === null) ? (undefined as unknown as T) : (retryData as T);
+          }
+        }
+      } catch (e) {
+        // ignore and fallthrough to original error
+      }
+    }
+
     const message =
       (data as ApiErrorBody | null)?.message ??
       response.statusText ??

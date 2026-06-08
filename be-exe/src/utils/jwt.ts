@@ -26,3 +26,7 @@ export function verifyAccessToken(token: string) {
 export function signRefreshToken(userId: string) {
   return jwt.sign({ sub: userId }, env.jwt.refreshSecret, refreshOptions);
 }
+
+export function verifyRefreshToken(token: string) {
+  return jwt.verify(token, env.jwt.refreshSecret) as { sub: string };
+}
