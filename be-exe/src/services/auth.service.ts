@@ -80,7 +80,7 @@ export async function registerUser(input: {
   user.lastLoginAt = new Date();
   await user.save();
 
-  return buildAuthResponse(user, accessToken);
+  return { ...buildAuthResponse(user, accessToken), refreshToken };
 }
 
 export async function loginUser(email: string, password: string) {
@@ -108,7 +108,7 @@ export async function loginUser(email: string, password: string) {
   user.lastLoginAt = new Date();
   await user.save();
 
-  return buildAuthResponse(user, accessToken);
+  return { ...buildAuthResponse(user, accessToken), refreshToken };
 }
 
 export async function forgotPassword(email: string) {
@@ -294,5 +294,5 @@ export async function findOrCreateGoogleUser(
   const refreshToken = signRefreshToken(user._id.toString());
   await storeRefreshToken(user._id.toString(), refreshToken);
 
-  return { accessToken, user: toAuthUser(user) };
+  return { accessToken, refreshToken, user: toAuthUser(user) };
 }
