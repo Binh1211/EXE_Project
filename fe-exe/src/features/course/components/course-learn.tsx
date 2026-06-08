@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { useSearchParams, useNavigate, useParams } from "react-router-dom";
-import { Star, Share2, Play, BookOpen, Lock, Gamepad2 } from "lucide-react";
+import { Star, Share2, Play, BookOpen, Lock } from "lucide-react";
 import {
   CourseBreadcrumb,
   CourseProgressCard,
@@ -8,7 +8,6 @@ import {
 } from "./shared";
 import FlashCards from "./shared/flash-card";
 import Mindmap from "./shared/mindmap";
-import LessonQuiz from "./shared/lesson-quiz";
 import { IMG } from "@/lib/images";
 import { chapterApi } from "../api/course-api";
 import { lessonApi } from "../api/lesson-api";
@@ -100,34 +99,6 @@ const CourseLearningPage = () => {
     const list = await lessonApi.getLessonsByChapterId(chapter._id);
     setLessons(list.filter((l) => l.isPublished !== false));
   }, [chapter]);
-
-  const handleQuizSubmit = useCallback(
-    async (result: { score: number; passed: boolean; attempts: number }) => {
-      if (!activeLesson?._id) return;
-
-      const prevAttempts = lessonDetail?.progress?.quizAttempts ?? 0;
-      const bestScore = Math.max(
-        result.score,
-        lessonDetail?.progress?.quizBestScore ?? 0,
-      );
-      const passed =
-        result.passed || Boolean(lessonDetail?.progress?.quizPassed);
-
-      await lessonProgressApi.upsert({
-        lessonId: activeLesson._id,
-        quizBestScore: bestScore,
-        quizPassed: passed,
-        quizAttempts: prevAttempts + result.attempts,
-        status: passed ? "completed" : "unlocked",
-        ...(passed ? { videoWatchedPct: 100 } : {}),
-      });
-
-      await refreshLessons();
-      const detail = await lessonApi.getLessonDetail(activeLesson._id);
-      setLessonDetail(detail);
-    },
-    [activeLesson?._id, lessonDetail?.progress, refreshLessons],
-  );
 
   useEffect(() => {
     if (loading || !chapter) return;
@@ -283,20 +254,9 @@ const CourseLearningPage = () => {
 
   const tabs = [
     { id: "Overview", label: "Tổng quan" },
-    { id: "Quiz", label: "Quiz" },
     { id: "Review", label: "Ôn tập" },
     { id: "Mindmap", label: "Sơ đồ tư duy" },
   ];
-
-  const quizPassed = Boolean(
-    lessonDetail?.progress?.quizPassed ||
-    activeLesson?.progress?.quizPassed ||
-    activeLesson?.progress?.status === "completed",
-  );
-  const nextLessonLocked = sidebarLessons.find(
-    (l, i) =>
-      sidebarLessons[i - 1]?.id === activeLesson?._id && l.isLocked,
-  );
 
   if (loading) {
     return (
@@ -463,59 +423,6 @@ const CourseLearningPage = () => {
                 progressPercentage={progressPct}
                 variant="large"
               />
-            </div>
-          )}
-          {activeTab === "Quiz" && (
-            <div className="mx-auto mt-6 w-full max-w-4xl pb-10">
-              <div className="mb-6 flex flex-col gap-4 rounded-2xl border border-[#5c3a21]/10 bg-white p-5 shadow-sm md:flex-row md:items-center md:justify-between">
-                <div>
-                  <h3 className="text-2xl font-bold text-[#5c3a21]">
-                    Quiz bài học
-                  </h3>
-                  {quizPassed ? (
-                    <p className="mt-1 text-sm font-semibold text-emerald-600">
-                      Bạn đã hoàn thành quiz này.
-                    </p>
-                  ) : nextLessonLocked ? (
-                    <p className="mt-1 text-sm text-gray-500">
-                      Hoàn thành quiz để mở khóa {nextLessonLocked.name}.
-                    </p>
-                  ) : (
-                    <p className="mt-1 text-sm text-gray-500">
-                      Làm quiz hoặc chơi game để ôn tập kiến thức bài học.
-                    </p>
-                  )}
-                </div>
-                <button
-                  type="button"
-                  onClick={() => navigate(`/game/vuot-rao/${activeLesson._id}`)}
-                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#5c3a21] px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#4a2e1a]"
-                >
-                  <Gamepad2 size={16} />
-                  Chơi game
-                </button>
-              </div>
-
-              {detailLoading ? (
-                <p className="py-12 text-center text-gray-500">
-                  Đang tải quiz...
-                </p>
-              ) : lessonDetail?.quizData ? (
-                <LessonQuiz
-                  quiz={lessonDetail.quizData}
-                  onSubmit={handleQuizSubmit}
-                  previousBestScore={
-                    lessonDetail.progress?.quizBestScore ??
-                    activeLesson.progress?.quizBestScore ??
-                    0
-                  }
-                  alreadyPassed={quizPassed}
-                />
-              ) : (
-                <p className="py-12 text-center text-gray-500">
-                  Chưa có quiz cho bài học này.
-                </p>
-              )}
             </div>
           )}
           {activeTab === "Review" && (

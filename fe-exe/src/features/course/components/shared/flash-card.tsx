@@ -125,7 +125,7 @@ export default function FlashCards({ cards }: FlashCardsProps) {
 
             {/* CARD */}
             <div
-                className={`[perspective:2000px] w-full max-w-5xl transition-all duration-500 ${isFullscreen ? "h-[80vh]" : "h-[450px]"
+                className={`[perspective:2000px] w-full max-w-5xl transition-all duration-500 ${isFullscreen ? "h-[75vh] mt-12" : "h-[450px]"
                     }`}
             >
                 <div
@@ -152,16 +152,10 @@ export default function FlashCards({ cards }: FlashCardsProps) {
 
                         {/* CONTENT */}
                         <div className="relative z-20 h-full flex flex-col items-center justify-center text-center p-10">
-                            <p
-                                className="uppercase tracking-[0.5em]
-                text-white/70 text-sm mb-6"
-                            >
-                                Timeline Flash Card
-                            </p>
 
                             <h1
-                                className="text-[120px] md:text-[180px]
-                font-black text-white leading-none"
+                                className="text-[40px] md:text-[72px]
+                font-black text-white leading-tight break-words max-w-[88%] mx-auto"
                             >
                                 {frontLabel}
                             </h1>
@@ -186,27 +180,23 @@ export default function FlashCards({ cards }: FlashCardsProps) {
                         {/* DECOR */}
                         <div className="absolute top-[-80px] right-[-80px] w-[250px] h-[250px] rounded-full bg-cyan-300/40 blur-3xl" />
 
-                        <div className="relative z-20 h-full flex flex-col justify-center p-14 md:p-20">
-                            <p
-                                className="uppercase tracking-[0.4em]
-                text-zinc-500 text-sm mb-6"
-                            >
-                                Information
-                            </p>
+                        <div className="relative z-20 h-full flex flex-col items-center justify-center gap-6 p-10 md:p-16">
 
                             <h2
-                                className="text-6xl md:text-7xl
-                font-black text-zinc-900 mb-10"
+                                className="text-3xl md:text-4xl
+                font-black text-zinc-900 text-center break-words max-w-full"
                             >
                                 {frontLabel}
                             </h2>
 
-                            <p
-                                className="text-zinc-700 text-xl md:text-2xl
-                leading-relaxed max-w-3xl"
-                            >
-                                {backLabel}
-                            </p>
+                            <div className="w-full max-w-3xl rounded-[32px] border border-white/70 bg-white/80 p-6 shadow-lg shadow-slate-200/30">
+                                <p
+                                    className="text-zinc-700 text-base md:text-lg
+                    leading-relaxed whitespace-pre-line text-center"
+                                >
+                                    {backLabel}
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
