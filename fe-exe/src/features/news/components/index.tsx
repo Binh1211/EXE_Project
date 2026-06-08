@@ -7,7 +7,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Clock4, Eye } from "lucide-react";
-import { IMG } from "@/lib/images";
 
 function NewsContent() {
   return (
