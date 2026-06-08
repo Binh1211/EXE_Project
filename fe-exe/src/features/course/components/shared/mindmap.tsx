@@ -17,9 +17,9 @@ const RectFrame: React.FC<{
             backgroundImage: `url('${resolveImageUrl("/title.png")}')`,
           }}
         >
-<span className="text-sm md:text-base font-title font-bold text-[#5c4033] tracking-wide text-center leading-tight px-20">
-  {title}
-</span>
+          <span className="text-sm md:text-base font-title font-bold text-[#5c4033] tracking-wide text-center leading-tight px-20">
+            {title}
+          </span>
         </div>
       </div>
 
@@ -62,11 +62,30 @@ export default function Mindmap({ mindmap }: { mindmap: MindmapType }) {
       <div className="absolute inset-0 bg-[#eadaaf]/10 pointer-events-none" />
 
       {/* Center vertical connector linking sections */}
-      <div aria-hidden className="hidden md:block absolute left-1/2 top-40 bottom-40 -translate-x-1/2 z-0 pointer-events-none">
-        <div className="w-[3px] h-full bg-gradient-to-b from-transparent via-[#c9a875]/30 to-transparent mx-auto relative">
-          <div className="absolute left-1/2 -translate-x-1/2 w-3 h-3 bg-[#d8b77d] rounded-full" style={{ top: '20%' }} />
-          <div className="absolute left-1/2 -translate-x-1/2 w-3 h-3 bg-[#d8b77d] rounded-full" style={{ top: '50%' }} />
-          <div className="absolute left-1/2 -translate-x-1/2 w-3 h-3 bg-[#d8b77d] rounded-full" style={{ top: '80%' }} />
+      <div
+        aria-hidden
+        className="hidden md:block absolute left-1/2 top-40 bottom-40 -translate-x-1/2 z-0 pointer-events-none"
+      >
+        <div
+          className="w-[6px] h-full rounded-full"
+          style={{
+            background:
+              "repeating-linear-gradient(to bottom,#caa36a 0,#caa36a 12px,#e7d3ac 12px,#e7d3ac 24px)",
+          }}
+        >
+          {" "}
+          <div
+            className="absolute left-1/2 -translate-x-1/2 w-3 h-3 bg-[#d8b77d] rounded-full"
+            style={{ top: "20%" }}
+          />
+          <div
+            className="absolute left-1/2 -translate-x-1/2 w-3 h-3 bg-[#d8b77d] rounded-full"
+            style={{ top: "50%" }}
+          />
+          <div
+            className="absolute left-1/2 -translate-x-1/2 w-3 h-3 bg-[#d8b77d] rounded-full"
+            style={{ top: "80%" }}
+          />
         </div>
       </div>
 
@@ -95,41 +114,252 @@ export default function Mindmap({ mindmap }: { mindmap: MindmapType }) {
                   className="w-full flex flex-col items-center z-10 my-4 select-none"
                 >
                   <div
-                    role="button"
-                    tabIndex={0}
-                    onClick={() =>
-                      setActiveTopicKey(
-                        activeTopicKey === scrollKey ? null : scrollKey,
-                      )
-                    }
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ")
+                    className="
+    relative
+    w-full
+    max-w-5xl
+    mx-auto
+    p-6
+    rounded-[30px]
+    overflow-hidden
+  "
+                  >
+                    {/* Nền giấy cổ */}
+                    <div
+                      className="absolute inset-0"
+                      style={{
+                        background:
+                          "linear-gradient(to bottom,#f8eed7,#f3e2bd)",
+                      }}
+                    />
+
+                    {/* Texture giấy */}
+                    <div
+                      className="absolute inset-0 opacity-20"
+                      style={{
+                        backgroundImage:
+                          "radial-gradient(#c49a6c 1px, transparent 1px)",
+                        backgroundSize: "18px 18px",
+                      }}
+                    />
+
+                    {/* Hoa văn góc */}
+                    <div className="absolute top-3 left-3 text-[#c7a26b] text-3xl opacity-40">
+                      ❦
+                    </div>
+
+                    <div className="absolute top-3 right-3 text-[#c7a26b] text-3xl rotate-90 opacity-40">
+                      ❦
+                    </div>
+
+                    <div className="absolute bottom-3 left-3 text-[#c7a26b] text-3xl -rotate-90 opacity-40">
+                      ❦
+                    </div>
+
+                    <div className="absolute bottom-3 right-3 text-[#c7a26b] text-3xl rotate-180 opacity-40">
+                      ❦
+                    </div>
+
+                    {/* Khung chính */}
+                    <div
+                      role="button"
+                      tabIndex={0}
+                      onClick={() =>
                         setActiveTopicKey(
                           activeTopicKey === scrollKey ? null : scrollKey,
-                        );
-                    }}
-                    className="w-full max-w-4xl cursor-pointer overflow-hidden rounded-lg drop-shadow-md hover:scale-[1.01] transition-transform duration-200"
-                  >
-                    <img
-                      src={resolveImageUrl(scrollImgUrl)}
-                      alt={section.title}
-                      className="w-full object-contain"
-                    />
+                        )
+                      }
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ")
+                          setActiveTopicKey(
+                            activeTopicKey === scrollKey ? null : scrollKey,
+                          );
+                      }}
+                      className="
+      relative
+      z-10
+      cursor-pointer
+      transition-all
+      duration-300
+      hover:scale-[1.01]
+    "
+                    >
+                      {/* Viền cổ */}
+                      <div
+                        className="
+        rounded-[20px]
+        border-[5px]
+        border-[#d2b48c]
+        p-3
+        bg-[#fff8e8]
+        shadow-[0_10px_40px_rgba(0,0,0,0.15)]
+      "
+                      >
+                        <img
+                          src={resolveImageUrl(scrollImgUrl)}
+                          alt={section.title}
+                          className="
+          w-full
+          rounded-xl
+          object-contain
+        "
+                        />
+                        <div
+                          className={`
+                          overflow-hidden
+                          transition-all
+                          duration-500
+                          ${
+                            activeTopicKey === scrollKey
+                              ? "max-h-[3000px] opacity-100"
+                              : "max-h-0 opacity-0"
+                          }
+                        `}
+                        >
+                          <div
+                            className="
+                      relative
+                      mt-4
+                      rounded-2xl
+                      border-2
+                      border-[#d2b48c]
+                      bg-[#fff8e8]
+                      p-6
+                      shadow-inner
+                    "
+                          >
+                            {/* Texture giấy */}
+                            <div
+                              className="absolute inset-0 opacity-10"
+                              style={{
+                                backgroundImage:
+                                  "radial-gradient(#c49a6c 1px, transparent 1px)",
+                                backgroundSize: "18px 18px",
+                              }}
+                            />
+
+                            {section.topics.map((topic, tIdx) => {
+                              const tKey = `${sIdx}-${tIdx}`;
+
+                              return (
+                                <div
+                                  key={tIdx}
+                                  className="
+            relative
+            z-10
+            mb-8
+            pb-6
+            border-b
+            border-[#d2b48c]
+            last:border-b-0
+          "
+                                >
+                                  <div
+                                    role="button"
+                                    tabIndex={0}
+                                    onClick={() =>
+                                      setActiveScrollTopicKey(
+                                        activeScrollTopicKey === tKey
+                                          ? null
+                                          : tKey,
+                                      )
+                                    }
+                                    className="
+              text-lg
+              font-bold
+              text-[#5c4033]
+              cursor-pointer
+              mb-3
+            "
+                                  >
+                                    {topic.title}
+                                  </div>
+
+                                  <div
+                                    className={`
+              overflow-hidden
+              transition-all
+              duration-300
+              ${
+                activeScrollTopicKey === tKey || activeTopicKey === scrollKey
+                  ? "max-h-[1000px] opacity-100"
+                  : "max-h-0 opacity-0"
+              }
+            `}
+                                  >
+                                    {topic.items.map((item, iIdx) => (
+                                      <div
+                                        key={iIdx}
+                                        className="
+                  bg-[#fffdf8]
+                  border
+                  border-[#e4d0ab]
+                  rounded-xl
+                  p-4
+                  mb-3
+                "
+                                      >
+                                        {item.label && (
+                                          <div
+                                            className="
+                      inline-block
+                      px-3
+                      py-1
+                      mb-2
+                      rounded-full
+                      bg-[#ead5ac]
+                      text-[#5c4033]
+                      text-xs
+                      font-semibold
+                    "
+                                          >
+                                            {item.label}
+                                          </div>
+                                        )}
+
+                                        <div className="text-[#4d392d]">
+                                          {item.content}
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
 
                   {/* Decorative flags around the scroll image (only visually) */}
                   {sIdx === 0 && (
                     <>
                       <div className="hidden md:block absolute left-4 top-1/2 -translate-y-1/2 z-10">
-                        <div className="bg-[#fff6e8] border border-[#e2c79a] px-2 py-1 rounded drop-shadow-sm rotate-3">◆</div>
+                        <div className="bg-[#fff6e8] border border-[#e2c79a] px-2 py-1 rounded drop-shadow-sm rotate-3">
+                          ◆
+                        </div>
                       </div>
                       <div className="hidden md:block absolute right-4 top-1/2 -translate-y-1/2 z-10">
-                        <div className="bg-[#fff6e8] border border-[#e2c79a] px-2 py-1 rounded drop-shadow-sm -rotate-3">✦</div>
+                        <div className="bg-[#fff6e8] border border-[#e2c79a] px-2 py-1 rounded drop-shadow-sm -rotate-3">
+                          ✦
+                        </div>
                       </div>
                       <div className="hidden md:block absolute top-3 right-6 z-20">
                         <div className="bg-[#fff]/60 rounded-full p-1 border border-[#e6cfa7]">
-                          <svg viewBox="0 0 24 24" className="w-5 h-5 text-[#b07a3a]" fill="none" stroke="currentColor" strokeWidth="1.5" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 2 L15 8 L22 9 L17 14 L18 21 L12 18 L6 21 L7 14 L2 9 L9 8 Z" strokeLinecap="round" strokeLinejoin="round" />
+                          <svg
+                            viewBox="0 0 24 24"
+                            className="w-5 h-5 text-[#b07a3a]"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1.5"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M12 2 L15 8 L22 9 L17 14 L18 21 L12 18 L6 21 L7 14 L2 9 L9 8 Z"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
                           </svg>
                         </div>
                       </div>
@@ -137,65 +367,6 @@ export default function Mindmap({ mindmap }: { mindmap: MindmapType }) {
                   )}
 
                   {/* Distinct panel design for scroll section content */}
-                  <div
-                    className={`w-full max-w-4xl mt-4 transition-all duration-300 ${activeTopicKey === scrollKey ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0"} overflow-hidden`}
-                  >
-                    <div className="bg-gradient-to-r from-[#fffaf0] to-[#fbf3dd] p-6 rounded-lg border border-[#e5cfa8] shadow-inner">
-                      {section.topics.map((topic, tIdx) => {
-                              const tKey = `${sIdx}-${tIdx}`;
-                        const tExpanded =
-                          activeScrollTopicKey === tKey ||
-                          activeTopicKey === scrollKey;
-                        return (
-                                <div key={tIdx} className="mb-4 relative">
-                                  {/* If we're in section 3 (index 2), show a numbered badge and connector */}
-                                  {sIdx === 2 && (
-                                    <div className="hidden md:block absolute -left-10 top-2 flex items-center">
-                                      <div className="w-8 h-8 rounded-full bg-[#f7e9d2] border border-[#dec79a] flex items-center justify-center text-sm font-semibold text-[#7b4d2a]">{tIdx + 1}</div>
-                                      <div className="w-6 h-[2px] bg-[#dec79a] ml-2" />
-                                    </div>
-                                  )}
-                            <div
-                              role="button"
-                              tabIndex={0}
-                              onClick={() =>
-                                setActiveScrollTopicKey(
-                                  activeScrollTopicKey === tKey ? null : tKey,
-                                )
-                              }
-                              onKeyDown={(e) => {
-                                if (e.key === "Enter" || e.key === " ")
-                                  setActiveScrollTopicKey(
-                                    activeScrollTopicKey === tKey ? null : tKey,
-                                  );
-                              }}
-                              className="font-title font-bold text-[#5c4033] mb-2 text-base cursor-pointer"
-                            >
-                              {topic.title}
-                            </div>
-
-                            <div
-                              className={`${tExpanded ? "max-h-[800px] opacity-100" : "max-h-0 opacity-0"} transition-all duration-300 overflow-hidden`}
-                            >
-                              {topic.items.map((item, iIdx) => (
-                                <div
-                                  key={iIdx}
-                                  className="text-sm text-gray-700 leading-relaxed mb-2"
-                                >
-                                  {item.label && (
-                                    <div className="font-semibold text-[#5c4033]">
-                                      {item.label}
-                                    </div>
-                                  )}
-                                  <div>{item.content}</div>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
                 </div>
               );
             }
@@ -223,17 +394,67 @@ export default function Mindmap({ mindmap }: { mindmap: MindmapType }) {
                           role="button"
                           tabIndex={0}
                           onClick={() => toggleTopic(sIdx, tIdx)}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter" || e.key === " ")
-                              toggleTopic(sIdx, tIdx);
-                          }}
-                          className="h-16 flex items-center justify-center mb-3 hover:scale-105 transition-all duration-300 cursor-pointer"
+                          className="
+    relative
+    w-[140px]
+    h-[140px]
+    mb-4
+    cursor-pointer
+    transition-all
+    duration-300
+    hover:scale-105
+    group
+  "
                         >
-                          <img
-                            src={resolveImageUrl(topic.illustrationUrl)}
-                            alt={topic.title}
-                            className="max-h-full object-contain"
-                          />
+                          {/* Viền ngoài */}
+                          <div
+                            className="
+      absolute
+      inset-0
+      rounded-full
+      bg-gradient-to-br
+      from-[#f7ead3]
+      to-[#d9b17c]
+      p-[6px]
+      shadow-xl
+      border-2
+      border-[#b88955]
+    "
+                          >
+                            {/* Vòng trang trí */}
+                            <div
+                              className="
+        absolute
+        inset-2
+        rounded-full
+        border-2
+        border-dashed
+        border-[#8b5e3c]/40
+      "
+                            />
+                          </div>
+
+                          {/* Ảnh */}
+                          <div
+                            className="
+      absolute
+      inset-[12px]
+      rounded-full
+      overflow-hidden
+      z-10
+      bg-[#f9f1de]
+    "
+                          >
+                            <img
+                              src={resolveImageUrl(topic.illustrationUrl)}
+                              alt={topic.title}
+                              className="
+        w-full
+        h-full
+        object-cover
+      "
+                            />
+                          </div>
                         </div>
                       )}
 
@@ -254,19 +475,79 @@ export default function Mindmap({ mindmap }: { mindmap: MindmapType }) {
                       {/* Topic Items: combined panel shown when topic is expanded */}
                       <div
                         id={`topic-content-${sIdx}-${tIdx}`}
-                        className={`w-full transition-all duration-300 overflow-hidden ${activeTopicKey === `${sIdx}-${tIdx}` ? "max-h-[800px] opacity-100" : "max-h-0 opacity-0"}`}
+                        className={`w-full transition-all duration-300 overflow-hidden ${
+                          activeTopicKey === `${sIdx}-${tIdx}`
+                            ? `
+      max-h-[800px]
+      opacity-100
+      rounded-xl
+      border-[3px]
+      border-[#c8a978]
+      bg-[#fffaf0]
+      shadow-[0_0_25px_rgba(196,154,108,0.45)]
+    `
+                            : "max-h-0 opacity-0"
+                        }`}
                       >
-                        <div className="bg-[#fdfcfa] rounded-b-lg shadow-sm border border-[#5c4033]/20">
+                        <div
+                          className="
+      relative
+      overflow-hidden
+      rounded-xl
+      border-2
+      border-[#d2b48c]
+      bg-[#fff8e8]
+      shadow-lg
+    "
+                        >
+                          {/* Họa tiết giấy cổ */}
+                          <div
+                            className="
+        absolute
+        inset-0
+        opacity-20
+        pointer-events-none
+      "
+                            style={{
+                              backgroundImage:
+                                "radial-gradient(#c49a6c 1px, transparent 1px)",
+                              backgroundSize: "18px 18px",
+                            }}
+                          />
+
                           {topic.items.map((item, iIdx) => (
                             <div
                               key={iIdx}
-                              className="p-3 text-xs md:text-sm text-gray-700 leading-relaxed font-normal border-b last:border-b-0"
+                              className="
+          relative
+          z-10
+          p-4
+          text-sm
+          text-[#4d392d]
+          leading-relaxed
+          border-b
+          border-[#d8c4a1]
+          last:border-b-0
+        "
                             >
                               {item.label && (
-                                <div className="font-semibold text-sm text-[#5c4033] mb-1">
+                                <div
+                                  className="
+              inline-block
+              px-3
+              py-1
+              mb-2
+              rounded-full
+              bg-[#e8d2a7]
+              text-[#5c4033]
+              font-semibold
+              text-xs
+            "
+                                >
                                   {item.label}
                                 </div>
                               )}
+
                               <div>{item.content}</div>
                             </div>
                           ))}
