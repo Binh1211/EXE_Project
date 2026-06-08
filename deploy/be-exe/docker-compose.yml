@@ -1,0 +1,37 @@
+services:
+  api:
+    image: ${API_IMAGE:-exe-be-api}:${IMAGE_TAG:-latest}
+    restart: unless-stopped
+    env_file:
+      - ${APP_ENV_FILE:-.env.production}
+    volumes:
+      - uploads:/app/uploads
+    networks:
+      - traefik
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=${TRAEFIK_NETWORK:?Set TRAEFIK_NETWORK}"
+      - "traefik.http.routers.exe-be-api.rule=Host(`${API_HOST:?Set API_HOST}`)"
+      - "traefik.http.routers.exe-be-api.entrypoints=websecure"
+      - "traefik.http.routers.exe-be-api.tls=true"
+      - "traefik.http.routers.exe-be-api.tls.certresolver=${TRAEFIK_CERT_RESOLVER:?Set TRAEFIK_CERT_RESOLVER}"
+      - "traefik.http.services.exe-be-api.loadbalancer.server.port=8080"
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:8080/health').then((res) => process.exit(res.ok ? 0 : 1)).catch(() => process.exit(1))"
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+networks:
+  traefik:
+    external: true
+    name: ${TRAEFIK_NETWORK:?Set TRAEFIK_NETWORK}
+
+volumes:
+  uploads:
+    name: ${UPLOADS_VOLUME_NAME:-exe-be-uploads}
