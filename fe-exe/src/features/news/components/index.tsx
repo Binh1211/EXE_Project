@@ -7,7 +7,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Clock4, Eye } from "lucide-react";
-import { IMG } from "@/lib/images";
 
 function NewsContent() {
   return (
@@ -29,11 +28,7 @@ function NewsContent() {
           </Button>
         </div>
         <div className="mr-[15%]">
-          <img
-            src={IMG.news1}
-            alt="EXE"
-            className="w-auto object-contain"
-          />
+         
         </div>
       </div>
       <div className="grid grid-cols-2 mt-12 gap-10">
@@ -48,10 +43,7 @@ function NewsContent() {
         </a>
         <div className="col-span-2 flex justify-between gap-10 mx-[7%]">
           <Card className="bg-white rounded-xl flex flex-col h-full w-[32%]">
-            <img
-              src={IMG.news2}
-              className="h-[40%] w-full object-cover p-4 pb-0"
-            />
+           
 
             <CardHeader className="flex-1">
               <CardTitle className="text-2xl font-semibold mb-2 line-clamp-2">
@@ -87,10 +79,7 @@ function NewsContent() {
           </Card>
 
           <Card className="bg-white rounded-xl flex flex-col h-full w-[32%]">
-            <img
-              src={IMG.news3}
-              className="h-[40%] w-full object-cover p-4 pb-0"
-            />
+           
 
             <CardHeader className="flex-1">
               <CardTitle className="text-2xl font-semibold mb-2 line-clamp-2">
@@ -125,10 +114,7 @@ function NewsContent() {
           </Card>
 
           <Card className="bg-white rounded-xl flex flex-col h-full w-[32%]">
-            <img
-              src={IMG.news1}
-              className="h-[40%] w-full object-cover p-4 pb-0"
-            />
+           
 
             <CardHeader className="flex-1">
               <CardTitle className="text-2xl font-semibold mb-2 line-clamp-2">
@@ -174,10 +160,7 @@ function NewsContent() {
         </a>
         <div className="col-span-2 flex justify-between gap-10 mx-[7%] mb-4">
           <Card className="bg-white rounded-xl flex flex-col h-full w-[23%]">
-            <img
-              src={IMG.news2}
-              className="h-[40%] w-full object-cover p-4 pb-0"
-            />
+           
             <div className="flex items-center mt-3 px-4">
               <p className="text-xs text-gray-600 font-medium">
                 Chuyên đề • Hiện đại
@@ -213,10 +196,7 @@ function NewsContent() {
           </Card>
 
           <Card className="bg-white rounded-xl flex flex-col h-full w-[23%]">
-            <img
-              src={IMG.news2}
-              className="h-[40%] w-full object-cover p-4 pb-0"
-            />
+           
             <div className="flex items-center mt-3 px-4">
               <p className="text-xs text-gray-600 font-medium">
                 Chuyên đề • Hiện đại
@@ -252,10 +232,7 @@ function NewsContent() {
           </Card>
 
           <Card className="bg-white rounded-xl flex flex-col h-full w-[23%]">
-            <img
-              src={IMG.news2}
-              className="h-[40%] w-full object-cover p-4 pb-0"
-            />
+            
             <div className="flex items-center mt-3 px-4">
               <p className="text-xs text-gray-600 font-medium">
                 Chuyên đề • Hiện đại
@@ -291,10 +268,7 @@ function NewsContent() {
           </Card>
 
           <Card className="bg-white rounded-xl flex flex-col h-full w-[23%]">
-            <img
-              src={IMG.news2}
-              className="h-[40%] w-full object-cover p-4 pb-0"
-            />
+            
             <div className="flex items-center mt-3 px-4">
               <p className="text-xs text-gray-600 font-medium">
                 Chuyên đề • Hiện đại

@@ -274,19 +274,19 @@ const CourseDetailPage = () => {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
               <RelatedCourseCard
-                image={IMG.news1}
+                image= "https://tse4.mm.bing.net/th/id/OIP.N__X_XjUoI1_8tNsHfYwaQHaKf?cb=thfc1falcon2&rs=1&pid=ImgDetMain&o=7&rm=3"
                 title="Lịch Sử Việt Nam Qua Các Thời Kỳ"
                 rating="5.0"
                 description="Tìm hiểu hành trình phát triển của Việt Nam từ thời kỳ dựng nước."
               />
               <RelatedCourseCard
-                image={IMG.news2}
+                image="https://i.ytimg.com/vi/6lqKQPHuXGU/maxresdefault.jpg"
                 title="Nghìn năm Bắc thuộc & kháng chiến"
                 rating="5.0"
                 description="Các cuộc khởi nghĩa và tinh thần bất khuất của dân tộc."
               />
               <RelatedCourseCard
-                image={IMG.news3}
+                image="https://tse3.mm.bing.net/th/id/OIP.12-lg1A5ogtAFcfkjMWHeQHaEc?cb=thfc1falcon2&rs=1&pid=ImgDetMain&o=7&rm=3"
                 title="Độc lập & phong kiến cực thịnh"
                 rating="5.0"
                 description="Kỷ nguyên độc lập tự chủ qua các triều đại phong kiến."
