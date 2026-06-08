@@ -283,20 +283,9 @@ const CourseLearningPage = () => {
 
   const tabs = [
     { id: "Overview", label: "Tổng quan" },
-    { id: "Quiz", label: "Quiz" },
     { id: "Review", label: "Ôn tập" },
     { id: "Mindmap", label: "Sơ đồ tư duy" },
   ];
-
-  const quizPassed = Boolean(
-    lessonDetail?.progress?.quizPassed ||
-    activeLesson?.progress?.quizPassed ||
-    activeLesson?.progress?.status === "completed",
-  );
-  const nextLessonLocked = sidebarLessons.find(
-    (l, i) =>
-      sidebarLessons[i - 1]?.id === activeLesson?._id && l.isLocked,
-  );
 
   if (loading) {
     return (
@@ -463,59 +452,6 @@ const CourseLearningPage = () => {
                 progressPercentage={progressPct}
                 variant="large"
               />
-            </div>
-          )}
-          {activeTab === "Quiz" && (
-            <div className="mx-auto mt-6 w-full max-w-4xl pb-10">
-              <div className="mb-6 flex flex-col gap-4 rounded-2xl border border-[#5c3a21]/10 bg-white p-5 shadow-sm md:flex-row md:items-center md:justify-between">
-                <div>
-                  <h3 className="text-2xl font-bold text-[#5c3a21]">
-                    Quiz bài học
-                  </h3>
-                  {quizPassed ? (
-                    <p className="mt-1 text-sm font-semibold text-emerald-600">
-                      Bạn đã hoàn thành quiz này.
-                    </p>
-                  ) : nextLessonLocked ? (
-                    <p className="mt-1 text-sm text-gray-500">
-                      Hoàn thành quiz để mở khóa {nextLessonLocked.name}.
-                    </p>
-                  ) : (
-                    <p className="mt-1 text-sm text-gray-500">
-                      Làm quiz hoặc chơi game để ôn tập kiến thức bài học.
-                    </p>
-                  )}
-                </div>
-                <button
-                  type="button"
-                  onClick={() => navigate(`/game/vuot-rao/${activeLesson._id}`)}
-                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#5c3a21] px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#4a2e1a]"
-                >
-                  <Gamepad2 size={16} />
-                  Chơi game
-                </button>
-              </div>
-
-              {detailLoading ? (
-                <p className="py-12 text-center text-gray-500">
-                  Đang tải quiz...
-                </p>
-              ) : lessonDetail?.quizData ? (
-                <LessonQuiz
-                  quiz={lessonDetail.quizData}
-                  onSubmit={handleQuizSubmit}
-                  previousBestScore={
-                    lessonDetail.progress?.quizBestScore ??
-                    activeLesson.progress?.quizBestScore ??
-                    0
-                  }
-                  alreadyPassed={quizPassed}
-                />
-              ) : (
-                <p className="py-12 text-center text-gray-500">
-                  Chưa có quiz cho bài học này.
-                </p>
-              )}
             </div>
           )}
           {activeTab === "Review" && (
