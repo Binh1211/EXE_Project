@@ -47,6 +47,7 @@ export async function apiRequest<T>(
     response = await fetch(`${API_BASE_URL}${path}`, {
       ...options,
       headers,
+      credentials: (options as any).credentials ?? "include",
     });
   } catch {
     throw new NetworkError(
@@ -88,6 +89,7 @@ export async function apiRequest<T>(
             const retryResp = await fetch(`${API_BASE_URL}${path}`, {
               ...options,
               headers: retryHeaders,
+              credentials: (options as any).credentials ?? "include",
             });
             const retryText = await retryResp.text();
             let retryData: T | ApiErrorBody | null = null;
