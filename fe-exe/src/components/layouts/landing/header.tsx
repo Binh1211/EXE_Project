@@ -335,9 +335,9 @@ export default function Header() {
               Game
             </button>
           </div>
-          <Link to="/vip" className="text-sm font-medium hover:text-[#5f3713]">
+          {/* <Link to="/vip" className="text-sm font-medium hover:text-[#5f3713]">
             Mua VIP
-          </Link>
+          </Link> */}
           <Link
             to="/contact"
             className="text-sm font-medium hover:text-[#5f3713]"

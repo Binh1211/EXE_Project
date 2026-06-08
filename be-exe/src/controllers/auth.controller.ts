@@ -53,13 +53,39 @@ const changePasswordSchema = z.object({
 export async function register(req: AuthRequest, res: Response) {
   const body = registerSchema.parse(req.body);
   const result = await registerUser(body);
-  res.status(201).json(result);
+  // set refresh token cookie if provided
+  if ((result as any).refreshToken) {
+    const raw = (result as any).refreshToken as string;
+    // decode exp to set cookie maxAge
+    const decoded: any = await import("jsonwebtoken").then((jwt) => jwt.default.decode(raw));
+    const maxAge = decoded?.exp ? decoded.exp * 1000 - Date.now() : undefined;
+    res.cookie("refresh_token", raw, {
+      httpOnly: true,
+      secure: env.nodeEnv === "production",
+      sameSite: "lax",
+      path: "/",
+      ...(maxAge ? { maxAge } : {}),
+    });
+  }
+  res.status(201).json({ accessToken: result.accessToken, user: result.user });
 }
 
 export async function login(req: AuthRequest, res: Response) {
   const body = loginSchema.parse(req.body);
   const result = await loginUser(body.email, body.password);
-  res.json(result);
+  if ((result as any).refreshToken) {
+    const raw = (result as any).refreshToken as string;
+    const decoded: any = await import("jsonwebtoken").then((jwt) => jwt.default.decode(raw));
+    const maxAge = decoded?.exp ? decoded.exp * 1000 - Date.now() : undefined;
+    res.cookie("refresh_token", raw, {
+      httpOnly: true,
+      secure: env.nodeEnv === "production",
+      sameSite: "lax",
+      path: "/",
+      ...(maxAge ? { maxAge } : {}),
+    });
+  }
+  res.json({ accessToken: result.accessToken, user: result.user });
 }
 
 export async function forgotPasswordHandler(req: AuthRequest, res: Response) {
@@ -147,7 +173,19 @@ export async function googleCallback(req: AuthRequest, res: Response) {
     const state = decodeGoogleState(stateRaw);
     redirectUri = state.redirectUri;
     const profile = await handleGoogleCallback(code);
-    const { accessToken, user } = await findOrCreateGoogleUser(profile, state.mode);
+    const { accessToken, user, refreshToken } = await findOrCreateGoogleUser(profile, state.mode) as any;
+
+    if (refreshToken) {
+      const decoded: any = await import("jsonwebtoken").then((jwt) => jwt.default.decode(refreshToken));
+      const maxAge = decoded?.exp ? decoded.exp * 1000 - Date.now() : undefined;
+      res.cookie("refresh_token", refreshToken, {
+        httpOnly: true,
+        secure: env.nodeEnv === "production",
+        sameSite: "lax",
+        path: "/",
+        ...(maxAge ? { maxAge } : {}),
+      });
+    }
 
     const params = new URLSearchParams({
       access_token: accessToken,
