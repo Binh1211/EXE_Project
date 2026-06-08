@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { useSearchParams, useNavigate, useParams } from "react-router-dom";
-import { Star, Share2, Play, BookOpen, Lock, Gamepad2 } from "lucide-react";
+import { Star, Share2, Play, BookOpen, Lock } from "lucide-react";
 import {
   CourseBreadcrumb,
   CourseProgressCard,
@@ -8,7 +8,6 @@ import {
 } from "./shared";
 import FlashCards from "./shared/flash-card";
 import Mindmap from "./shared/mindmap";
-import LessonQuiz from "./shared/lesson-quiz";
 import { IMG } from "@/lib/images";
 import { chapterApi } from "../api/course-api";
 import { lessonApi } from "../api/lesson-api";
@@ -100,34 +99,6 @@ const CourseLearningPage = () => {
     const list = await lessonApi.getLessonsByChapterId(chapter._id);
     setLessons(list.filter((l) => l.isPublished !== false));
   }, [chapter]);
-
-  const handleQuizSubmit = useCallback(
-    async (result: { score: number; passed: boolean; attempts: number }) => {
-      if (!activeLesson?._id) return;
-
-      const prevAttempts = lessonDetail?.progress?.quizAttempts ?? 0;
-      const bestScore = Math.max(
-        result.score,
-        lessonDetail?.progress?.quizBestScore ?? 0,
-      );
-      const passed =
-        result.passed || Boolean(lessonDetail?.progress?.quizPassed);
-
-      await lessonProgressApi.upsert({
-        lessonId: activeLesson._id,
-        quizBestScore: bestScore,
-        quizPassed: passed,
-        quizAttempts: prevAttempts + result.attempts,
-        status: passed ? "completed" : "unlocked",
-        ...(passed ? { videoWatchedPct: 100 } : {}),
-      });
-
-      await refreshLessons();
-      const detail = await lessonApi.getLessonDetail(activeLesson._id);
-      setLessonDetail(detail);
-    },
-    [activeLesson?._id, lessonDetail?.progress, refreshLessons],
-  );
 
   useEffect(() => {
     if (loading || !chapter) return;
