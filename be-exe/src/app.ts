@@ -1,6 +1,5 @@
 import cors from "cors";
 import express from "express";
-import mongoose from "mongoose";
 import path from "path";
 import { fileURLToPath } from "url";
 import { env } from "./config/env.js";
@@ -23,6 +22,14 @@ export function createApp() {
 
   // Serve static files from uploads directory
   app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
+
+  app.get("/health", (_req, res) => {
+    res.json({
+      status: "ok",
+      service: "be-exe",
+      uptime: process.uptime(),
+    });
+  });
 
   app.use("/api", routes);
 
