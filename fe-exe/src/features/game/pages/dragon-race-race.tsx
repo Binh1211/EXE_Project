@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import type { Socket } from "socket.io-client";
-import { ArrowLeft, Clock, Loader2 } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import { createDragonRaceSocket } from "../socket/dragon-race-socket";
 import type {
   DragonRaceLeaderboardItem,
@@ -138,135 +138,314 @@ export default function DragonRaceRacePage() {
     });
   };
 
+  const maxTime = question?.timeLimit ?? 15;
+  const fullCircle = 188.5;
+  const timerDashOffset = question ? fullCircle - (remaining / maxTime) * fullCircle : fullCircle;
+
+  type LaneTemplate = {
+    label: string;
+    img: string;
+    border: string;
+    defaultLeft: string;
+    extraClass: string;
+  };
+
+  type LaneData = LaneTemplate & {
+    left: string;
+    player?: DragonRacePlayer;
+  };
+
+  const trackHeightClass = sortedPlayers.length <= 2
+    ? "h-[30vh] min-h-[240px]"
+    : sortedPlayers.length === 3
+      ? "h-[36vh] min-h-[300px]"
+      : "h-[45vh] min-h-[380px]";
+
+  const contentSectionClass = sortedPlayers.length <= 2
+    ? "grid gap-4 px-4 pt-3 pb-6 lg:grid-cols-12 lg:px-8 lg:pt-4 lg:pb-10"
+    : "grid gap-4 px-4 py-6 lg:grid-cols-12 lg:px-8 lg:py-10";
+
+  const laneTemplates: LaneTemplate[] = [
+    {
+      label: "YOU",
+      img: "https://lh3.googleusercontent.com/aida-public/AB6AXuD_c0vorgzS-rcPBh-RHs0c4xS4ZhYxED5s75lqEHaghUiWPn5vdzn-AE6kLwTdmKHTR-0_3SJ8QJ5K-v-cuVy--Psm8XKAmMxa30qibQvSbNcjKGgF_lDYmoTlegCg2QOx36j87ZM2giptQgT7UAivx5yrsLnKttf_wT6FbLWf8o264j3TNat4B_o8XFrF_ioqzmDI_WnIaTvAihcBSFyradNsd6qTXR9po1iIKMmtYF1ZACZwSNkW1bXsXhTzqK7wLbmeUVfPAV9s",
+      border: "border-[#ffb599]",
+      defaultLeft: "65%",
+      extraClass: "border-[#ffb599]",
+    },
+    {
+      label: "Bolt",
+      img: "https://lh3.googleusercontent.com/aida-public/AB6AXuD_c0vorgzS-rcPBh-RHs0c4xS4ZhYxED5s75lqEHaghUiWPn5vdzn-AE6kLwTdmKHTR-0_3SJ8QJ5K-v-cuVy--Psm8XKAmMxa30qibQvSbNcjKGgF_lDYmoTlegCg2QOx36j87ZM2giptQgT7UAivx5yrsLnKttf_wT6FbLWf8o264j3TNat4B_o8XFrF_ioqzmDI_WnIaTvAihcBSFyradNsd6qTXR9po1iIKMmtYF1ZACZwSNkW1bXsXhTzqK7wLbmeUVfPAV9s",
+      border: "border-[#bc70ff]",
+      defaultLeft: "42%",
+      extraClass: "opacity-80",
+    },
+    {
+      label: "Frost",
+      img: "https://lh3.googleusercontent.com/aida-public/AB6AXuD_c0vorgzS-rcPBh-RHs0c4xS4ZhYxED5s75lqEHaghUiWPn5vdzn-AE6kLwTdmKHTR-0_3SJ8QJ5K-v-cuVy--Psm8XKAmMxa30qibQvSbNcjKGgF_lDYmoTlegCg2QOx36j87ZM2giptQgT7UAivx5yrsLnKttf_wT6FbLWf8o264j3TNat4B_o8XFrF_ioqzmDI_WnIaTvAihcBSFyradNsd6qTXR9po1iIKMmtYF1ZACZwSNkW1bXsXhTzqK7wLbmeUVfPAV9s",
+      border: "border-[#ffb4a8]",
+      defaultLeft: "58%",
+      extraClass: "opacity-80",
+    },
+    {
+      label: "Terra",
+      img: "https://lh3.googleusercontent.com/aida-public/AB6AXuD_c0vorgzS-rcPBh-RHs0c4xS4ZhYxED5s75lqEHaghUiWPn5vdzn-AE6kLwTdmKHTR-0_3SJ8QJ5K-v-cuVy--Psm8XKAmMxa30qibQvSbNcjKGgF_lDYmoTlegCg2QOx36j87ZM2giptQgT7UAivx5yrsLnKttf_wT6FbLWf8o264j3TNat4B_o8XFrF_ioqzmDI_WnIaTvAihcBSFyradNsd6qTXR9po1iIKMmtYF1ZACZwSNkW1bXsXhTzqK7wLbmeUVfPAV9s",
+      border: "border-[#9ca3af]",
+      defaultLeft: "30%",
+      extraClass: "opacity-80",
+    },
+  ];
+
+  const topLanes: LaneData[] = sortedPlayers.length > 0
+    ? sortedPlayers.map((player, index) => {
+        const template = laneTemplates[index % laneTemplates.length];
+        const left = player.position !== undefined ? `${Math.min(player.position, 94)}%` : template.defaultLeft;
+        return { ...template, left, player };
+      })
+    : laneTemplates.map((template) => ({
+        ...template,
+        left: template.defaultLeft,
+      }));
+
   return (
-    <div className="flex-1 bg-[#fff6f4] px-6 py-8">
-      <div className="mx-auto max-w-6xl">
-        <div className="mb-5 flex items-center justify-between">
+    <div className="min-h-screen bg-[#171119] text-[#ecdfeb] overflow-x-hidden">
+      <main className="relative mx-auto w-full max-w-[1920px]">
+        <div className="flex items-center justify-between px-5 py-5 lg:px-10">
           <button
             type="button"
             onClick={() => navigate(`/game/dua-rong/lobby/${roomCode}`)}
-            className="inline-flex items-center gap-2 text-sm font-bold text-[#5c3a21]"
+            className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-[#171119]/80 px-4 py-2 text-sm font-bold text-[#ffb599] shadow-lg shadow-black/20"
           >
             <ArrowLeft size={18} />
             Lobby
           </button>
-          <div className="rounded-xl bg-white px-4 py-2 text-sm font-bold text-[#5c3a21] shadow-sm">
-            Phòng {roomCode} {room?.status ? `· ${room.status}` : ""}
+          <div className="rounded-full border border-white/10 bg-[#171119]/80 px-4 py-2 text-sm font-bold text-[#e4bfb1] shadow-lg shadow-black/20">
+            Phòng {roomCode} · {room?.status ?? "Waiting"}
           </div>
         </div>
 
-        {error && <p className="mb-5 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}
-        {feedbackMessage && !error && (
-          <p className="mb-5 rounded-xl bg-emerald-50 px-4 py-3 text-sm font-bold text-emerald-800">
-            {feedbackMessage}
-          </p>
-        )}
-
-        {countdown && (
-          <div className="mb-6 rounded-2xl bg-[#5c3a21] py-10 text-center text-7xl font-bold text-white">
-            {countdown}
+        <section className={`relative overflow-hidden flex flex-col ${trackHeightClass}`}>
+          <div className="absolute inset-0 z-0">
+            <img
+              alt="Volcanic Background"
+              className="w-full h-full object-cover opacity-30"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuCHapZwRe6z-lKLBL428NoF3BQKUA1dvhFsvK5FVP_BD0pRcKieJ4FupQZZHN-pGNPQkUbNxRQbj2BBrn1IQNFD8rU-UhxtkPJYMuEC-9-x-x7h-PAB1hHtXuaqKL8-ZduIw48mmU0wvN3C4bMvzBKbuA-abwjTEprx4hGXz4giq2l6trOcKN8GqEqjCpA8oQj7oU4R6exKoyk1Uq9Dap_hGNFwVIQI5qbRXxUXKAY3O9T26eNYgPga0jtcWgRHupznWOKAuf0V8jzX"
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-[#171119] via-transparent to-[#171119]/90" />
           </div>
-        )}
 
-        <div className="grid gap-6 lg:grid-cols-[1fr_420px]">
-          <div className="rounded-2xl border border-[#5c3a21]/10 bg-white p-6 shadow-sm">
-            {!question ? (
-              <div className="flex min-h-[360px] items-center justify-center gap-3 text-[#5c3a21]">
-                <Loader2 className="animate-spin" />
-                Đang chờ câu hỏi...
-              </div>
-            ) : (
-              <>
-                <div className="mb-5 flex items-center justify-between gap-4">
-                  <p className="text-sm font-bold uppercase tracking-[0.2em] text-gray-400">
-                    Câu {question.index + 1}/{question.total}
-                  </p>
-                  <div className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-bold ${
-                    remaining <= 5 ? "bg-red-50 text-red-700" : "bg-[#5c3a21]/5 text-[#5c3a21]"
-                  }`}>
-                    <Clock size={16} />
-                    {remaining}s
+          <div className="relative z-10 flex flex-grow gap-3 px-4 py-3 lg:px-7 lg:py-5">
+            <div className="flex-grow flex flex-col gap-2 relative overflow-y-auto pb-2">
+              {topLanes.map((lane) => (
+                <div
+                  key={lane.player?.userId ?? lane.label}
+                  className={`min-h-[56px] rounded-xl border-l-4 ${lane.border} relative overflow-hidden bg-[#1c1322]/70`}
+                >
+                  <div
+                    className="absolute inset-0"
+                    style={{ backgroundImage: "linear-gradient(90deg, rgba(23,17,25,0) 0%, rgba(255,95,5,0.05) 100%)" }}
+                  />
+                  <div className="absolute top-1/2 flex items-center transition-all duration-1000 ease-out z-20"
+                    style={{ left: lane.left, transform: "translate(-50%, -50%)" }}
+                  >
+                    <div className="w-10 h-10 relative animate-drift">
+                      <img
+                        alt={`${lane.label} Dragon`}
+                        className={`w-full h-full rounded-full border-4 flame-trail ${lane.extraClass}`}
+                        src={lane.img}
+                      />
+                    </div>
+                    <div className="ml-2 rounded-full bg-[#ffdbce] px-2 py-1 text-[10px] font-semibold text-[#531900] shadow-lg">
+                      {lane.player?.username ?? lane.label}
+                    </div>
                   </div>
                 </div>
+              ))}
+            </div>
+          </div>
+        </section>
 
-                <h1 className="mb-6 text-2xl font-bold leading-relaxed text-[#5c3a21]">
-                  {question.text}
-                </h1>
+        <section className={contentSectionClass}>
+          <div className="lg:col-span-3 space-y-6">
+            <div className="glass-panel rounded-2xl p-6">
+              <div className="mb-6 flex items-center justify-between">
+                <h3 className="flex items-center gap-2 text-[18px] font-bold uppercase tracking-[0.2em] text-[#ffb599]">
+                  <span className="text-[20px]">🏆</span>
+                  Arena Ranks
+                </h3>
+                <div className="flex items-center gap-2">
+                  <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="text-[10px] uppercase tracking-[0.2em] text-[#e4bfb1] font-bold">Live</span>
+                </div>
+              </div>
 
-                <div className="grid gap-3">
-                  {question.options.map((option, index) => (
-                    <button
-                      key={option.id}
-                      type="button"
-                      disabled={Boolean(selectedOptionId)}
-                      onClick={() => submitAnswer(option.id)}
-                      className={`flex items-center gap-4 rounded-xl border px-5 py-4 text-left transition ${
-                        selectedOptionId === option.id
-                          ? answerResult === "correct"
-                            ? "border-emerald-500 bg-emerald-50 text-emerald-800"
-                            : answerResult === "wrong"
-                              ? "border-red-500 bg-red-50 text-red-800"
-                              : "border-[#5c3a21] bg-[#5c3a21]/5"
-                          : answerResult === "wrong" && option.id === correctOptionId
-                            ? "border-emerald-500 bg-emerald-50 text-emerald-800"
-                            : "border-gray-200 hover:border-[#5c3a21]/40"
-                      }`}
-                    >
-                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#5c3a21] text-sm font-bold text-white">
-                        {String.fromCharCode(65 + index)}
-                      </span>
-                      <span className="font-medium">{option.text}</span>
-                    </button>
-                  ))}
+              <div className="space-y-3">
+                {sortedPlayers.slice(0, 4).map((player, index) => (
+                  <div key={player.userId} className="rounded-2xl border border-white/5 bg-white/5 p-4">
+                    <div className="mb-3 flex items-center justify-between text-sm font-bold text-[#ecdfeb]">
+                      <span>{index + 1}. {player.username}</span>
+                      <span className="text-[#ffb599]">{player.score.toLocaleString()}</span>
+                    </div>
+                    <div className="h-2 rounded-full bg-white/10">
+                      <div
+                        className="h-full rounded-full bg-gradient-to-r from-[#ffb599] to-[#ff5f05]"
+                        style={{ width: `${Math.min(player.position ?? 10, 100)}%` }}
+                      />
+                    </div>
+                  </div>
+                ))}
+                {sortedPlayers.length === 0 && (
+                  <div className="rounded-2xl border border-white/5 bg-white/5 p-4 text-sm text-[#e4bfb1]">
+                    Đang đồng bộ người chơi...
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="lg:col-span-9 flex flex-col">
+            <div className="glass-panel relative overflow-hidden rounded-3xl p-6 lg:p-10">
+              <div className="pointer-events-none absolute -top-20 -left-20 h-40 w-40 rounded-full bg-[#ffb599]/10 blur-3xl" />
+              <div className="pointer-events-none absolute -bottom-20 -right-20 h-40 w-40 rounded-full bg-[#dfb7ff]/10 blur-3xl" />
+
+              <div className="absolute right-6 top-6 flex h-16 w-16 items-center justify-center rounded-full bg-[#1f1727]/80 backdrop-blur-lg">
+                <svg className="absolute inset-0 h-full w-full -rotate-90" viewBox="0 0 64 64">
+                  <circle className="text-white/10" cx="32" cy="32" r="30" stroke="currentColor" strokeWidth="3" fill="transparent" />
+                  <circle
+                    className="text-[#ffb599]"
+                    cx="32"
+                    cy="32"
+                    r="30"
+                    fill="transparent"
+                    stroke="currentColor"
+                    strokeWidth="3"
+                    strokeDasharray="188.5"
+                    strokeDashoffset={timerDashOffset}
+                  />
+                </svg>
+                <span className="relative text-[20px] font-bold text-[#ffb599]">
+                  {remaining}
+                </span>
+              </div>
+
+              <div className="relative z-10 mx-auto flex max-w-3xl flex-col h-full">
+                <div className="mb-2 text-center">
+                  <h2 className="text-[26px] font-black leading-tight text-[#ecdfeb] sm:text-[32px]">
+                    {question?.text ?? "Đang chờ câu hỏi..."}
+                  </h2>
+
+                  {countdown && (
+                    <div className="mx-auto mb-6 inline-flex items-center rounded-full bg-[#93000a]/90 px-6 py-3 text-[24px] font-black text-[#ffdad6]">
+                      {countdown}
+                    </div>
+                  )}
+
+                  {error && (
+                    <div className="mx-auto mb-4 rounded-3xl border border-[#93000a]/20 bg-[#93000a]/10 px-4 py-3 text-sm text-[#ffdad6]">
+                      {error}
+                    </div>
+                  )}
+
+                  {!error && feedbackMessage && (
+                    <div className="mx-auto mb-4 rounded-3xl border border-[#f8f3a2]/30 bg-[#fdf7c4]/90 px-4 py-3 text-sm font-semibold text-[#2f361f] shadow-inner shadow-yellow-500/10">
+                      {feedbackMessage}
+                    </div>
+                  )}
                 </div>
 
-                {selectedOptionId && (
-                  <p className="mt-5 text-sm font-bold text-gray-500">
+                <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                  {!question ? (
+                    <div className="col-span-full rounded-3xl border border-white/10 bg-[#1f1727]/80 p-8 text-center text-[#e4bfb1]">
+                      <Loader2 className="mx-auto mb-4 h-10 w-10 animate-spin text-[#ffb599]" />
+                      Đang chờ câu hỏi...
+                    </div>
+                  ) : (
+                    question.options.map((option, index) => {
+                      const isSelected = selectedOptionId === option.id;
+                      const isCorrect = option.id === correctOptionId;
+                      const isWrongSelected = isSelected && answerResult === "wrong";
+                      const showCorrectAnswer = selectedOptionId && answerResult === "wrong" && isCorrect;
+
+                      return (
+                        <button
+                          key={option.id}
+                          type="button"
+                          disabled={Boolean(selectedOptionId)}
+                          onClick={() => submitAnswer(option.id)}
+                          className={`btn-game group relative rounded-3xl border px-5 py-4 text-left transition-all duration-300 ${
+                            isSelected
+                              ? answerResult === "correct"
+                                ? "border-emerald-400 bg-emerald-900/30 text-[#ecdfeb] shadow-[0_0_30px_rgba(74,222,128,0.15)]"
+                                : "border-[#93000a] bg-[#93000a]/20 text-[#ffdad6]"
+                              : showCorrectAnswer
+                                ? "border-emerald-400 bg-emerald-900/20 text-[#ecdfeb]"
+                                : "border-[#aa897d]/30 bg-[#241d26]/80 hover:border-[#ff5f05] hover:bg-[#2b1f2b]"
+                          }`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <span className={`flex h-10 w-10 items-center justify-center rounded-2xl bg-[#ffdbce]/20 text-[#ffb599] text-lg font-bold transition-all duration-300 ${isWrongSelected ? "bg-[#93000a]/25 text-[#ffdad6]" : "group-hover:bg-[#ffb599] group-hover:text-[#171119]"}`}>
+                              {String.fromCharCode(65 + index)}
+                            </span>
+                            <span className="font-medium text-[#ecdfeb]">{option.text}</span>
+                          </div>
+                        </button>
+                      );
+                    })
+                  )}
+                </div>
+
+                {selectedOptionId && question && (
+                  <p className="mt-8 text-center text-sm font-bold text-[#e4bfb1]">
                     {answerResult === "correct"
-                      ? "Đáp án đúng! Chuẩn bị cho câu hỏi tiếp theo ngay sau đây."
+                      ? "Đúng! Chuẩn bị cho câu hỏi tiếp theo ngay sau đây."
                       : answerResult === "wrong"
-                        ? `Sai rồi. Đáp án đúng là: ${question?.options.find((opt) => opt.id === correctOptionId)?.text ?? "..."}`
+                        ? `Sai rồi. Đáp án đúng là: ${question.options.find((opt) => opt.id === correctOptionId)?.text ?? "..."}`
                         : "Đã gửi câu trả lời. Đang chờ kết quả..."}
                   </p>
                 )}
-              </>
-            )}
-          </div>
-
-          <div className="rounded-2xl border border-[#5c3a21]/10 bg-white p-6 shadow-sm">
-            <h2 className="mb-6 text-xl font-bold text-[#5c3a21]">Đường đua</h2>
-            <div className="space-y-6">
-              {sortedPlayers.map((player) => (
-                <div key={player.userId}>
-                  <div className="mb-2 flex items-center justify-between text-sm">
-                    <span className="font-bold text-[#5c3a21]">{player.username}</span>
-                    <span className="font-bold text-gray-500">{player.score} điểm</span>
-                  </div>
-                  <div className="relative h-12 overflow-hidden rounded-xl bg-[#f7eadf]">
-                    <div className="absolute bottom-0 left-0 right-0 top-1/2 border-t border-dashed border-[#5c3a21]/30" />
-                    <div
-                      className="absolute left-0 top-1/2 -translate-y-1/2 text-3xl transition-transform duration-500 ease-linear"
-                      style={{
-                        left: `${Math.min(player.position ?? 0, 94)}%`,
-                        transform: "translate(-50%, -50%)",
-                      }}
-                    >
-                      🐉
-                    </div>
-                    <div className="absolute right-3 top-1/2 -translate-y-1/2 text-2xl">🏰</div>
-                  </div>
-                  <p className="mt-1 text-xs text-gray-400">
-                    {player.correctAnswers} câu đúng
-                  </p>
-                </div>
-              ))}
-              {sortedPlayers.length === 0 && (
-                <p className="py-10 text-center text-gray-500">Đang đồng bộ người chơi...</p>
-              )}
+              </div>
             </div>
           </div>
-        </div>
-      </div>
+        </section>
+      </main>
+
+      <style>{`
+        .dragon-lane-gradient {
+          background: linear-gradient(90deg, rgba(23, 17, 25, 0) 0%, rgba(255, 95, 5, 0.05) 100%);
+        }
+        .flame-trail {
+          box-shadow: 0 0 15px #ff5f05, 0 0 30px #ffb599;
+        }
+        .glass-panel {
+          background: rgba(36, 29, 38, 0.8);
+          backdrop-filter: blur(12px);
+          border: 1px solid rgba(170, 137, 125, 0.2);
+        }
+        @keyframes drift {
+          0% { transform: translate(0, 0); }
+          50% { transform: translate(8px, -4px); }
+          100% { transform: translate(0, 0); }
+        }
+        .animate-drift { animation: drift 4s ease-in-out infinite; }
+        .btn-game:active { transform: scale(0.97) translateY(1px); }
+        .btn-game:hover { transform: scale(1.02); }
+        .correct-toast {
+          animation: floatUp 1.2s ease-out forwards;
+        }
+        .particle {
+          position: absolute;
+          pointer-events: none;
+          background: #4ade80;
+          border-radius: 50%;
+          z-index: 100;
+        }
+        @keyframes floatUp {
+          0% { transform: translateY(0); opacity: 0; }
+          20% { opacity: 1; }
+          80% { opacity: 1; }
+          100% { transform: translateY(-30px); opacity: 0; }
+        }
+      `}</style>
     </div>
   );
 }
