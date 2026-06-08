@@ -61,6 +61,15 @@ export default function Mindmap({ mindmap }: { mindmap: MindmapType }) {
       {/* Warm Retro Map Overlay Wash */}
       <div className="absolute inset-0 bg-[#eadaaf]/10 pointer-events-none" />
 
+      {/* Center vertical connector linking sections */}
+      <div aria-hidden className="hidden md:block absolute left-1/2 top-40 bottom-40 -translate-x-1/2 z-0 pointer-events-none">
+        <div className="w-[3px] h-full bg-gradient-to-b from-transparent via-[#c9a875]/30 to-transparent mx-auto relative">
+          <div className="absolute left-1/2 -translate-x-1/2 w-3 h-3 bg-[#d8b77d] rounded-full" style={{ top: '20%' }} />
+          <div className="absolute left-1/2 -translate-x-1/2 w-3 h-3 bg-[#d8b77d] rounded-full" style={{ top: '50%' }} />
+          <div className="absolute left-1/2 -translate-x-1/2 w-3 h-3 bg-[#d8b77d] rounded-full" style={{ top: '80%' }} />
+        </div>
+      </div>
+
       {/* Main Mindmap Title Banner */}
       <div className="w-full max-w-2xl mx-auto mb-14 relative z-10">
         {/* Nội dung đặt giữa khung */}
@@ -108,18 +117,44 @@ export default function Mindmap({ mindmap }: { mindmap: MindmapType }) {
                     />
                   </div>
 
+                  {/* Decorative flags around the scroll image (only visually) */}
+                  {sIdx === 0 && (
+                    <>
+                      <div className="hidden md:block absolute left-4 top-1/2 -translate-y-1/2 z-10">
+                        <div className="bg-[#fff6e8] border border-[#e2c79a] px-2 py-1 rounded drop-shadow-sm rotate-3">◆</div>
+                      </div>
+                      <div className="hidden md:block absolute right-4 top-1/2 -translate-y-1/2 z-10">
+                        <div className="bg-[#fff6e8] border border-[#e2c79a] px-2 py-1 rounded drop-shadow-sm -rotate-3">✦</div>
+                      </div>
+                      <div className="hidden md:block absolute top-3 right-6 z-20">
+                        <div className="bg-[#fff]/60 rounded-full p-1 border border-[#e6cfa7]">
+                          <svg viewBox="0 0 24 24" className="w-5 h-5 text-[#b07a3a]" fill="none" stroke="currentColor" strokeWidth="1.5" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2 L15 8 L22 9 L17 14 L18 21 L12 18 L6 21 L7 14 L2 9 L9 8 Z" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        </div>
+                      </div>
+                    </>
+                  )}
+
                   {/* Distinct panel design for scroll section content */}
                   <div
                     className={`w-full max-w-4xl mt-4 transition-all duration-300 ${activeTopicKey === scrollKey ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0"} overflow-hidden`}
                   >
                     <div className="bg-gradient-to-r from-[#fffaf0] to-[#fbf3dd] p-6 rounded-lg border border-[#e5cfa8] shadow-inner">
                       {section.topics.map((topic, tIdx) => {
-                        const tKey = `${sIdx}-${tIdx}`;
+                              const tKey = `${sIdx}-${tIdx}`;
                         const tExpanded =
                           activeScrollTopicKey === tKey ||
                           activeTopicKey === scrollKey;
                         return (
-                          <div key={tIdx} className="mb-4">
+                                <div key={tIdx} className="mb-4 relative">
+                                  {/* If we're in section 3 (index 2), show a numbered badge and connector */}
+                                  {sIdx === 2 && (
+                                    <div className="hidden md:block absolute -left-10 top-2 flex items-center">
+                                      <div className="w-8 h-8 rounded-full bg-[#f7e9d2] border border-[#dec79a] flex items-center justify-center text-sm font-semibold text-[#7b4d2a]">{tIdx + 1}</div>
+                                      <div className="w-6 h-[2px] bg-[#dec79a] ml-2" />
+                                    </div>
+                                  )}
                             <div
                               role="button"
                               tabIndex={0}

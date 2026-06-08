@@ -53,13 +53,43 @@ const changePasswordSchema = z.object({
 export async function register(req: AuthRequest, res: Response) {
   const body = registerSchema.parse(req.body);
   const result = await registerUser(body);
-  res.status(201).json(result);
+  // set refresh token cookie if provided
+  if ((result as any).refreshToken) {
+    const raw = (result as any).refreshToken as string;
+    // decode exp to set cookie maxAge
+    const decoded: any = await import("jsonwebtoken").then((jwt) => jwt.default.decode(raw));
+    const maxAge = decoded?.exp ? decoded.exp * 1000 - Date.now() : undefined;
+      const cookieOptions: any = {
+        httpOnly: true,
+        secure: env.nodeEnv === "production",
+        sameSite: env.nodeEnv === "production" ? "none" : "lax",
+        path: "/",
+        ...(maxAge ? { maxAge } : {}),
+      };
+      if (env.cookieDomain) cookieOptions.domain = env.cookieDomain;
+      res.cookie("refresh_token", raw, cookieOptions);
+  }
+  res.status(201).json({ accessToken: result.accessToken, user: result.user });
 }
 
 export async function login(req: AuthRequest, res: Response) {
   const body = loginSchema.parse(req.body);
   const result = await loginUser(body.email, body.password);
-  res.json(result);
+  if ((result as any).refreshToken) {
+    const raw = (result as any).refreshToken as string;
+    const decoded: any = await import("jsonwebtoken").then((jwt) => jwt.default.decode(raw));
+    const maxAge = decoded?.exp ? decoded.exp * 1000 - Date.now() : undefined;
+      const cookieOptions: any = {
+        httpOnly: true,
+        secure: env.nodeEnv === "production",
+        sameSite: env.nodeEnv === "production" ? "none" : "lax",
+        path: "/",
+        ...(maxAge ? { maxAge } : {}),
+      };
+      if (env.cookieDomain) cookieOptions.domain = env.cookieDomain;
+      res.cookie("refresh_token", raw, cookieOptions);
+  }
+  res.json({ accessToken: result.accessToken, user: result.user });
 }
 
 export async function forgotPasswordHandler(req: AuthRequest, res: Response) {
@@ -106,6 +136,10 @@ export async function uploadAvatarHandler(req: AuthRequest, res: Response) {
 
 export async function logoutHandler(req: AuthRequest, res: Response) {
   const result = await logoutUser(req.userId!);
+  // Clear refresh cookie on logout
+  const clearOptions: any = { path: "/" };
+  if (env.cookieDomain) clearOptions.domain = env.cookieDomain;
+  res.clearCookie("refresh_token", clearOptions);
   res.json(result);
 }
 
@@ -147,7 +181,19 @@ export async function googleCallback(req: AuthRequest, res: Response) {
     const state = decodeGoogleState(stateRaw);
     redirectUri = state.redirectUri;
     const profile = await handleGoogleCallback(code);
-    const { accessToken, user } = await findOrCreateGoogleUser(profile, state.mode);
+    const { accessToken, user, refreshToken } = await findOrCreateGoogleUser(profile, state.mode) as any;
+
+    if (refreshToken) {
+      const decoded: any = await import("jsonwebtoken").then((jwt) => jwt.default.decode(refreshToken));
+      const maxAge = decoded?.exp ? decoded.exp * 1000 - Date.now() : undefined;
+      res.cookie("refresh_token", refreshToken, {
+        httpOnly: true,
+        secure: env.nodeEnv === "production",
+        sameSite: "lax",
+        path: "/",
+        ...(maxAge ? { maxAge } : {}),
+      });
+    }
 
     const params = new URLSearchParams({
       access_token: accessToken,
