@@ -1,6 +1,5 @@
 export const API_BASE_URL =
-  // In production serve API from the same origin (Vercel serverless proxy). In dev, default to localhost backend.
-  (import.meta.env.PROD ? '' : (import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8080'));
+  import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080";
 
 export class ApiError extends Error {
   status: number;
