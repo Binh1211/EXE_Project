@@ -1,4 +1,4 @@
-import axios, { AxiosError, AxiosInstance } from 'axios';
+import axios, { AxiosError, type AxiosInstance, type AxiosResponse, type InternalAxiosRequestConfig } from 'axios';
 import { getAccessToken, setAccessToken, refreshAccessToken } from './auth';
 
 /**
@@ -8,10 +8,10 @@ import { getAccessToken, setAccessToken, refreshAccessToken } from './auth';
 
 const api: AxiosInstance = axios.create({ baseURL: '/api' });
 
-api.interceptors.request.use(cfg => {
+api.interceptors.request.use((cfg: InternalAxiosRequestConfig) => {
   const token = getAccessToken();
   if (token && cfg && cfg.headers) {
-    cfg.headers['Authorization'] = `Bearer ${token}`;
+    (cfg.headers as any)['Authorization'] = `Bearer ${token}`;
   }
   return cfg;
 });
@@ -29,7 +29,7 @@ function addSubscriber(cb: (token: string | null) => void) {
 }
 
 api.interceptors.response.use(
-  r => r,
+  (r: AxiosResponse) => r,
   async (error: AxiosError) => {
     const originalRequest = (error.config || {}) as any;
     if (error.response?.status === 401 && !originalRequest._retry) {
