@@ -92,17 +92,17 @@ const CourseRow = ({
   return (
     <div
       onClick={handleClick}
-      className="grid grid-cols-12 gap-4 items-center py-4 border-b border-gray-200 transition-colors px-4 hover:bg-white/50 cursor-pointer"
+      className="flex flex-col md:grid md:grid-cols-12 gap-4 items-center py-4 border-b border-gray-200 transition-colors px-4 hover:bg-white/50 cursor-pointer"
     >
-      <div className="col-span-8 flex gap-4 pr-4">
+      <div className="flex items-center gap-4 md:col-span-8 pr-0 md:pr-4 w-full">
         <img
           src={coverImageUrl || "https://placehold.co/300x200"}
           alt={title}
-          className="w-24 h-24 object-cover rounded-xl shrink-0"
+          className="w-20 h-20 md:w-24 md:h-24 object-cover rounded-xl shrink-0"
         />
 
-        <div className="flex flex-col justify-center">
-          <h4 className="font-bold text-gray-800 text-base mb-1">{title}</h4>
+        <div className="flex flex-col justify-center min-w-0">
+          <h4 className="font-bold text-gray-800 text-base mb-1 truncate">{title}</h4>
 
           {description && (
             <p className="text-xs text-gray-500 line-clamp-2">{description}</p>
@@ -110,7 +110,7 @@ const CourseRow = ({
         </div>
       </div>
 
-      <div className="col-span-4 flex items-center">
+      <div className="md:col-span-4 flex items-center w-full justify-start md:justify-end mt-3 md:mt-0">
         {isLocked ? (
           <span className="text-sm font-bold text-white bg-[#b45309] px-3 py-1 rounded-full flex items-center gap-1">
             <Lock size={12} />
@@ -213,7 +213,7 @@ export default function CoursePage() {
       }}
     >
       {/* Left Sidebar */}
-      <aside className="w-[260px] flex-shrink-0 flex flex-col items-center py-8 px-6 border-r border-black/5">
+      <aside className="hidden md:flex w-[260px] flex-shrink-0 flex flex-col items-center py-8 px-6 border-r border-black/5">
         <Link to="/" className="mb-10 flex flex-col items-center">
           <img src={IMG.logo} alt="EXE" />
         </Link>
@@ -254,8 +254,8 @@ export default function CoursePage() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col h-screen overflow-y-auto overflow-x-hidden">
-        <div className="p-8 max-w-[1200px] w-full mx-auto">
+      <main className="flex-1 flex flex-col overflow-y-auto overflow-x-hidden">
+        <div className="p-4 md:p-8 max-w-7xl w-full mx-auto">
           {/* Header */}
           <div className="flex justify-between items-start mb-8">
             <div>
@@ -297,12 +297,10 @@ export default function CoursePage() {
           <div>
             <div className="bg-white/40 rounded-2xl overflow-hidden border border-black/5 shadow-sm">
               {/* Table Header */}
-              <div className="bg-[#5c3a21] text-white grid grid-cols-12 gap-4 px-4 py-3 rounded-t-2xl">
-                <div className="col-span-8 font-semibold text-sm pl-4">
-                  Tên khóa học
-                </div>
-                <div className="col-span-4 font-semibold text-sm">
-                  Trạng thái
+              <div className="bg-[#5c3a21] text-white rounded-t-2xl px-4 py-3">
+                <div className="flex items-center justify-between">
+                  <div className="font-semibold text-sm">Tên khóa học</div>
+                  <div className="font-semibold text-sm">Trạng thái</div>
                 </div>
               </div>
 
@@ -364,7 +362,7 @@ export default function CoursePage() {
       </main>
 
       {/* Right Sidebar */}
-      <aside className="w-[320px] flex-shrink-0 bg-white/40 border-l border-black/5 h-screen overflow-y-auto px-6 py-8 shadow-[-4px_0_15px_-5px_rgba(0,0,0,0.05)]">
+      <aside className="hidden lg:block w-[320px] flex-shrink-0 bg-white/40 border-l border-black/5 h-screen overflow-y-auto px-6 py-8 shadow-[-4px_0_15px_-5px_rgba(0,0,0,0.05)]">
         {/* Profile */}
         <div className="mb-10 w-full">
           <h3 className="font-bold text-gray-800 text-lg mb-4">Hồ sơ</h3>

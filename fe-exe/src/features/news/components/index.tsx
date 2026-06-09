@@ -11,8 +11,8 @@ import { Clock4, Eye } from "lucide-react";
 function NewsContent() {
   return (
     <div>
-      <div className="grid grid-cols-2 w-full bg-[#EED4B1] py-14 mt-6">
-        <div className="ml-[15%] pr-[20%]">
+      <div className="grid grid-cols-1 md:grid-cols-2 w-full bg-[#EED4B1] py-14 mt-6">
+        <div className="px-6 md:px-16 lg:px-24">
           <h4 className="text-black text-lg">Tin tức & Giáo dục</h4>
           <h1 className="text-4xl font-bold text-[#785336] mt-4">
             Lịch sử Việt Nam trong thời đại số; Vì sao học qua tương tác giúp
@@ -27,22 +27,15 @@ function NewsContent() {
             Đọc bài viết
           </Button>
         </div>
-        <div className="mr-[15%]">
-         
-        </div>
+        <div className="hidden md:block" />
       </div>
-      <div className="grid grid-cols-2 mt-12 gap-10">
-        <h4 className="text-black text-2xl font-semibold ml-[15%]">
-          Bài viết nổi bật
-        </h4>
-        <a
-          href="#"
-          className="text-[#785336] text-lg font-semibold mr-[15%] underline text-right"
-        >
-          (Xem tất cả)
-        </a>
-        <div className="col-span-2 flex justify-between gap-10 mx-[7%]">
-          <Card className="bg-white rounded-xl flex flex-col h-full w-[32%]">
+      <div className="mt-12">
+        <div className="max-w-7xl mx-auto px-6 md:px-8 flex justify-between items-center">
+          <h4 className="text-black text-2xl font-semibold">Bài viết nổi bật</h4>
+          <a href="#" className="text-[#785336] text-lg font-semibold underline">(Xem tất cả)</a>
+        </div>
+        <div className="max-w-7xl mx-auto px-6 md:px-8 grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+          <Card className="bg-white rounded-xl flex flex-col h-full">
            
 
             <CardHeader className="flex-1">
@@ -78,7 +71,7 @@ function NewsContent() {
             </CardFooter>
           </Card>
 
-          <Card className="bg-white rounded-xl flex flex-col h-full w-[32%]">
+          <Card className="bg-white rounded-xl flex flex-col h-full">
            
 
             <CardHeader className="flex-1">
@@ -113,7 +106,7 @@ function NewsContent() {
             </CardFooter>
           </Card>
 
-          <Card className="bg-white rounded-xl flex flex-col h-full w-[32%]">
+          <Card className="bg-white rounded-xl flex flex-col h-full">
            
 
             <CardHeader className="flex-1">

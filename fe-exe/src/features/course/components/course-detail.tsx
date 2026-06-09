@@ -113,7 +113,7 @@ const CourseDetailPage = () => {
     <div className="flex-1 w-full flex flex-col font-sans overflow-x-hidden">
       <div className="relative z-10 flex-1">
         {/* Hero */}
-        <div className="bg-[#5c3a21] text-white pt-5 pb-16 px-10 relative overflow-hidden">
+        <div className="bg-[#5c3a21] text-white pt-5 pb-16 px-6 md:px-10 relative overflow-hidden">
           <div
             className="absolute inset-0 opacity-10 pointer-events-none"
             style={{
@@ -122,7 +122,7 @@ const CourseDetailPage = () => {
             }}
           />
 
-          <div className="max-w-[1280px] mx-auto relative z-10">
+          <div className="max-w-7xl mx-auto px-4 md:px-0 relative z-10">
             <CourseBreadcrumb
               courseTitle={timeline.title}
               chapterTitle={chapter.title}
@@ -130,9 +130,9 @@ const CourseDetailPage = () => {
               className="mb-4"
             />
 
-            <div className="grid grid-cols-12 gap-12 items-center">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
               <div className="col-span-12 lg:col-span-7">
-                <h1 className="text-[44px] leading-[1.2] font-title font-bold mb-8 italic">
+                <h1 className="text-2xl md:text-[44px] leading-[1.2] font-title font-bold mb-6 md:mb-8 italic">
                   {chapter.title}
                 </h1>
 
@@ -180,7 +180,7 @@ const CourseDetailPage = () => {
                 </div>
               </div>
 
-              <div className="col-span-12 lg:col-span-5 relative mt-8 lg:mt-0 pr-4">
+              <div className="col-span-12 lg:col-span-5 relative mt-6 lg:mt-0 pr-0 lg:pr-4">
                 <div className="relative rounded-[32px] overflow-hidden shadow-2xl shadow-black/40 aspect-[4/3]">
                   <img
                     src={coverImage}
@@ -209,11 +209,11 @@ const CourseDetailPage = () => {
         </div>
 
         {/* Lessons */}
-        <div className="w-full px-8 md:px-12 pt-14 pb-16">
-          <div className="max-w-[1280px] mx-auto">
-            <div className="flex justify-between items-end mb-10">
+        <div className="w-full px-4 md:px-12 pt-14 pb-16">
+          <div className="max-w-7xl mx-auto px-4 md:px-0">
+            <div className="flex flex-col md:flex-row justify-between items-end mb-6 md:mb-10">
               <div>
-                <h2 className="text-[42px] font-serif font-bold text-gray-800 mb-4 italic">
+                <h2 className="text-2xl md:text-[42px] font-serif font-bold text-gray-800 mb-3 md:mb-4 italic">
                   Nội dung bài học
                 </h2>
                 <p className="text-[13px] font-semibold text-gray-500 uppercase tracking-[0.3em]">
@@ -266,13 +266,13 @@ const CourseDetailPage = () => {
 
         {/* Related */}
         <div className="pt-8 pb-16">
-          <div className="max-w-[1280px] mx-auto px-10">
+          <div className="max-w-7xl mx-auto px-4 md:px-10">
             <div className="mb-6">
-              <h2 className="text-[40px] font-serif font-bold text-[#5c3a21] mb-2 italic">
+              <h2 className="text-2xl md:text-[40px] font-serif font-bold text-[#5c3a21] mb-2 italic">
                 Khóa học liên quan
               </h2>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-10">
               <RelatedCourseCard
                 image= "https://tse4.mm.bing.net/th/id/OIP.N__X_XjUoI1_8tNsHfYwaQHaKf?cb=thfc1falcon2&rs=1&pid=ImgDetMain&o=7&rm=3"
                 title="Lịch Sử Việt Nam Qua Các Thời Kỳ"
