@@ -53,11 +53,11 @@ export default function PremiumTimeline() {
   }, [searchParams]);
 
   if (timelines.length === 0) {
-    return <div className="h-[90vh] bg-black" />;
+    return <div className="min-h-[60vh] bg-black" />;
   }
 
   return (
-    <div className="relative w-full h-[90vh] bg-black overflow-hidden mb-[-80px]">
+    <div className="relative w-full min-h-[70vh] md:h-[90vh] bg-black overflow-hidden">
       {/* TIMELINE YEARS */}
       <div className="absolute top-7 left-1/2 z-30 flex -translate-x-1/2 flex-nowrap gap-10">
         {timelines.map((item, index) => {
@@ -235,5 +235,6 @@ export default function PremiumTimeline() {
         })}
       </div>
     </div>
-  );
+
+);
 }

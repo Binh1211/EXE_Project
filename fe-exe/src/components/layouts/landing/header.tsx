@@ -1,5 +1,6 @@
-import { Search } from "lucide-react";
+import { Search, Menu, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../../ui/button";
 import {
@@ -18,6 +19,68 @@ import { timelineApi } from "@/features/timeLine/api/timeline-api";
 import type { Timeline } from "@/features/timeLine/types";
 import { API_BASE_URL } from "@/lib/api-client";
 
+function MobileCoursesMenu({
+  onNavigate,
+}: {
+  onNavigate: (path: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [classesOpen, setClassesOpen] = useState(false);
+
+  return (
+    <div>
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="w-full text-left px-3 py-2 flex items-center justify-between"
+      >
+        <span>Khóa học</span>
+        <span className="ml-2">{open ? "▲" : "▼"}</span>
+      </button>
+      {open && (
+        <div className="pl-4">
+          <button
+            onClick={() => onNavigate("/time-line")}
+            className="w-full text-left px-3 py-2"
+          >
+            Time Line Lịch sử
+          </button>
+          <button
+            onClick={() => onNavigate("/course/all")}
+            className="w-full text-left px-3 py-2"
+          >
+            Kho học liệu
+          </button>
+          <button
+            onClick={() => onNavigate("/flashcard-rooms/join")}
+            className="w-full text-left px-3 py-2"
+          >
+            Ôn thi
+          </button>
+
+          <div>
+            <button
+              onClick={() => setClassesOpen((v) => !v)}
+              className="w-full text-left px-3 py-2 flex items-center justify-between"
+            >
+              <span>Lớp học</span>
+              <span className="ml-2">{classesOpen ? "▲" : "▼"}</span>
+            </button>
+            {classesOpen && (
+              <div className="pl-4">
+                <button onClick={() => onNavigate("/course/all?class=10")} className="w-full text-left px-3 py-2">Lớp 10</button>
+                <button onClick={() => onNavigate("/course/all?class=11")} className="w-full text-left px-3 py-2">Lớp 11</button>
+                <button onClick={() => onNavigate("/course/all?class=12")} className="w-full text-left px-3 py-2">Lớp 12</button>
+              </div>
+            )}
+          </div>
+
+          <button onClick={() => onNavigate("/news")} className="w-full text-left px-3 py-2">Sách</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 type SearchScope = "all" | "timeline" | "course";
 
 type CourseHit = { id: string; title: string };
@@ -32,6 +95,7 @@ export default function Header() {
   const [showResults, setShowResults] = useState(false);
   const [timelines, setTimelines] = useState<Timeline[]>([]);
   const [courses, setCourses] = useState<CourseHit[]>([]);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
     timelineApi
@@ -96,6 +160,16 @@ export default function Header() {
       }
       setShowResults(false);
     }
+  };
+
+
+  const [activeDropdown, setActiveDropdown] = useState<"home" | "courses" | null>(null);
+  const [dropdownPos] = useState<{ left: number; top: number; width: number } | null>(null);
+  const [classesSubOpen, setClassesSubOpen] = useState(false);
+
+
+  const hideDropdown = () => {
+    setActiveDropdown(null);
   };
 
   return (
@@ -335,9 +409,6 @@ export default function Header() {
               Game
             </button>
           </div>
-          {/* <Link to="/vip" className="text-sm font-medium hover:text-[#5f3713]">
-            Mua VIP
-          </Link> */}
           <Link
             to="/contact"
             className="text-sm font-medium hover:text-[#5f3713]"
@@ -368,8 +439,203 @@ export default function Header() {
               </Button>
             </>
           )}
+          <button
+            type="button"
+            className="ml-2 inline-flex items-center justify-center rounded-md p-2 text-gray-700 hover:bg-gray-100 md:hidden"
+            onClick={() => setMobileOpen((v) => !v)}
+            aria-label="Mở menu"
+          >
+            {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </button>
         </div>
       </div>
+      {mobileOpen && (
+        <div className="md:hidden absolute left-0 right-0 top-full z-[210] bg-[#fff3e9] p-4 shadow-lg">
+          <div className="flex flex-col gap-2">
+            <button
+              onClick={() => {
+                setMobileOpen(false);
+                navigate("/");
+              }}
+              className="text-left px-3 py-2"
+            >
+              Trang chủ
+            </button>
+
+            <MobileCoursesMenu
+              onNavigate={(path) => {
+                setMobileOpen(false);
+                navigate(path);
+              }}
+            />
+
+            <button
+              onClick={() => {
+                setMobileOpen(false);
+                navigate("/game/list");
+              }}
+              className="text-left px-3 py-2"
+            >
+              Game
+            </button>
+
+            <button
+              onClick={() => {
+                setMobileOpen(false);
+                navigate("/contact");
+              }}
+              className="text-left px-3 py-2"
+            >
+              Liên hệ
+            </button>
+
+            <button
+              onClick={() => {
+                setMobileOpen(false);
+                navigate("/news");
+              }}
+              className="text-left px-3 py-2"
+            >
+              Tin tức
+            </button>
+
+            {!isLoggedIn && (
+              <div className="flex gap-2 mt-2">
+                <Button
+                  onClick={() => {
+                    setMobileOpen(false);
+                    navigate(AUTH_ROUTES.login);
+                  }}
+                  className="flex-1"
+                >
+                  Đăng nhập
+                </Button>
+                <Button
+                  onClick={() => {
+                    setMobileOpen(false);
+                    navigate(AUTH_ROUTES.register);
+                  }}
+                  className="flex-1 bg-[#5f3713] text-white"
+                >
+                  Đăng ký
+                </Button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+      {activeDropdown && dropdownPos
+        ? createPortal(
+            <div
+              style={{
+                position: "absolute",
+                left: dropdownPos.left,
+                top: dropdownPos.top,
+                zIndex: 10000,
+                minWidth: 200,
+              }}
+              onMouseEnter={() => {
+                // keep submenu visible while mouse is inside the portal
+                setClassesSubOpen(true);
+              }}
+              onMouseLeave={() => {
+                setClassesSubOpen(false);
+                hideDropdown();
+              }}
+            >
+              <div className="rounded-xl bg-[#fff3e9] p-1 shadow-lg">
+                {activeDropdown === "home" ? (
+                  <div className="w-40">
+                    <Link
+                      to="/"
+                      className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
+                    >
+                      Về Vistory
+                    </Link>
+                    <Link
+                      to="/#team"
+                      className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
+                    >
+                      Thành phần
+                    </Link>
+                    <Link
+                      to="/#features"
+                      className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
+                    >
+                      Tính năng
+                    </Link>
+                    <Link
+                      to="/#benefits"
+                      className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
+                    >
+                      Lợi ích
+                    </Link>
+                  </div>
+                ) : (
+                  <div className="w-44 relative">
+                    <Link
+                      to="/time-line"
+                      className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
+                    >
+                      Time Line Lịch sử
+                    </Link>
+                    <Link
+                      to="/course/all"
+                      className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
+                    >
+                      Kho học liệu
+                    </Link>
+                    <Link
+                      to="/flashcard-rooms/join"
+                      className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
+                    >
+                      Ôn thi
+                    </Link>
+                    <div
+                      className="border-t mt-1 pt-1 relative"
+                      onMouseEnter={() => setClassesSubOpen(true)}
+                      onMouseLeave={() => setClassesSubOpen(false)}
+                    >
+                      <div className="text-sm px-2 py-2 rounded-xl hover:bg-[#f3e2d3] flex items-center justify-between">
+                        <span>Lớp học</span>
+                        <span className="ml-2 text-xs">›</span>
+                      </div>
+                      {classesSubOpen && (
+                        <div style={{ left: 'calc(100% - 8px)', top: 0 }} className="absolute w-36 rounded-lg bg-[#fff3e9] p-1 shadow-lg">
+                          <Link
+                            to="/course/all?class=10"
+                            className="block px-2 py-1 text-sm hover:bg-[#f3e2d3] rounded-md"
+                          >
+                            Lớp 10
+                          </Link>
+                          <Link
+                            to="/course/all?class=11"
+                            className="block px-2 py-1 text-sm hover:bg-[#f3e2d3] rounded-md"
+                          >
+                            Lớp 11
+                          </Link>
+                          <Link
+                            to="/course/all?class=12"
+                            className="block px-2 py-1 text-sm hover:bg-[#f3e2d3] rounded-md"
+                          >
+                            Lớp 12
+                          </Link>
+                        </div>
+                      )}
+                    </div>
+                    <Link
+                      to="/news"
+                      className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3] mt-1"
+                    >
+                      Sách
+                    </Link>
+                  </div>
+                )}
+              </div>
+            </div>,
+            document.body,
+          )
+        : null}
     </header>
   );
 }

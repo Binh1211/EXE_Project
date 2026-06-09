@@ -6,26 +6,25 @@ import { resolveImageUrl } from "@/lib/images";
 const RectFrame: React.FC<{
   title: string;
   children: React.ReactNode;
-}> = ({ title, children }) => {
+  smallTitle?: boolean;
+}> = ({ title, children, smallTitle = false }) => {
   return (
-    <div className="relative mb-2 w-full">
-      {/* Header */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
+    <div className="relative mb-4 w-full">
+      {/* Header placed above the frame to avoid overlap on small screens */}
+      <div className="flex justify-center mb-3">
         <div
-          className="inline-flex items-center justify-center px-8 py-3 bg-contain bg-no-repeat bg-center"
+          className="inline-flex items-center justify-center px-4 py-2 bg-contain bg-no-repeat bg-center"
           style={{
             backgroundImage: `url('${resolveImageUrl("/title.png")}')`,
           }}
         >
-          <span className="text-sm md:text-base font-title font-bold text-[#5c4033] tracking-wide text-center leading-tight px-20">
-            {title}
-          </span>
+          <span className={`${smallTitle ? "text-xs md:text-base" : "text-sm md:text-base"} font-title font-bold text-[#5c4033] tracking-wide text-center leading-tight px-4 md:px-20`}>{title}</span>
         </div>
       </div>
 
       {/* Khung */}
       <div
-        className="bg-[#fbf8ee] p-8"
+        className="bg-[#fbf8ee] p-6 md:p-8"
         style={{
           border: "24px solid transparent",
           borderImage: `url('${resolveImageUrl("/frame.png")}') 24 stretch`,
@@ -52,7 +51,7 @@ export default function Mindmap({ mindmap }: { mindmap: MindmapType }) {
 
   return (
     <div
-      className="w-full min-h-[700px] py-14 px-4 md:px-10 relative rounded-3xl overflow-hidden shadow-2xl border-2 border-[#5c4033]/30 bg-repeat-y"
+      className="w-full md:min-h-[700px] min-h-[480px] py-10 md:py-14 px-4 md:px-10 relative rounded-3xl overflow-hidden shadow-2xl border-2 border-[#5c4033]/30 bg-repeat-y"
       style={{
         backgroundImage: `url('${resolveImageUrl("/bg_mindmap.png")}')`,
         backgroundSize: "100% auto",
@@ -90,17 +89,17 @@ export default function Mindmap({ mindmap }: { mindmap: MindmapType }) {
       </div>
 
       {/* Main Mindmap Title Banner */}
-      <div className="w-full max-w-2xl mx-auto mb-14 relative z-10">
+      <div className="w-full max-w-2xl mx-auto mb-6 md:mb-14 relative z-10 px-2 md:px-0">
         {/* Nội dung đặt giữa khung */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <h2 className="text-xl md:text-3xl font-title font-bold text-[#5c4033] tracking-wide text-center">
+        <div className="flex items-center justify-center py-4 md:py-6">
+          <h2 className="text-lg md:text-3xl font-title font-bold text-[#5c4033] tracking-wide text-center">
             {mindmap.title}
           </h2>
         </div>
       </div>
 
       {/* Mindmap Content Layout */}
-      <div className="relative z-10 w-full max-w-5xl mx-auto flex flex-col items-center gap-1">
+      <div className="relative z-10 w-full max-w-full md:max-w-5xl mx-auto flex flex-col items-center gap-6 md:gap-8 px-2 md:px-0">
         {mindmap.sections.map((section, sIdx) => {
           // If layoutType is scroll and we have an image, render a clickable image
           // that toggles a distinct styled panel with the section's topics/items
@@ -113,17 +112,7 @@ export default function Mindmap({ mindmap }: { mindmap: MindmapType }) {
                   key={sIdx}
                   className="w-full flex flex-col items-center z-10 my-4 select-none"
                 >
-                  <div
-                    className="
-    relative
-    w-full
-    max-w-5xl
-    mx-auto
-    p-6
-    rounded-[30px]
-    overflow-hidden
-  "
-                  >
+                  <div className="relative w-full p-4 md:p-6 rounded-[30px] overflow-hidden">
                     {/* Nền giấy cổ */}
                     <div
                       className="absolute inset-0"
@@ -198,11 +187,7 @@ export default function Mindmap({ mindmap }: { mindmap: MindmapType }) {
                         <img
                           src={resolveImageUrl(scrollImgUrl)}
                           alt={section.title}
-                          className="
-          w-full
-          rounded-xl
-          object-contain
-        "
+                          className="w-full rounded-xl object-contain"
                         />
                         <div
                           className={`
@@ -373,9 +358,9 @@ export default function Mindmap({ mindmap }: { mindmap: MindmapType }) {
           }
 
           return (
-            <RectFrame key={sIdx} title={section.title}>
+            <RectFrame key={sIdx} title={section.title} smallTitle={sIdx === 2}>
               {/* Topics Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 justify-items-center relative z-10 w-full">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 justify-items-center relative z-10 w-full">
                 {/* Horizontal connector line on desktop for 3 topics */}
                 {section.topics.length === 3 && (
                   <div className="absolute top-10 left-[15%] right-[15%] h-[1px] bg-[#5c4033]/20 hidden md:block z-0" />
@@ -390,22 +375,12 @@ export default function Mindmap({ mindmap }: { mindmap: MindmapType }) {
                     >
                       {/* Topic Illustration */}
                       {topic.illustrationUrl && (
-                        <div
-                          role="button"
-                          tabIndex={0}
-                          onClick={() => toggleTopic(sIdx, tIdx)}
-                          className="
-    relative
-    w-[140px]
-    h-[140px]
-    mb-4
-    cursor-pointer
-    transition-all
-    duration-300
-    hover:scale-105
-    group
-  "
-                        >
+                          <div
+                            role="button"
+                            tabIndex={0}
+                            onClick={() => toggleTopic(sIdx, tIdx)}
+                            className="relative w-20 h-20 md:w-[140px] md:h-[140px] mb-4 cursor-pointer transition-all duration-300 hover:scale-105 group"
+                          >
                           {/* Viền ngoài */}
                           <div
                             className="
@@ -467,7 +442,7 @@ export default function Mindmap({ mindmap }: { mindmap: MindmapType }) {
                           if (e.key === "Enter" || e.key === " ")
                             toggleTopic(sIdx, tIdx);
                         }}
-                        className="text-sm md:text-base font-title font-bold text-[#5c4033] mb-4 flex items-center justify-center px-2 whitespace-normal break-words text-center max-w-full cursor-pointer z-10"
+                        className={`${sIdx === 2 ? "text-xs md:text-base" : "text-sm md:text-base"} font-title font-bold text-[#5c4033] mb-4 flex items-center justify-center px-2 whitespace-normal break-words text-center max-w-full cursor-pointer z-10`}
                       >
                         {topic.title}
                       </h4>

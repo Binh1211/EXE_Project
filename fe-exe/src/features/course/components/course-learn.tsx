@@ -289,7 +289,7 @@ const CourseLearningPage = () => {
 
   return (
     <div className="flex-1 w-full flex flex-col font-sans">
-      <div className="bg-[#4a321f] text-white px-8 py-3.5 flex items-center justify-between shadow-md relative z-20">
+      <div className="bg-[#4a321f] text-white px-4 md:px-8 py-3.5 flex items-center justify-between shadow-md relative z-20">
         <div className="flex items-center gap-8 min-w-0">
           <CourseBreadcrumb
             courseTitle={timeline.title}
@@ -316,7 +316,7 @@ const CourseLearningPage = () => {
       </div>
 
       <div className="flex flex-col lg:flex-row lg:items-stretch bg-black">
-        <div className="lg:w-[70%] aspect-video relative group overflow-hidden">
+        <div className="w-full lg:w-7/12 aspect-video relative group overflow-hidden">
           {activeVideoId ? (
             <div className="w-full h-full bg-black">
               <div ref={ytContainerRef} className="w-full h-full" />
@@ -337,15 +337,15 @@ const CourseLearningPage = () => {
         </div>
 
         <div
-          className="lg:w-[30%] min-h-[400px] lg:min-h-0 relative bg-cover"
+          className="w-full lg:w-5/12 min-h-0 relative bg-cover"
           style={{ backgroundImage: `url(${IMG.paperTexture})` }}
         >
-          <div className="absolute inset-0 overflow-y-auto overflow-x-hidden p-8">
-            <div className="mb-8">
-              <h2 className="text-[28px] font-title font-bold text-[#5c3a21] leading-tight mb-2">
+          <div className="relative overflow-y-auto p-4 md:p-8">
+            <div className="mb-6">
+              <h2 className="text-xl md:text-[28px] font-title font-bold text-[#5c3a21] leading-tight mb-2">
                 {chapter.title}
               </h2>
-              <p className="text-[13px] text-gray-500 font-medium">
+              <p className="text-sm md:text-[13px] text-gray-500 font-medium">
                 {lessons.length} bài học • {progressPct}% hoàn thành
               </p>
             </div>
@@ -380,9 +380,9 @@ const CourseLearningPage = () => {
         </div>
       </div>
 
-      <div className="flex flex-col flex-1 bg-[#FFF6F4] border-t border-black/5">
+        <div className="flex flex-col flex-1 bg-[#FFF6F4] border-t border-black/5">
         <div className="border-b border-black/5">
-          <div className="flex gap-8 px-12">
+          <div className="flex gap-8 px-4 md:px-12">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
@@ -404,7 +404,7 @@ const CourseLearningPage = () => {
 
         <div className="p-4">
           {activeTab === "Overview" && (
-            <div className="flex flex-row items-start justify-between gap-8 px-8">
+            <div className="flex flex-col md:flex-row items-start justify-between gap-8 px-4 md:px-8">
               <CourseOutcome
                 title="Thông tin bài học"
                 outcomes={
@@ -426,7 +426,7 @@ const CourseLearningPage = () => {
             </div>
           )}
           {activeTab === "Review" && (
-            <div className="mt-6 mx-[7%] flex flex-col items-center pb-10">
+            <div className="mt-6 max-w-3xl mx-auto flex flex-col items-center pb-10 px-4">
               <div className="w-full mb-4">
                 <h3 className="text-2xl font-bold text-[#5c3a21]">
                   Ôn tập kiến thức
@@ -450,7 +450,7 @@ const CourseLearningPage = () => {
           )}
 
           {activeTab === "Mindmap" && (
-            <div className="mt-6 mx-[7%] flex flex-col items-center pb-10 w-[86%]">
+            <div className="mt-6 max-w-3xl mx-auto flex flex-col items-center pb-10 px-4">
               {detailLoading ? (
                 <p className="text-gray-500 py-12">Đang tải sơ đồ tư duy...</p>
               ) : lessonDetail?.mindmap ? (

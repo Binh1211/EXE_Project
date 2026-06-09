@@ -6,7 +6,7 @@ import { getAccessToken, setAccessToken, refreshAccessToken } from './auth';
  * Note: This is FE-only refresh flow (refresh token stored in localStorage).
  */
 
-const api: AxiosInstance = axios.create({ baseURL: '/api' });
+const api: AxiosInstance = axios.create({ baseURL: '/api', withCredentials: true });
 
 api.interceptors.request.use((cfg: InternalAxiosRequestConfig) => {
   const token = getAccessToken();
@@ -45,6 +45,8 @@ api.interceptors.response.use(
           originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
           return api(originalRequest);
         } catch (e) {
+          // surface backend error for debugging (if available)
+          if ((e as any)?.message) console.warn('Refresh failed:', (e as any).message);
           isRefreshing = false;
           onRefreshed(null);
           window.location.href = '/login';
@@ -66,3 +68,19 @@ api.interceptors.response.use(
 );
 
 export default api;
+
+// Attempt one-time refresh on module load if no access token in memory.
+(async function tryInitialRefresh() {
+  try {
+    const token = getAccessToken();
+    if (!token) {
+      const newToken = await refreshAccessToken().catch(() => null);
+      if (newToken) {
+        setAccessToken(newToken);
+        console.info('Initial token refresh succeeded');
+      }
+    }
+  } catch (err) {
+    // silent
+  }
+})();
