@@ -162,22 +162,11 @@ export default function Header() {
     }
   };
 
-  const homeRef = useRef<HTMLDivElement | null>(null);
-  const coursesRef = useRef<HTMLDivElement | null>(null);
+
   const [activeDropdown, setActiveDropdown] = useState<"home" | "courses" | null>(null);
-  const [dropdownPos, setDropdownPos] = useState<{ left: number; top: number; width: number } | null>(null);
+  const [dropdownPos] = useState<{ left: number; top: number; width: number } | null>(null);
   const [classesSubOpen, setClassesSubOpen] = useState(false);
 
-  const showDropdown = (
-    key: "home" | "courses",
-    ref: React.RefObject<HTMLDivElement | null>,
-  ) => {
-    const r = ref.current?.getBoundingClientRect();
-    if (r) {
-      setDropdownPos({ left: r.left + window.scrollX, top: r.bottom + window.scrollY, width: r.width });
-    }
-    setActiveDropdown(key);
-  };
 
   const hideDropdown = () => {
     setActiveDropdown(null);
