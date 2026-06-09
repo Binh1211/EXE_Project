@@ -166,6 +166,7 @@ export default function Header() {
   const coursesRef = useRef<HTMLDivElement | null>(null);
   const [activeDropdown, setActiveDropdown] = useState<"home" | "courses" | null>(null);
   const [dropdownPos, setDropdownPos] = useState<{ left: number; top: number; width: number } | null>(null);
+  const [classesSubOpen, setClassesSubOpen] = useState(false);
 
   const showDropdown = (
     key: "home" | "courses",
@@ -305,15 +306,8 @@ export default function Header() {
           )}
         </div>
 
-        <nav className="relative z-[400] hidden items-center gap-4 md:flex overflow-visible">
-          <div
-            ref={homeRef}
-            className="relative inline-block"
-            onMouseEnter={() => showDropdown("home", homeRef)}
-            onMouseLeave={hideDropdown}
-            onFocus={() => showDropdown("home", homeRef)}
-            onBlur={hideDropdown}
-          >
+        <nav className="relative z-[210] hidden items-center gap-4 md:flex">
+          <div className="group relative inline-block">
             <button
               type="button"
               className="text-sm font-medium hover:text-[#5f3713]"
@@ -321,16 +315,35 @@ export default function Header() {
             >
               Trang chủ
             </button>
+            <div className="invisible absolute left-0 z-[220] mt-2 w-40 rounded-xl bg-[#fff3e9] p-1 opacity-0 shadow-lg transition-all duration-200 group-hover:visible group-hover:opacity-100">
+              <Link
+                to="/"
+                className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
+              >
+                Về Vistory
+              </Link>
+              <Link
+                to="/#team"
+                className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
+              >
+                Thành phần
+              </Link>
+              <Link
+                to="/#features"
+                className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
+              >
+                Tính năng
+              </Link>
+              <Link
+                to="/#benefits"
+                className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
+              >
+                Lợi ích
+              </Link>
+            </div>
           </div>
 
-          <div
-            ref={coursesRef}
-            className="relative inline-block"
-            onMouseEnter={() => showDropdown("courses", coursesRef)}
-            onMouseLeave={hideDropdown}
-            onFocus={() => showDropdown("courses", coursesRef)}
-            onBlur={hideDropdown}
-          >
+          <div className="group relative inline-block">
             <button
               type="button"
               className="text-sm font-medium hover:text-[#5f3713]"
@@ -338,6 +351,65 @@ export default function Header() {
             >
               Khóa học
             </button>
+            <div className="invisible absolute left-0 z-[220] mt-2 w-44 rounded-xl bg-[#fff3e9] p-1 opacity-0 shadow-lg transition-all duration-200 group-hover:visible group-hover:opacity-100">
+              <Link
+                to="/time-line"
+                className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
+              >
+                Time Line Lịch sử
+              </Link>
+              <Link
+                to="/course/all"
+                className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
+              >
+                Kho học liệu
+              </Link>
+              <Link
+                to="/flashcard-rooms/join"
+                className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
+              >
+                Ôn thi
+              </Link>
+              <div className="group/lophoc relative">
+                <div className="flex items-center justify-between rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3] cursor-pointer">
+                  Lớp học
+                  <svg
+                    className="ml-1 h-3 w-3"
+                    viewBox="0 0 12 12"
+                    fill="currentColor"
+                  >
+                    <path d="M4.5 2l4 4-4 4" />
+                  </svg>
+                </div>
+                <div className="invisible absolute left-full top-0 z-[230] ml-1 w-36 rounded-xl bg-[#fff3e9] p-1 opacity-0 shadow-lg transition-all duration-200 group-hover/lophoc:visible group-hover/lophoc:opacity-100">
+                  <Link
+                    to="/course/all?class=10"
+                    className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
+                  >
+                    Lớp 10
+                  </Link>
+                  <Link
+                    to="/course/all?class=11"
+                    className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
+                  >
+                    Lớp 11
+                  </Link>
+                  <Link
+                    to="/course/all?class=12"
+                    className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
+                  >
+                    Lớp 12
+                  </Link>
+                </div>
+              </div>
+
+              <Link
+                to="/news"
+                className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
+              >
+                Sách
+              </Link>
+            </div>
           </div>
           <div className="group relative inline-block">
             <button
@@ -348,9 +420,6 @@ export default function Header() {
               Game
             </button>
           </div>
-          {/* <Link to="/vip" className="text-sm font-medium hover:text-[#5f3713]">
-            Mua VIP
-          </Link> */}
           <Link
             to="/contact"
             className="text-sm font-medium hover:text-[#5f3713]"
@@ -477,10 +546,13 @@ export default function Header() {
                 minWidth: 200,
               }}
               onMouseEnter={() => {
-                /* keep open while mouse inside portal */
-                setActiveDropdown(activeDropdown);
+                // keep submenu visible while mouse is inside the portal
+                setClassesSubOpen(true);
               }}
-              onMouseLeave={hideDropdown}
+              onMouseLeave={() => {
+                setClassesSubOpen(false);
+                hideDropdown();
+              }}
             >
               <div className="rounded-xl bg-[#fff3e9] p-1 shadow-lg">
                 {activeDropdown === "home" ? (
@@ -511,7 +583,7 @@ export default function Header() {
                     </Link>
                   </div>
                 ) : (
-                  <div className="w-44">
+                  <div className="w-44 relative">
                     <Link
                       to="/time-line"
                       className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
@@ -530,30 +602,41 @@ export default function Header() {
                     >
                       Ôn thi
                     </Link>
-                    <div className="border-t mt-1 pt-1">
-                      <div className="text-sm px-2 py-2">Lớp học</div>
-                      <Link
-                        to="/course/all?class=10"
-                        className="block px-2 py-2 text-sm hover:bg-[#f3e2d3]"
-                      >
-                        Lớp 10
-                      </Link>
-                      <Link
-                        to="/course/all?class=11"
-                        className="block px-2 py-2 text-sm hover:bg-[#f3e2d3]"
-                      >
-                        Lớp 11
-                      </Link>
-                      <Link
-                        to="/course/all?class=12"
-                        className="block px-2 py-2 text-sm hover:bg-[#f3e2d3]"
-                      >
-                        Lớp 12
-                      </Link>
+                    <div
+                      className="border-t mt-1 pt-1 relative"
+                      onMouseEnter={() => setClassesSubOpen(true)}
+                      onMouseLeave={() => setClassesSubOpen(false)}
+                    >
+                      <div className="text-sm px-2 py-2 rounded-xl hover:bg-[#f3e2d3] flex items-center justify-between">
+                        <span>Lớp học</span>
+                        <span className="ml-2 text-xs">›</span>
+                      </div>
+                      {classesSubOpen && (
+                        <div style={{ left: 'calc(100% - 8px)', top: 0 }} className="absolute w-36 rounded-lg bg-[#fff3e9] p-1 shadow-lg">
+                          <Link
+                            to="/course/all?class=10"
+                            className="block px-2 py-1 text-sm hover:bg-[#f3e2d3] rounded-md"
+                          >
+                            Lớp 10
+                          </Link>
+                          <Link
+                            to="/course/all?class=11"
+                            className="block px-2 py-1 text-sm hover:bg-[#f3e2d3] rounded-md"
+                          >
+                            Lớp 11
+                          </Link>
+                          <Link
+                            to="/course/all?class=12"
+                            className="block px-2 py-1 text-sm hover:bg-[#f3e2d3] rounded-md"
+                          >
+                            Lớp 12
+                          </Link>
+                        </div>
+                      )}
                     </div>
                     <Link
                       to="/news"
-                      className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
+                      className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3] mt-1"
                     >
                       Sách
                     </Link>
