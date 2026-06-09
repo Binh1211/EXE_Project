@@ -21,6 +21,7 @@ const AUTH_PREFIX = "/api/auth";
 export const authApi = {
   /** POST /api/auth/login */
   login(payload: LoginRequest) {
+    // call Vercel proxy in production (relative path) so cookies are set for Vercel domain
     return apiRequest<AuthResponse>(`${AUTH_PREFIX}/login`, {
       method: "POST",
       body: JSON.stringify(payload),
