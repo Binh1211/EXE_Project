@@ -9,22 +9,24 @@ const RectFrame: React.FC<{
   smallTitle?: boolean;
 }> = ({ title, children, smallTitle = false }) => {
   return (
-    <div className="relative mb-4 w-full">
+    <div className="relative mb-2 w-full">
       {/* Header placed above the frame to avoid overlap on small screens */}
-      <div className="flex justify-center mb-3">
+      <div className="flex justify-center mb-2">
         <div
-          className="inline-flex items-center justify-center px-4 py-2 bg-contain bg-no-repeat bg-center"
+          className="relative flex items-center justify-center max-w-2xl mx-auto px-10 py-3"
           style={{
             backgroundImage: `url('${resolveImageUrl("/title.png")}')`,
+            backgroundSize: "100% 100%",
+            backgroundRepeat: "no-repeat",
           }}
         >
-          <span className={`${smallTitle ? "text-xs md:text-base" : "text-sm md:text-base"} font-title font-bold text-[#5c4033] tracking-wide text-center leading-tight px-4 md:px-20`}>{title}</span>
+          <span className={`${smallTitle ? "text-xs md:text-sm" : "text-sm md:text-base"} font-title font-bold text-[#5c4033] tracking-wide text-center leading-snug whitespace-normal break-words`}>{title}</span>
         </div>
       </div>
 
       {/* Khung */}
       <div
-        className="bg-[#fbf8ee] p-6 md:p-8"
+        className="bg-[#fbf8ee] p-4 md:p-6"
         style={{
           border: "24px solid transparent",
           borderImage: `url('${resolveImageUrl("/frame.png")}') 24 stretch`,
@@ -51,7 +53,7 @@ export default function Mindmap({ mindmap }: { mindmap: MindmapType }) {
 
   return (
     <div
-      className="w-full md:min-h-[700px] min-h-[480px] py-10 md:py-14 px-4 md:px-10 relative rounded-3xl overflow-hidden shadow-2xl border-2 border-[#5c4033]/30 bg-repeat-y"
+      className="w-full md:min-h-[400px] min-h-[300px] py-6 md:py-8 px-4 md:px-6 relative rounded-3xl overflow-hidden shadow-2xl border-2 border-[#5c4033]/30 bg-repeat-y"
       style={{
         backgroundImage: `url('${resolveImageUrl("/bg_mindmap.png")}')`,
         backgroundSize: "100% auto",
@@ -89,9 +91,9 @@ export default function Mindmap({ mindmap }: { mindmap: MindmapType }) {
       </div>
 
       {/* Main Mindmap Title Banner */}
-      <div className="w-full max-w-2xl mx-auto mb-6 md:mb-14 relative z-10 px-2 md:px-0">
+      <div className="w-full max-w-4xl mx-auto mb-4 md:mb-6 relative z-10 px-2 md:px-0">
         {/* Nội dung đặt giữa khung */}
-        <div className="flex items-center justify-center py-4 md:py-6">
+        <div className="flex items-center justify-center py-2 md:py-3">
           <h2 className="text-lg md:text-3xl font-title font-bold text-[#5c4033] tracking-wide text-center">
             {mindmap.title}
           </h2>
@@ -99,7 +101,7 @@ export default function Mindmap({ mindmap }: { mindmap: MindmapType }) {
       </div>
 
       {/* Mindmap Content Layout */}
-      <div className="relative z-10 w-full max-w-full md:max-w-5xl mx-auto flex flex-col items-center gap-6 md:gap-8 px-2 md:px-0">
+      <div className="relative z-10 w-full max-w-full md:max-w-7xl mx-auto flex flex-col items-center gap-4 md:gap-5 px-2 md:px-4">
         {mindmap.sections.map((section, sIdx) => {
           // If layoutType is scroll and we have an image, render a clickable image
           // that toggles a distinct styled panel with the section's topics/items
@@ -360,7 +362,7 @@ export default function Mindmap({ mindmap }: { mindmap: MindmapType }) {
           return (
             <RectFrame key={sIdx} title={section.title} smallTitle={sIdx === 2}>
               {/* Topics Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 justify-items-center relative z-10 w-full">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-10 justify-items-stretch relative z-10 w-full">
                 {/* Horizontal connector line on desktop for 3 topics */}
                 {section.topics.length === 3 && (
                   <div className="absolute top-10 left-[15%] right-[15%] h-[1px] bg-[#5c4033]/20 hidden md:block z-0" />
@@ -370,8 +372,8 @@ export default function Mindmap({ mindmap }: { mindmap: MindmapType }) {
                   return (
                     <div
                       key={tIdx}
-                      className={`flex flex-col items-center text-center w-full max-w-[280px] relative z-10
-                      ${section.topics.length === 1 ? "md:col-start-2" : ""}`}
+                      className={`flex flex-col items-center text-center w-full relative z-10
+                      ${section.topics.length === 1 ? "md:col-start-2 max-w-md mx-auto" : ""}`}
                     >
                       {/* Topic Illustration */}
                       {topic.illustrationUrl && (
@@ -379,7 +381,7 @@ export default function Mindmap({ mindmap }: { mindmap: MindmapType }) {
                             role="button"
                             tabIndex={0}
                             onClick={() => toggleTopic(sIdx, tIdx)}
-                            className="relative w-20 h-20 md:w-[140px] md:h-[140px] mb-4 cursor-pointer transition-all duration-300 hover:scale-105 group"
+                            className="relative w-16 h-16 md:w-[90px] md:h-[90px] mb-2 cursor-pointer transition-all duration-300 hover:scale-105 group"
                           >
                           {/* Viền ngoài */}
                           <div
@@ -442,7 +444,7 @@ export default function Mindmap({ mindmap }: { mindmap: MindmapType }) {
                           if (e.key === "Enter" || e.key === " ")
                             toggleTopic(sIdx, tIdx);
                         }}
-                        className={`${sIdx === 2 ? "text-xs md:text-base" : "text-sm md:text-base"} font-title font-bold text-[#5c4033] mb-4 flex items-center justify-center px-2 whitespace-normal break-words text-center max-w-full cursor-pointer z-10`}
+                        className={`text-xs md:text-sm font-title font-bold text-[#5c4033] mb-2 flex items-center justify-center px-2 whitespace-normal break-words text-center max-w-full cursor-pointer z-10`}
                       >
                         {topic.title}
                       </h4>
