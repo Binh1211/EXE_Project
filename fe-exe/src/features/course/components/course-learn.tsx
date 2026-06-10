@@ -450,7 +450,7 @@ const CourseLearningPage = () => {
           )}
 
           {activeTab === "Mindmap" && (
-            <div className="mt-6 max-w-3xl mx-auto flex flex-col items-center pb-10 px-4">
+            <div className="mt-6 w-full flex flex-col items-center pb-10 px-2 md:px-6">
               {detailLoading ? (
                 <p className="text-gray-500 py-12">Đang tải sơ đồ tư duy...</p>
               ) : lessonDetail?.mindmap ? (
