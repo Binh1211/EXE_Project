@@ -1,542 +1,495 @@
 import React, { useState } from "react";
-import type { Mindmap as MindmapType } from "../../types";
+import type { Mindmap as MindmapType, MindmapSection } from "../../types";
 import { resolveImageUrl } from "@/lib/images";
 
-// Ornate rectangular section frame with vintage styles
-const RectFrame: React.FC<{
-  title: string;
-  children: React.ReactNode;
-  smallTitle?: boolean;
-}> = ({ title, children, smallTitle = false }) => {
-  return (
-    <div className="relative mb-2 w-full">
-      {/* Header placed above the frame to avoid overlap on small screens */}
-      <div className="flex justify-center mb-2">
-        <div
-          className="relative flex items-center justify-center max-w-2xl mx-auto px-10 py-3"
-          style={{
-            backgroundImage: `url('${resolveImageUrl("/title.png")}')`,
-            backgroundSize: "100% 100%",
-            backgroundRepeat: "no-repeat",
-          }}
-        >
-          <span className={`${smallTitle ? "text-xs md:text-sm" : "text-sm md:text-base"} font-title font-bold text-[#5c4033] tracking-wide text-center leading-snug whitespace-normal break-words`}>{title}</span>
-        </div>
-      </div>
+/* ─────────────────────────────────────────────
+   Helper: Roman numerals for section headers
+───────────────────────────────────────────── */
+const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"];
 
-      {/* Khung */}
-      <div
-        className="bg-[#fbf8ee] p-4 md:p-6"
-        style={{
-          border: "24px solid transparent",
-          borderImage: `url('${resolveImageUrl("/frame.png")}') 24 stretch`,
-        }}
-      >
-        {children}
-      </div>
-    </div>
-  );
-};
+/* ─────────────────────────────────────────────
+   Section I & III style: Card grid with
+   circular illustration + toggle-expand items
+───────────────────────────────────────────── */
+const GridSection: React.FC<{
+  section: MindmapSection;
+  sIdx: number;
+}> = ({ section, sIdx }) => {
+  // Track các topic đang MỞ (mặc định rỗng = tất cả đang ẩn)
+  const [openKeys, setOpenKeys] = useState<Set<string>>(new Set());
 
-export default function Mindmap({ mindmap }: { mindmap: MindmapType }) {
-  // Store active expanded topic in key format: "sectionIndex-topicIndex"
-  const [activeTopicKey, setActiveTopicKey] = useState<string | null>(null);
-  // For scroll-layout sections, track which topic inside the scroll panel is expanded
-  const [activeScrollTopicKey, setActiveScrollTopicKey] = useState<
-    string | null
-  >(null);
-
-  const toggleTopic = (sectionIdx: number, topicIdx: number) => {
-    const key = `${sectionIdx}-${topicIdx}`;
-    setActiveTopicKey(activeTopicKey === key ? null : key);
+  const toggle = (tIdx: number) => {
+    const k = `${sIdx}-${tIdx}`;
+    setOpenKeys((prev) => {
+      const next = new Set(prev);
+      if (next.has(k)) next.delete(k);
+      else next.add(k);
+      return next;
+    });
   };
 
   return (
+    <section className="relative z-10 mb-16">
+      {/* Section Header */}
+      <div className="text-center mb-10">
+        <div
+          className="inline-flex items-center gap-3 px-8 py-2 rounded-full shadow-sm border border-[#ad3130]/20"
+          style={{ background: "#f9e6c5" }}
+        >
+          <span className="text-[#ad3130] font-bold text-lg">
+            {ROMAN[sIdx] ?? sIdx + 1}.
+          </span>
+          <h2 className="text-xl md:text-2xl font-bold text-[#231a06] tracking-wide">
+            {section.title}
+          </h2>
+        </div>
+      </div>
+
+      {/* Topic cards */}
+      <div
+        className={`grid gap-10 ${
+          section.topics.length === 1
+            ? "grid-cols-1 max-w-sm mx-auto"
+            : section.topics.length === 2
+            ? "grid-cols-1 md:grid-cols-2 max-w-2xl mx-auto"
+            : "grid-cols-1 md:grid-cols-3"
+        }`}
+      >
+        {/* Horizontal connector for 3-topic rows */}
+        {section.topics.length === 3 && (
+          <div className="hidden md:block absolute top-[calc(10rem+3rem)] left-[calc(15%+40px)] right-[calc(15%+40px)] h-px bg-[#ad3130]/20 z-0 pointer-events-none" />
+        )}
+
+        {section.topics.map((topic, tIdx) => {
+          const key = `${sIdx}-${tIdx}`;
+          const isOpen = openKeys.has(key); // mặc định ẨN
+
+          return (
+            <div key={tIdx} className="flex flex-col items-center text-center relative z-10">
+              {/* Number badge + circular illustration */}
+              <div
+                role="button"
+                tabIndex={0}
+                onClick={() => toggle(tIdx)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") toggle(tIdx);
+                }}
+                className="relative mb-5 cursor-pointer group"
+              >
+                <div
+                  className="w-36 h-36 md:w-44 md:h-44 rounded-full overflow-hidden border-4 shadow-xl transition-transform duration-500 group-hover:scale-105"
+                  style={{ borderColor: "#f9e6c5" }}
+                >
+                  {topic.illustrationUrl ? (
+                    <img
+                      src={resolveImageUrl(topic.illustrationUrl)}
+                      alt={topic.title}
+                      className="w-full h-full object-cover"
+                      style={{ filter: "sepia(0.45) contrast(0.9) brightness(1.1)" }}
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-[#f9e6c5] to-[#e8c97a] flex items-center justify-center">
+                      <span className="text-4xl font-bold text-[#ad3130]/40">
+                        {ROMAN[tIdx] ?? tIdx + 1}
+                      </span>
+                    </div>
+                  )}
+                </div>
+                {/* Numbered badge */}
+                <div
+                  className="absolute -bottom-2 -right-2 w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm border-2 shadow"
+                  style={{
+                    background: "#ad3130",
+                    color: "#f9e6c5",
+                    borderColor: "#f9e6c5",
+                  }}
+                >
+                  {tIdx + 1}
+                </div>
+              </div>
+
+              {/* Topic title — click để toggle */}
+              <h3
+                role="button"
+                tabIndex={0}
+                onClick={() => toggle(tIdx)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") toggle(tIdx);
+                }}
+                className="text-lg md:text-xl font-bold text-[#ad3130] mb-3 cursor-pointer flex items-center gap-1 justify-center"
+                style={{
+                  borderBottom: "2px solid #ad3130",
+                  paddingBottom: "6px",
+                  display: "inline-flex",
+                  marginBottom: "12px",
+                }}
+              >
+                {topic.title}
+                <span className="text-sm ml-1 opacity-50">{isOpen ? "▲" : "▼"}</span>
+              </h3>
+
+              {/* Tất cả items — hiển thị mặc định, đóng lại khi click */}
+              {topic.items.length > 0 && (
+                <div
+                  className={`w-full overflow-hidden transition-all duration-500 ${
+                    isOpen ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0"
+                  }`}
+                >
+                  {topic.items.map((item, iIdx) => (
+                    <div
+                      key={iIdx}
+                      className={`rounded-xl border border-[#d4b896] p-4 text-left text-sm shadow-sm ${
+                        iIdx === 0 ? "mb-2" : "mt-2"
+                      }`}
+                      style={{ background: "linear-gradient(to right, #fdf3e3, #f9e8cb)" }}
+                    >
+                      {item.label && (
+                        <span className="inline-block px-3 py-1 mb-2 rounded-full bg-[#f9e6c5] text-[#5c4033] text-xs font-semibold">
+                          {item.label}
+                        </span>
+                      )}
+                      <div className="text-[#4d392d] italic">{item.content}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+};
+
+/* ─────────────────────────────────────────────
+   Section II style: Physical Scroll layout —
+   big image that expands into topic list
+───────────────────────────────────────────── */
+const ScrollSection: React.FC<{
+  section: MindmapSection;
+  sIdx: number;
+}> = ({ section, sIdx }) => {
+  // false = hiện ảnh, true = hiện nội dung thay thế ảnh
+  const [showContent, setShowContent] = useState(false);
+  // Track các topic đang BỊ ĐÓNG (mặc định rỗng = tất cả mở)
+  const [closedTopics, setClosedTopics] = useState<Set<string>>(new Set());
+
+  const toggleTopic = (key: string) => {
+    setClosedTopics((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  };
+
+  const mainImage = section.topics.find((t) => t.illustrationUrl)?.illustrationUrl;
+
+  return (
+    <section className="relative z-10 mb-16 px-4 md:px-8">
+      {/* Scroll container */}
+      <div
+        className="relative py-10 px-6 md:px-24"
+        style={{
+          background: "linear-gradient(to bottom, #f8eed7, #f3e2bd, #f8eed7)",
+          borderTop: "2px solid #c9a87c",
+          borderBottom: "2px solid #c9a87c",
+        }}
+      >
+        {/* Scroll handles */}
+        <div
+          className="hidden md:block absolute top-[-18px] bottom-[-18px] left-10 w-12 z-20 rounded-lg border-4 shadow-xl"
+          style={{
+            background: "linear-gradient(to right,#5d4201,#332300,#5d4201)",
+            borderColor: "#f9e6c5",
+          }}
+        >
+          <div
+            className="absolute -top-3 -left-2.5 -right-2.5 h-7 rounded-full border-2"
+            style={{ background: "#261900", borderColor: "#f9e6c5" }}
+          />
+          <div
+            className="absolute -bottom-3 -left-2.5 -right-2.5 h-7 rounded-full border-2"
+            style={{ background: "#261900", borderColor: "#f9e6c5" }}
+          />
+        </div>
+        <div
+          className="hidden md:block absolute top-[-18px] bottom-[-18px] right-10 w-12 z-20 rounded-lg border-4 shadow-xl"
+          style={{
+            background: "linear-gradient(to right,#5d4201,#332300,#5d4201)",
+            borderColor: "#f9e6c5",
+          }}
+        >
+          <div
+            className="absolute -top-3 -left-2.5 -right-2.5 h-7 rounded-full border-2"
+            style={{ background: "#261900", borderColor: "#f9e6c5" }}
+          />
+          <div
+            className="absolute -bottom-3 -left-2.5 -right-2.5 h-7 rounded-full border-2"
+            style={{ background: "#261900", borderColor: "#f9e6c5" }}
+          />
+        </div>
+
+        {/* Section header */}
+        <div className="text-center mb-8 relative -mt-3">
+          <div
+            className="inline-flex items-center gap-3 px-10 py-3 rounded-full shadow-lg border-2 border-[#231a06]/30"
+            style={{ background: "#f9e6c5" }}
+          >
+            <span className="text-[#ad3130] font-bold text-lg">
+              {ROMAN[sIdx] ?? sIdx + 1}.
+            </span>
+            <h2 className="text-xl md:text-3xl font-bold text-[#231a06] tracking-wide">
+              {section.title}
+            </h2>
+          </div>
+        </div>
+
+        {/* Layout: ảnh bên trái ↔ nội dung khi click */}
+        <div className="flex flex-col md:flex-row items-start gap-8 pb-4">
+
+          {/* ── Cột trái: Ảnh HOẶC danh sách topics ── */}
+          {mainImage && (
+            <div className="md:w-1/2 w-full">
+              {/* Ảnh — hiện khi chưa click */}
+              <div
+                className={`transition-all duration-500 overflow-hidden ${
+                  showContent ? "max-h-0 opacity-0 pointer-events-none" : "max-h-[500px] opacity-100"
+                }`}
+              >
+                <div
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => setShowContent(true)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") setShowContent(true);
+                  }}
+                  className="cursor-pointer group"
+                >
+                  <div
+                    className="rounded-xl border-4 overflow-hidden shadow-lg transition-transform duration-300 group-hover:scale-[1.02]"
+                    style={{ borderColor: "rgba(249,230,197,0.7)" }}
+                  >
+                    <img
+                      src={resolveImageUrl(mainImage)}
+                      alt={section.title}
+                      className="w-full h-64 md:h-72 object-cover"
+                      style={{
+                        filter: "sepia(0.45) contrast(0.9) brightness(1.1)",
+                        mixBlendMode: "multiply",
+                      }}
+                    />
+                  </div>
+                  <p className="text-center text-xs text-[#ad3130]/70 mt-2 italic font-medium">
+                    🖱 Nhấn vào ảnh để xem nội dung chi tiết
+                  </p>
+                </div>
+              </div>
+
+              {/* Nội dung topics — hiện khi đã click ảnh */}
+              <div
+                className={`transition-all duration-500 overflow-hidden ${
+                  showContent ? "max-h-[3000px] opacity-100" : "max-h-0 opacity-0 pointer-events-none"
+                }`}
+              >
+                <div
+                  className="rounded-2xl border-2 border-[#c9a05a] p-5 shadow-inner relative overflow-hidden"
+                  style={{ background: "linear-gradient(135deg, #f5ead0 0%, #eddbb5 50%, #f5ead0 100%)" }}
+                >
+                  {/* Paper texture */}
+                  <div
+                    className="absolute inset-0 opacity-10 pointer-events-none"
+                    style={{
+                      backgroundImage: "radial-gradient(#c49a6c 1px, transparent 1px)",
+                      backgroundSize: "18px 18px",
+                    }}
+                  />
+
+                  {/* Nút quay lại ảnh */}
+                  <button
+                    type="button"
+                    onClick={() => setShowContent(false)}
+                    className="relative z-10 mb-4 flex items-center gap-1.5 text-xs font-semibold text-[#ad3130]/70 hover:text-[#ad3130] transition-colors"
+                  >
+                    ← Xem ảnh
+                  </button>
+
+                  {section.topics.map((topic, tIdx) => {
+                    const tKey = `scroll-${sIdx}-${tIdx}`;
+                    const tIsOpen = !closedTopics.has(tKey);
+
+                    return (
+                      <div
+                        key={tIdx}
+                        className="relative z-10 mb-6 pb-5 border-b border-[#d2b48c] last:border-b-0"
+                      >
+                        <div
+                          role="button"
+                          tabIndex={0}
+                          onClick={() => toggleTopic(tKey)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" || e.key === " ") toggleTopic(tKey);
+                          }}
+                          className="text-base font-bold text-[#5c4033] cursor-pointer mb-3 flex items-center gap-2"
+                        >
+                          <span
+                            className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
+                            style={{ background: "#ad3130", color: "#f9e6c5" }}
+                          >
+                            {tIdx + 1}
+                          </span>
+                          {topic.title}
+                          <span className="ml-auto text-sm text-[#ad3130]/50">
+                            {tIsOpen ? "▲" : "▼"}
+                          </span>
+                        </div>
+
+                        <div
+                          className={`overflow-hidden transition-all duration-300 ${
+                            tIsOpen ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0"
+                          }`}
+                        >
+                          {topic.items.map((item, iIdx) => (
+                            <div
+                              key={iIdx}
+                              className="rounded-xl border border-[#c9a05a]/50 p-3 mb-2 shadow-sm text-sm"
+                              style={{ background: "linear-gradient(to right, #fdf3e3, #f9e8cb)" }}
+                            >
+                              {item.label && (
+                                <div className="inline-block px-2.5 py-0.5 mb-1.5 rounded-full bg-[#ead5ac] text-[#5c4033] text-xs font-semibold">
+                                  {item.label}
+                                </div>
+                              )}
+                              <div className="text-[#4d392d]">{item.content}</div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ── Cột phải: Text preview (luôn hiển thị) ── */}
+          <div className={mainImage ? "md:w-1/2 w-full" : "w-full"}>
+            {section.topics[0] && (
+              <>
+                {section.topics[0].items[0] && (
+                  <p className="text-lg md:text-xl italic text-[#231a06] leading-loose mb-5">
+                    <span
+                      className="float-left font-bold mr-2 leading-none"
+                      style={{ fontSize: "3rem", color: "#ad3130", lineHeight: 0.85 }}
+                    >
+                      {section.topics[0].items[0].content.charAt(0)}
+                    </span>
+                    {section.topics[0].items[0].content.slice(1)}
+                  </p>
+                )}
+                {section.topics[0].items[1] && (
+                  <div
+                    className="p-5 italic text-[#231a06]/80 text-base clearfix"
+                    style={{
+                      borderLeft: "4px solid #ad3130",
+                      background: "rgba(35,26,6,0.04)",
+                    }}
+                  >
+                    {section.topics[0].items[1].content}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+
+
+/* ─────────────────────────────────────────────
+   Main Mindmap Component
+───────────────────────────────────────────── */
+export default function Mindmap({ mindmap }: { mindmap: MindmapType }) {
+  return (
     <div
-      className="w-full md:min-h-[400px] min-h-[300px] py-6 md:py-8 px-4 md:px-6 relative rounded-3xl overflow-hidden shadow-2xl border-2 border-[#5c4033]/30 bg-repeat-y"
+      className="w-full md:min-h-[400px] min-h-[300px] relative overflow-hidden shadow-2xl rounded-3xl border-2 border-[#5c4033]/30 bg-repeat-y"
       style={{
         backgroundImage: `url('${resolveImageUrl("/bg_mindmap.png")}')`,
         backgroundSize: "100% auto",
       }}
     >
-      {/* Warm Retro Map Overlay Wash */}
-      <div className="absolute inset-0 bg-[#eadaaf]/10 pointer-events-none" />
-
-      {/* Center vertical connector linking sections */}
+      {/* Trong-dong decorative background circle */}
       <div
         aria-hidden
-        className="hidden md:block absolute left-1/2 top-40 bottom-40 -translate-x-1/2 z-0 pointer-events-none"
-      >
-        <div
-          className="w-[6px] h-full rounded-full"
-          style={{
-            background:
-              "repeating-linear-gradient(to bottom,#caa36a 0,#caa36a 12px,#e7d3ac 12px,#e7d3ac 24px)",
-          }}
-        >
-          {" "}
-          <div
-            className="absolute left-1/2 -translate-x-1/2 w-3 h-3 bg-[#d8b77d] rounded-full"
-            style={{ top: "20%" }}
-          />
-          <div
-            className="absolute left-1/2 -translate-x-1/2 w-3 h-3 bg-[#d8b77d] rounded-full"
-            style={{ top: "50%" }}
-          />
-          <div
-            className="absolute left-1/2 -translate-x-1/2 w-3 h-3 bg-[#d8b77d] rounded-full"
-            style={{ top: "80%" }}
-          />
-        </div>
-      </div>
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] opacity-[0.04] pointer-events-none"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='none' stroke='black' stroke-width='0.5'/%3E%3Ccircle cx='50' cy='50' r='35' fill='none' stroke='black' stroke-width='0.5'/%3E%3Ccircle cx='50' cy='50' r='20' fill='none' stroke='black' stroke-width='0.5'/%3E%3Cpath d='M50,2 L50,98 M2,50 L98,50 M15,15 L85,85 M15,85 L85,15' stroke='black' stroke-width='0.2'/%3E%3C/svg%3E")`,
+          backgroundSize: "contain",
+          backgroundRepeat: "no-repeat",
+        }}
+      />
 
-      {/* Main Mindmap Title Banner */}
-      <div className="w-full max-w-4xl mx-auto mb-4 md:mb-6 relative z-10 px-2 md:px-0">
-        {/* Nội dung đặt giữa khung */}
-        <div className="flex items-center justify-center py-2 md:py-3">
-          <h2 className="text-lg md:text-3xl font-title font-bold text-[#5c4033] tracking-wide text-center">
+      {/* Inner padding */}
+      <div className="relative z-10 px-4 md:px-14 py-10 md:py-14">
+        {/* ── Main Title Banner ── */}
+        <header className="text-center mb-14">
+          <h1 className="text-3xl md:text-5xl font-bold text-[#231a06] mb-4">
             {mindmap.title}
-          </h2>
+          </h1>
+          <div className="flex justify-center items-center gap-5">
+            <div className="h-px w-28 md:w-40" style={{ background: "rgba(173,49,48,0.3)" }} />
+            <span className="text-[#ad3130] italic font-medium text-sm md:text-base">
+              Bản đồ họa thuật lại dòng chảy lịch sử dân tộc
+            </span>
+            <div className="h-px w-28 md:w-40" style={{ background: "rgba(173,49,48,0.3)" }} />
+          </div>
+        </header>
+
+        {/* ── Vertical center connector (desktop) ── */}
+        <div
+          aria-hidden
+          className="hidden md:block absolute left-1/2 top-52 bottom-32 -translate-x-1/2 z-0 pointer-events-none"
+        >
+          <div
+            className="w-1.5 h-full rounded-full"
+            style={{
+              background:
+                "repeating-linear-gradient(to bottom,#caa36a 0,#caa36a 12px,#e7d3ac 12px,#e7d3ac 24px)",
+            }}
+          >
+            {[20, 50, 80].map((pct) => (
+              <div
+                key={pct}
+                className="absolute left-1/2 -translate-x-1/2 w-3 h-3 rounded-full"
+                style={{ top: `${pct}%`, background: "#d8b77d" }}
+              />
+            ))}
+          </div>
         </div>
-      </div>
 
-      {/* Mindmap Content Layout */}
-      <div className="relative z-10 w-full max-w-full md:max-w-7xl mx-auto flex flex-col items-center gap-4 md:gap-5 px-2 md:px-4">
-        {mindmap.sections.map((section, sIdx) => {
-          // If layoutType is scroll and we have an image, render a clickable image
-          // that toggles a distinct styled panel with the section's topics/items
-          if (section.layoutType === "scroll") {
-            const scrollImgUrl = section.topics[0]?.illustrationUrl;
-            if (scrollImgUrl) {
-              const scrollKey = `scroll-${sIdx}`;
-              return (
-                <div
-                  key={sIdx}
-                  className="w-full flex flex-col items-center z-10 my-4 select-none"
-                >
-                  <div className="relative w-full p-4 md:p-6 rounded-[30px] overflow-hidden">
-                    {/* Nền giấy cổ */}
-                    <div
-                      className="absolute inset-0"
-                      style={{
-                        background:
-                          "linear-gradient(to bottom,#f8eed7,#f3e2bd)",
-                      }}
-                    />
+        {/* ── Render Sections ── */}
+        {mindmap.sections.map((section, sIdx) =>
+          section.layoutType === "scroll" ? (
+            <ScrollSection key={sIdx} section={section} sIdx={sIdx} />
+          ) : (
+            <GridSection key={sIdx} section={section} sIdx={sIdx} />
+          )
+        )}
 
-                    {/* Texture giấy */}
-                    <div
-                      className="absolute inset-0 opacity-20"
-                      style={{
-                        backgroundImage:
-                          "radial-gradient(#c49a6c 1px, transparent 1px)",
-                        backgroundSize: "18px 18px",
-                      }}
-                    />
-
-                    {/* Hoa văn góc */}
-                    <div className="absolute top-3 left-3 text-[#c7a26b] text-3xl opacity-40">
-                      ❦
-                    </div>
-
-                    <div className="absolute top-3 right-3 text-[#c7a26b] text-3xl rotate-90 opacity-40">
-                      ❦
-                    </div>
-
-                    <div className="absolute bottom-3 left-3 text-[#c7a26b] text-3xl -rotate-90 opacity-40">
-                      ❦
-                    </div>
-
-                    <div className="absolute bottom-3 right-3 text-[#c7a26b] text-3xl rotate-180 opacity-40">
-                      ❦
-                    </div>
-
-                    {/* Khung chính */}
-                    <div
-                      role="button"
-                      tabIndex={0}
-                      onClick={() =>
-                        setActiveTopicKey(
-                          activeTopicKey === scrollKey ? null : scrollKey,
-                        )
-                      }
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" || e.key === " ")
-                          setActiveTopicKey(
-                            activeTopicKey === scrollKey ? null : scrollKey,
-                          );
-                      }}
-                      className="
-      relative
-      z-10
-      cursor-pointer
-      transition-all
-      duration-300
-      hover:scale-[1.01]
-    "
-                    >
-                      {/* Viền cổ */}
-                      <div
-                        className="
-        rounded-[20px]
-        border-[5px]
-        border-[#d2b48c]
-        p-3
-        bg-[#fff8e8]
-        shadow-[0_10px_40px_rgba(0,0,0,0.15)]
-      "
-                      >
-                        <img
-                          src={resolveImageUrl(scrollImgUrl)}
-                          alt={section.title}
-                          className="w-full rounded-xl object-contain"
-                        />
-                        <div
-                          className={`
-                          overflow-hidden
-                          transition-all
-                          duration-500
-                          ${
-                            activeTopicKey === scrollKey
-                              ? "max-h-[3000px] opacity-100"
-                              : "max-h-0 opacity-0"
-                          }
-                        `}
-                        >
-                          <div
-                            className="
-                      relative
-                      mt-4
-                      rounded-2xl
-                      border-2
-                      border-[#d2b48c]
-                      bg-[#fff8e8]
-                      p-6
-                      shadow-inner
-                    "
-                          >
-                            {/* Texture giấy */}
-                            <div
-                              className="absolute inset-0 opacity-10"
-                              style={{
-                                backgroundImage:
-                                  "radial-gradient(#c49a6c 1px, transparent 1px)",
-                                backgroundSize: "18px 18px",
-                              }}
-                            />
-
-                            {section.topics.map((topic, tIdx) => {
-                              const tKey = `${sIdx}-${tIdx}`;
-
-                              return (
-                                <div
-                                  key={tIdx}
-                                  className="
-            relative
-            z-10
-            mb-8
-            pb-6
-            border-b
-            border-[#d2b48c]
-            last:border-b-0
-          "
-                                >
-                                  <div
-                                    role="button"
-                                    tabIndex={0}
-                                    onClick={() =>
-                                      setActiveScrollTopicKey(
-                                        activeScrollTopicKey === tKey
-                                          ? null
-                                          : tKey,
-                                      )
-                                    }
-                                    className="
-              text-lg
-              font-bold
-              text-[#5c4033]
-              cursor-pointer
-              mb-3
-            "
-                                  >
-                                    {topic.title}
-                                  </div>
-
-                                  <div
-                                    className={`
-              overflow-hidden
-              transition-all
-              duration-300
-              ${
-                activeScrollTopicKey === tKey || activeTopicKey === scrollKey
-                  ? "max-h-[1000px] opacity-100"
-                  : "max-h-0 opacity-0"
-              }
-            `}
-                                  >
-                                    {topic.items.map((item, iIdx) => (
-                                      <div
-                                        key={iIdx}
-                                        className="
-                  bg-[#fffdf8]
-                  border
-                  border-[#e4d0ab]
-                  rounded-xl
-                  p-4
-                  mb-3
-                "
-                                      >
-                                        {item.label && (
-                                          <div
-                                            className="
-                      inline-block
-                      px-3
-                      py-1
-                      mb-2
-                      rounded-full
-                      bg-[#ead5ac]
-                      text-[#5c4033]
-                      text-xs
-                      font-semibold
-                    "
-                                          >
-                                            {item.label}
-                                          </div>
-                                        )}
-
-                                        <div className="text-[#4d392d]">
-                                          {item.content}
-                                        </div>
-                                      </div>
-                                    ))}
-                                  </div>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Decorative flags around the scroll image (only visually) */}
-                  {sIdx === 0 && (
-                    <>
-                      <div className="hidden md:block absolute left-4 top-1/2 -translate-y-1/2 z-10">
-                        <div className="bg-[#fff6e8] border border-[#e2c79a] px-2 py-1 rounded drop-shadow-sm rotate-3">
-                          ◆
-                        </div>
-                      </div>
-                      <div className="hidden md:block absolute right-4 top-1/2 -translate-y-1/2 z-10">
-                        <div className="bg-[#fff6e8] border border-[#e2c79a] px-2 py-1 rounded drop-shadow-sm -rotate-3">
-                          ✦
-                        </div>
-                      </div>
-                      <div className="hidden md:block absolute top-3 right-6 z-20">
-                        <div className="bg-[#fff]/60 rounded-full p-1 border border-[#e6cfa7]">
-                          <svg
-                            viewBox="0 0 24 24"
-                            className="w-5 h-5 text-[#b07a3a]"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="1.5"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              d="M12 2 L15 8 L22 9 L17 14 L18 21 L12 18 L6 21 L7 14 L2 9 L9 8 Z"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                          </svg>
-                        </div>
-                      </div>
-                    </>
-                  )}
-
-                  {/* Distinct panel design for scroll section content */}
-                </div>
-              );
-            }
-          }
-
-          return (
-            <RectFrame key={sIdx} title={section.title} smallTitle={sIdx === 2}>
-              {/* Topics Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-10 justify-items-stretch relative z-10 w-full">
-                {/* Horizontal connector line on desktop for 3 topics */}
-                {section.topics.length === 3 && (
-                  <div className="absolute top-10 left-[15%] right-[15%] h-[1px] bg-[#5c4033]/20 hidden md:block z-0" />
-                )}
-
-                {section.topics.map((topic, tIdx) => {
-                  return (
-                    <div
-                      key={tIdx}
-                      className={`flex flex-col items-center text-center w-full relative z-10
-                      ${section.topics.length === 1 ? "md:col-start-2 max-w-md mx-auto" : ""}`}
-                    >
-                      {/* Topic Illustration */}
-                      {topic.illustrationUrl && (
-                          <div
-                            role="button"
-                            tabIndex={0}
-                            onClick={() => toggleTopic(sIdx, tIdx)}
-                            className="relative w-16 h-16 md:w-[90px] md:h-[90px] mb-2 cursor-pointer transition-all duration-300 hover:scale-105 group"
-                          >
-                          {/* Viền ngoài */}
-                          <div
-                            className="
-      absolute
-      inset-0
-      rounded-full
-      bg-gradient-to-br
-      from-[#f7ead3]
-      to-[#d9b17c]
-      p-[6px]
-      shadow-xl
-      border-2
-      border-[#b88955]
-    "
-                          >
-                            {/* Vòng trang trí */}
-                            <div
-                              className="
-        absolute
-        inset-2
-        rounded-full
-        border-2
-        border-dashed
-        border-[#8b5e3c]/40
-      "
-                            />
-                          </div>
-
-                          {/* Ảnh */}
-                          <div
-                            className="
-      absolute
-      inset-[12px]
-      rounded-full
-      overflow-hidden
-      z-10
-      bg-[#f9f1de]
-    "
-                          >
-                            <img
-                              src={resolveImageUrl(topic.illustrationUrl)}
-                              alt={topic.title}
-                              className="
-        w-full
-        h-full
-        object-cover
-      "
-                            />
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Topic Title (clickable to toggle whole topic content) */}
-                      <h4
-                        role="button"
-                        tabIndex={0}
-                        onClick={() => toggleTopic(sIdx, tIdx)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter" || e.key === " ")
-                            toggleTopic(sIdx, tIdx);
-                        }}
-                        className={`text-xs md:text-sm font-title font-bold text-[#5c4033] mb-2 flex items-center justify-center px-2 whitespace-normal break-words text-center max-w-full cursor-pointer z-10`}
-                      >
-                        {topic.title}
-                      </h4>
-
-                      {/* Topic Items: combined panel shown when topic is expanded */}
-                      <div
-                        id={`topic-content-${sIdx}-${tIdx}`}
-                        className={`w-full transition-all duration-300 overflow-hidden ${
-                          activeTopicKey === `${sIdx}-${tIdx}`
-                            ? `
-      max-h-[800px]
-      opacity-100
-      rounded-xl
-      border-[3px]
-      border-[#c8a978]
-      bg-[#fffaf0]
-      shadow-[0_0_25px_rgba(196,154,108,0.45)]
-    `
-                            : "max-h-0 opacity-0"
-                        }`}
-                      >
-                        <div
-                          className="
-      relative
-      overflow-hidden
-      rounded-xl
-      border-2
-      border-[#d2b48c]
-      bg-[#fff8e8]
-      shadow-lg
-    "
-                        >
-                          {/* Họa tiết giấy cổ */}
-                          <div
-                            className="
-        absolute
-        inset-0
-        opacity-20
-        pointer-events-none
-      "
-                            style={{
-                              backgroundImage:
-                                "radial-gradient(#c49a6c 1px, transparent 1px)",
-                              backgroundSize: "18px 18px",
-                            }}
-                          />
-
-                          {topic.items.map((item, iIdx) => (
-                            <div
-                              key={iIdx}
-                              className="
-          relative
-          z-10
-          p-4
-          text-sm
-          text-[#4d392d]
-          leading-relaxed
-          border-b
-          border-[#d8c4a1]
-          last:border-b-0
-        "
-                            >
-                              {item.label && (
-                                <div
-                                  className="
-              inline-block
-              px-3
-              py-1
-              mb-2
-              rounded-full
-              bg-[#e8d2a7]
-              text-[#5c4033]
-              font-semibold
-              text-xs
-            "
-                                >
-                                  {item.label}
-                                </div>
-                              )}
-
-                              <div>{item.content}</div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </RectFrame>
-          );
-        })}
+        {/* ── Footer ornament ── */}
+        <footer className="text-center pt-10 border-t border-[#ad3130]/10 mt-4">
+          <div className="flex justify-center items-center gap-4 opacity-40">
+            <span className="text-2xl">⛩</span>
+            <p className="text-lg font-bold text-[#231a06]">Đại Nam Lục</p>
+            <span className="text-2xl">⛩</span>
+          </div>
+          <p className="text-xs tracking-[0.25em] font-bold text-[#231a06]/30 mt-2 uppercase">
+            Bảo tồn hồn cốt dân tộc
+          </p>
+        </footer>
       </div>
     </div>
   );
