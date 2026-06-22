@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import {
-    ChevronLeft,
     ChevronRight,
     Maximize2,
     Minimize2,
@@ -10,22 +9,22 @@ import {
 } from "lucide-react";
 
 type FlashCardItem = {
-  front?: string;
-  back?: string;
-  year?: string;
-  content?: string;
+    front?: string;
+    back?: string;
+    year?: string;
+    content?: string;
 };
 
 type FlashCardsProps = {
-  cards: FlashCardItem[];
+    cards: FlashCardItem[];
 };
 
 function getFront(card: FlashCardItem) {
-  return card?.front ?? card?.year ?? "";
+    return card?.front ?? card?.year ?? "";
 }
 
 function getBack(card: FlashCardItem) {
-  return card?.back ?? card?.content ?? "";
+    return card?.back ?? card?.content ?? "";
 }
 
 export default function FlashCards({ cards }: FlashCardsProps) {
@@ -91,7 +90,7 @@ export default function FlashCards({ cards }: FlashCardsProps) {
             `}>
                 <div className="absolute w-[700px] h-[700px] rounded-full bg-yellow-500/20 blur-[140px]" />
                 <div className="absolute right-0 bottom-0 w-[500px] h-[500px] rounded-full bg-amber-500/20 blur-[140px]" />
-                
+
                 {/* FULLSCREEN BUTTON */}
                 <button
                     onClick={(e) => {
@@ -116,7 +115,7 @@ export default function FlashCards({ cards }: FlashCardsProps) {
                 <div className="relative z-10 flex flex-col items-center">
                     <h2 className="text-4xl md:text-5xl font-black text-white mb-4 text-center drop-shadow-md">Hoàn thành!</h2>
                     <p className="text-yellow-100 text-lg md:text-xl text-center mb-8 drop-shadow-sm">Bạn đã ôn tập xong tất cả các thẻ.</p>
-                    <button 
+                    <button
                         onClick={() => {
                             setActiveCards(cards);
                             setFlipped(false);
@@ -230,9 +229,9 @@ export default function FlashCards({ cards }: FlashCardsProps) {
             ${!flipped ? 'pointer-events-none' : ''}`}
                     >
                         {/* Lớp nền bắt sự kiện click để lật lại */}
-                        <div 
-                            className="absolute inset-0 z-0 cursor-pointer" 
-                            onClick={() => setFlipped(false)} 
+                        <div
+                            className="absolute inset-0 z-0 cursor-pointer"
+                            onClick={() => setFlipped(false)}
                         />
 
                         {/* DECOR */}
@@ -246,7 +245,7 @@ export default function FlashCards({ cards }: FlashCardsProps) {
                                 {frontLabel}
                             </h2>
 
-                            <div 
+                            <div
                                 onClick={() => setFlipped(false)}
                                 className="w-full max-w-3xl rounded-[32px] border border-amber-100 bg-white/90 p-6 shadow-lg shadow-amber-900/5 flex-grow overflow-y-auto pointer-events-auto cursor-pointer"
                             >
