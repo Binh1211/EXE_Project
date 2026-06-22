@@ -5,6 +5,16 @@
 @layer base {
   body {
     @apply bg-[#fbf0ce] m-0;
+    cursor: url('/cursor_hac.png') 64 26, auto;
+  }
+
+  * {
+    cursor: url('/cursor_hac.png') 64 26, auto;
+  }
+
+  /* Bigger + brighter crane cursor for interactive elements */
+  a, button, [role="button"], select, label[for], input[type="submit"], input[type="button"], input[type="checkbox"], input[type="radio"] {
+    cursor: url('/cursor_hac_hover.png') 64 26, pointer;
   }
 }
 

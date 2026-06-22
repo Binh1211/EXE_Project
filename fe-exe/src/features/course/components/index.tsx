@@ -10,6 +10,10 @@ import {
   MapPin,
   PlayCircle,
   Lock,
+  Camera,
+  BookOpenCheck,
+  GraduationCap,
+  Eye,
 } from "lucide-react";
 import { Link, useLocation, useSearchParams } from "react-router";
 import { IMG } from "@/lib/images";
@@ -22,6 +26,7 @@ import { timelineApi } from "@/features/timeLine/api/timeline-api";
 import type { Timeline } from "@/features/timeLine/types";
 import type { Chapter } from "../types";
 import { isChapterLevelLocked } from "../hooks/useChapterAccess";
+import { useTheme } from "@/lib/ThemeContext";
 
 const ITEMS_PER_PAGE = 4;
 
@@ -37,14 +42,21 @@ const SidebarItem = ({
   active?: boolean;
   isPro?: boolean;
 }) => {
+  const { isDark } = useTheme();
   return (
     <div
-      className={`flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-colors ${active ? "bg-[#5c3a21] text-white" : "text-gray-700 hover:bg-white/50"
+      className={`flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-colors ${
+        active 
+          ? "bg-[#5c3a21] text-white" 
+          : `hover:bg-black/5 ${isDark ? "text-gray-200" : "text-gray-700"}`
         }`}
     >
-      <Icon size={20} className={active ? "text-white" : "text-gray-600"} />
+      <Icon size={20} className={active ? "text-white" : isDark ? "text-gray-300" : "text-gray-600"} />
       <span
-        className={`font-medium text-sm flex-1 ${active ? "text-white" : "text-gray-800"
+        className={`font-medium text-sm flex-1 ${
+          active 
+            ? "text-white" 
+            : isDark ? "text-gray-200" : "text-gray-800"
           }`}
       >
         {text}
@@ -127,6 +139,7 @@ const CourseRow = ({
 };
 
 export default function CoursePage() {
+  const { isDark } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuthUser();
@@ -206,16 +219,13 @@ export default function CoursePage() {
 
   return (
     <div
-      className="min-h-screen font-sans flex overflow-hidden"
-      style={{
-        backgroundImage:
-          'url("https://www.transparenttextures.com/patterns/cream-paper.png")',
-      }}
+      className="min-h-screen font-sans flex overflow-hidden transition-all duration-500"
+      style={{ backgroundImage: `url(${isDark ? IMG.bgDarkmode : IMG.paperTexture})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed' }}
     >
       {/* Left Sidebar */}
-      <aside className="hidden md:flex w-[260px] flex-shrink-0 flex flex-col items-center py-8 px-6 border-r border-black/5">
+      <aside className={`hidden md:flex w-[260px] flex-shrink-0 flex flex-col items-center py-8 px-6 border-r ${isDark ? "border-white/10" : "border-black/5"}`}>
         <Link to="/" className="mb-10 flex flex-col items-center">
-          <img src={IMG.logo} alt="EXE" />
+          <img src={isDark ? IMG.logoWhite : IMG.logo} alt="EXE" className="w-24" />
         </Link>
 
         <nav className="w-full flex-1 flex flex-col gap-2">
@@ -235,11 +245,11 @@ export default function CoursePage() {
           />
         </nav>
 
-        <div className="w-full bg-[#fdf8e7] rounded-xl p-5 mt-auto text-center border border-black/5">
-          <h4 className="font-bold text-gray-800 text-sm mb-2">
+        <div className={`w-full rounded-xl p-5 mt-auto text-center border ${isDark ? "bg-[#3D2010] border-white/10" : "bg-[#fdf8e7] border-black/5"}`}>
+          <h4 className={`font-bold text-sm mb-2 ${isDark ? "text-white" : "text-gray-800"}`}>
             Nâng cấp tài khoản
           </h4>
-          <p className="text-[10px] text-gray-500 mb-4">
+          <p className={`text-[10px] mb-4 ${isDark ? "text-gray-300" : "text-gray-500"}`}>
             Khám phá các tính năng mới thông qua việc đăng ký các gói nâng cấp
             của chúng tôi
           </p>
@@ -254,15 +264,17 @@ export default function CoursePage() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col overflow-y-auto overflow-x-hidden">
+      <main 
+        className="flex-1 flex flex-col overflow-y-auto overflow-x-hidden transition-all duration-500"
+      >
         <div className="p-4 md:p-8 max-w-7xl w-full mx-auto">
           {/* Header */}
           <div className="flex justify-between items-start mb-8">
             <div>
-              <h2 className="text-3xl text-gray-800 font-serif mb-1">
-                Xin chào, <span className="font-bold">{displayName}</span>
+              <h2 className={`text-3xl font-serif mb-1 ${isDark ? "text-white" : "text-gray-800"}`}>
+                Xin chào, <span className={`font-bold ${isDark ? "text-[#EED996]" : ""}`}>{displayName}</span>
               </h2>
-              <p className="text-gray-500 text-sm">
+              <p className={`text-sm ${isDark ? "text-gray-200" : "text-gray-500"}`}>
                 Hãy cùng nhau học thêm nhiều kiến thức mới nào!
               </p>
               {slugTimeline === "all" && (
@@ -293,9 +305,47 @@ export default function CoursePage() {
             </div>
           </div>
 
+          {/* Stats Boxes (Static for now, based on mockup) */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div className="bg-white rounded-xl p-4 flex flex-col items-center justify-center shadow-sm">
+              <div className="w-10 h-10 rounded-full bg-[#e0e7ff] text-[#4f46e5] flex items-center justify-center mb-2">
+                <Camera size={20} />
+              </div>
+              <p className="text-xs text-gray-500 text-center mb-1">Khóa học mới</p>
+              <h3 className="text-xl font-bold text-gray-800">168</h3>
+            </div>
+            
+            <div className="bg-[#e0f2fe] rounded-xl p-4 flex flex-col items-center justify-center shadow-sm">
+              <div className="w-10 h-10 rounded-full bg-[#bae6fd] text-[#0284c7] flex items-center justify-center mb-2">
+                <BookOpenCheck size={20} />
+              </div>
+              <p className="text-xs text-gray-600 text-center mb-1">Khóa học đã hoàn thành</p>
+              <h3 className="text-xl font-bold text-gray-800">12</h3>
+            </div>
+
+            <div className="bg-[#fce7f3] rounded-xl p-4 flex flex-col items-center justify-center shadow-sm">
+              <div className="w-10 h-10 rounded-full bg-[#fbcfe8] text-[#db2777] flex items-center justify-center mb-2">
+                <GraduationCap size={20} />
+              </div>
+              <p className="text-xs text-gray-600 text-center mb-1">Tổng học viên</p>
+              <h3 className="text-xl font-bold text-gray-800">5,622</h3>
+            </div>
+
+            <div className="bg-[#fefce8] rounded-xl p-4 flex flex-col items-center justify-center shadow-sm">
+              <div className="w-10 h-10 rounded-full bg-[#fef08a] text-[#ca8a04] flex items-center justify-center mb-2">
+                <Eye size={20} />
+              </div>
+              <p className="text-xs text-gray-600 text-center mb-1">Người học mới hôm nay</p>
+              <h3 className="text-xl font-bold text-gray-800">110</h3>
+            </div>
+          </div>
+
           {/* Course List */}
           <div>
-            <div className="bg-white/40 rounded-2xl overflow-hidden border border-black/5 shadow-sm">
+            <h3 className={`text-xl font-bold mb-4 mt-8 ${isDark ? "text-white" : "text-gray-800"}`}>
+              Các khóa học hiện có
+            </h3>
+            <div className="bg-white rounded-2xl overflow-hidden border border-black/5 shadow-sm">
               {/* Table Header */}
               <div className="bg-[#5c3a21] text-white rounded-t-2xl px-4 py-3">
                 <div className="flex items-center justify-between">
@@ -362,10 +412,10 @@ export default function CoursePage() {
       </main>
 
       {/* Right Sidebar */}
-      <aside className="hidden lg:block w-[320px] flex-shrink-0 bg-white/40 border-l border-black/5 h-screen overflow-y-auto px-6 py-8 shadow-[-4px_0_15px_-5px_rgba(0,0,0,0.05)]">
+      <aside className={`hidden lg:block w-[320px] flex-shrink-0 border-l h-screen overflow-y-auto px-6 py-8 ${isDark ? "border-white/10" : "border-black/5 shadow-[-4px_0_15px_-5px_rgba(0,0,0,0.05)]"}`}>
         {/* Profile */}
         <div className="mb-10 w-full">
-          <h3 className="font-bold text-gray-800 text-lg mb-4">Hồ sơ</h3>
+          <h3 className={`font-bold text-lg mb-4 ${isDark ? "text-white" : "text-gray-800"}`}>Hồ sơ</h3>
           <div className="flex items-center gap-3">
             <img
               src={avatarUrl}
@@ -373,8 +423,8 @@ export default function CoursePage() {
               className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm"
             />
             <div>
-              <h4 className="font-bold text-gray-800 text-sm">{displayName}</h4>
-              <p className="text-xs text-gray-500">
+              <h4 className={`font-bold text-sm ${isDark ? "text-gray-100" : "text-gray-800"}`}>{displayName}</h4>
+              <p className={`text-xs ${isDark ? "text-gray-300" : "text-gray-500"}`}>
                 Lịch sử & Văn minh thế giới
               </p>
             </div>
@@ -383,7 +433,7 @@ export default function CoursePage() {
 
         {/* Highlighted Courses */}
         <div className="mb-10 w-full">
-          <h3 className="font-bold text-gray-800 text-lg mb-4">
+          <h3 className={`font-bold text-lg mb-4 ${isDark ? "text-white" : "text-gray-800"}`}>
             Khóa học nổi bật
           </h3>
           <div className="flex flex-col gap-4">
@@ -393,7 +443,7 @@ export default function CoursePage() {
                   <MapPin size={18} />
                 </div>
                 <div>
-                  <h4 className="font-bold text-gray-800 text-xs">
+                  <h4 className={`font-bold text-xs ${isDark ? "text-gray-200" : "text-gray-800"}`}>
                     Lịch Sử Việt Nam Qua Các Thời Kỳ
                   </h4>
                   <p className="text-[10px] text-gray-400">12+ khóa học</p>
@@ -410,7 +460,7 @@ export default function CoursePage() {
                   <PlayCircle size={18} />
                 </div>
                 <div>
-                  <h4 className="font-bold text-gray-800 text-xs">
+                  <h4 className={`font-bold text-xs ${isDark ? "text-gray-200" : "text-gray-800"}`}>
                     Lịch Sử Thế Giới
                   </h4>
                   <p className="text-[10px] text-gray-400">10+ khóa học</p>
@@ -427,7 +477,7 @@ export default function CoursePage() {
                   <BookOpen size={18} />
                 </div>
                 <div>
-                  <h4 className="font-bold text-gray-800 text-xs">
+                  <h4 className={`font-bold text-xs ${isDark ? "text-gray-200" : "text-gray-800"}`}>
                     Các Cuộc Chiến Tranh Lớn
                   </h4>
                   <p className="text-[10px] text-gray-400">8+ khóa học</p>
