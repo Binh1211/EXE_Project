@@ -1,16 +1,18 @@
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "@/lib/ThemeContext";
 import { ArrowLeft, Plus, Users } from "lucide-react";
 
 export default function DragonRaceHomePage() {
   const navigate = useNavigate();
+  const { isDark } = useTheme();
 
   return (
-    <div className="flex-1 bg-[#fff6f4] px-8 py-10">
+    <div className="flex-1  px-8 py-10">
       <div className="mx-auto max-w-5xl">
         <button
           type="button"
           onClick={() => navigate("/game/list")}
-          className="mb-8 inline-flex items-center gap-2 text-sm font-bold text-[#5c3a21]"
+          className={`mb-8 inline-flex items-center gap-2 text-sm font-bold ${isDark ? "text-white" : "text-[#5c3a21]"}`}
         >
           <ArrowLeft size={18} />
           Danh sách trò chơi
@@ -18,8 +20,8 @@ export default function DragonRaceHomePage() {
 
         <div className="rounded-3xl border border-[#5c3a21]/10 bg-white p-10 shadow-sm">
           <div className="mb-8">
-            <h1 className="text-4xl font-bold text-[#5c3a21]">Đua Rồng</h1>
-            <p className="mt-3 text-gray-600 leading-relaxed text-lg">
+            <h1 className={`text-4xl font-bold ${isDark ? "text-white" : "text-[#5c3a21]"}`}>Đua Rồng</h1>
+            <p className={`mt-3 leading-relaxed text-lg ${isDark ? "text-gray-300" : "text-gray-600"}`}>
               Chọn một cách tham gia cuộc đua.
               Bạn có thể tạo phòng mới và mời bạn bè vào chơi, hoặc vào ngay phòng có sẵn bằng mã.
             </p>

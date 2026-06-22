@@ -1,20 +1,22 @@
 import { useState } from "react";
+import { useTheme } from "@/lib/ThemeContext";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, LogIn } from "lucide-react";
 
 export default function DragonRaceJoinPage() {
   const navigate = useNavigate();
+  const { isDark } = useTheme();
   const [roomCode, setRoomCode] = useState("");
 
   const normalizedCode = roomCode.trim().toUpperCase();
 
   return (
-    <div className="flex-1 bg-[#fff6f4] px-8 py-10">
+    <div className="flex-1  px-8 py-10">
       <div className="mx-auto max-w-xl">
         <button
           type="button"
           onClick={() => navigate("/game/list")}
-          className="mb-8 inline-flex items-center gap-2 text-sm font-bold text-[#5c3a21]"
+          className={`mb-8 inline-flex items-center gap-2 text-sm font-bold ${isDark ? "text-white" : "text-[#5c3a21]"}`}
         >
           <ArrowLeft size={18} />
           Danh sách trò chơi

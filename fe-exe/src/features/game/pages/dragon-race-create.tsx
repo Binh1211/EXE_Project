@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTheme } from "@/lib/ThemeContext";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Loader2, Plus, Users } from "lucide-react";
 import { quizApi } from "@/features/course/api/quiz-api";
@@ -8,6 +9,7 @@ import { gameRoomApi } from "../api/game-room-api";
 
 export default function DragonRaceCreatePage() {
   const navigate = useNavigate();
+  const { isDark } = useTheme();
   const [quizzes, setQuizzes] = useState<LessonQuizDocument[]>([]);
   const [selectedQuizId, setSelectedQuizId] = useState("");
   const [loading, setLoading] = useState(true);
@@ -41,12 +43,12 @@ export default function DragonRaceCreatePage() {
   };
 
   return (
-    <div className="flex-1 bg-[#fff6f4] px-8 py-10">
+    <div className="flex-1  px-8 py-10">
       <div className="mx-auto max-w-5xl">
         <button
           type="button"
           onClick={() => navigate("/game/list")}
-          className="mb-8 inline-flex items-center gap-2 text-sm font-bold text-[#5c3a21]"
+          className={`mb-8 inline-flex items-center gap-2 text-sm font-bold ${isDark ? "text-white" : "text-[#5c3a21]"}`}
         >
           <ArrowLeft size={18} />
           Danh sách trò chơi
@@ -54,8 +56,8 @@ export default function DragonRaceCreatePage() {
 
         <div className="mb-8 flex items-center justify-between gap-4">
           <div>
-            <h1 className="text-4xl font-bold text-[#5c3a21]">Tạo phòng Đua Rồng</h1>
-            <p className="mt-2 text-sm text-gray-500">Chọn quiz có sẵn để tạo mã phòng.</p>
+            <h1 className={`text-4xl font-bold ${isDark ? "text-white" : "text-[#5c3a21]"}`}>Tạo phòng Đua Rồng</h1>
+            <p className={`mt-2 text-sm ${isDark ? "text-gray-300" : "text-gray-500"}`}>Chọn quiz có sẵn để tạo mã phòng.</p>
           </div>
           <button
             type="button"
@@ -82,11 +84,10 @@ export default function DragonRaceCreatePage() {
                   key={quiz._id}
                   type="button"
                   onClick={() => setSelectedQuizId(quiz._id)}
-                  className={`rounded-xl border p-4 text-left transition ${
-                    selectedQuizId === quiz._id
+                  className={`rounded-xl border p-4 text-left transition ${selectedQuizId === quiz._id
                       ? "border-[#5c3a21] bg-[#5c3a21]/5"
                       : "border-gray-200 hover:border-[#5c3a21]/40"
-                  }`}
+                    }`}
                 >
                   <p className="font-bold text-[#5c3a21]">{quiz.title}</p>
                   <p className="mt-1 text-sm text-gray-500">

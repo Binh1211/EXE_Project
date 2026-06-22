@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
+import { useTheme } from "@/lib/ThemeContext";
 import { useSearchParams, useNavigate, useParams } from "react-router-dom";
 import { Star, Share2, Play, BookOpen, Lock } from "lucide-react";
 import {
@@ -37,6 +38,7 @@ const CourseLearningPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const lessonIdFromUrl = searchParams.get("lesson");
   const navigate = useNavigate();
+  const { isDark } = useTheme();
 
   const [timeline, setTimeline] = useState<Timeline | null>(null);
   const [chapter, setChapter] = useState<Chapter | null>(null);
@@ -358,10 +360,10 @@ const CourseLearningPage = () => {
                   disabled={lesson.isLocked}
                   onClick={() => selectLesson(lesson)}
                   className={`w-full text-left flex items-center gap-3 p-3 rounded-xl transition-all ${lesson.id === activeLesson._id
-                      ? "bg-[#5c3a21] text-white"
-                      : lesson.isLocked
-                        ? "opacity-50 cursor-not-allowed text-gray-500"
-                        : "hover:bg-[#5c3a21]/10 text-[#5c3a21]"
+                    ? "bg-[#5c3a21] text-white"
+                    : lesson.isLocked
+                      ? "opacity-50 cursor-not-allowed text-gray-500"
+                      : "hover:bg-[#5c3a21]/10 text-[#5c3a21]"
                     }`}
                 >
                   {lesson.isLocked ? (
@@ -380,22 +382,23 @@ const CourseLearningPage = () => {
         </div>
       </div>
 
-        <div className="flex flex-col flex-1 bg-[#FFF6F4] border-t border-black/5">
-        <div className="border-b border-black/5">
+      <div className={`flex flex-col flex-1  border-t ${isDark ? "border-white/10" : "border-black/5"}`}>
+        <div className={`border-b ${isDark ? "border-white/10" : "border-black/5"}`}>
           <div className="flex gap-8 px-4 md:px-12">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 type="button"
                 onClick={() => setActiveTab(tab.id)}
-                className={`py-6 text-[15px] font-bold transition-all relative ${activeTab === tab.id
-                    ? "text-[#5c3a21]"
-                    : "text-gray-400 hover:text-gray-600"
-                  }`}
+                className={`py-6 text-[15px] font-bold transition-all relative ${
+                  activeTab === tab.id
+                    ? isDark ? "text-white" : "text-[#5c3a21]"
+                    : isDark ? "text-gray-400 hover:text-gray-200" : "text-gray-400 hover:text-gray-600"
+                }`}
               >
                 {tab.label}
                 {activeTab === tab.id && (
-                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-[#5c3a21]" />
+                  <div className={`absolute bottom-0 left-0 right-0 h-1 ${isDark ? "bg-white" : "bg-[#5c3a21]"}`} />
                 )}
               </button>
             ))}
@@ -428,21 +431,21 @@ const CourseLearningPage = () => {
           {activeTab === "Review" && (
             <div className="mt-6 max-w-3xl mx-auto flex flex-col items-center pb-10 px-4">
               <div className="w-full mb-4">
-                <h3 className="text-2xl font-bold text-[#5c3a21]">
+                <h3 className={`text-2xl font-bold ${isDark ? "text-white" : "text-[#5c3a21]"}`}>
                   Ôn tập kiến thức
                 </h3>
                 {lessonDetail?.flashcardSet?.title && (
-                  <p className="text-sm text-gray-500 mt-1">
+                  <p className={`text-sm mt-1 ${isDark ? "text-gray-300" : "text-gray-500"}`}>
                     {lessonDetail.flashcardSet.title}
                   </p>
                 )}
               </div>
               {detailLoading ? (
-                <p className="text-gray-500 py-12">Đang tải flashcard...</p>
+                <p className={`py-12 ${isDark ? "text-gray-400" : "text-gray-500"}`}>Đang tải flashcard...</p>
               ) : flashcardCards.length > 0 ? (
                 <FlashCards cards={flashcardCards} />
               ) : (
-                <p className="text-gray-500 py-12">
+                <p className={`py-12 ${isDark ? "text-gray-400" : "text-gray-500"}`}>
                   Chưa có flashcard cho bài học này.
                 </p>
               )}

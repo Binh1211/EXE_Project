@@ -30,7 +30,7 @@ export default function GameList() {
   return (
     <div className="flex-1 w-full flex flex-col">
       {/* Hero Banner */}
-      <div className="relative bg-[#5c3a21] text-white overflow-hidden">
+      <div className="relative  text-white overflow-hidden">
         <div
           className="absolute inset-0 opacity-10 pointer-events-none"
           style={{
@@ -69,7 +69,7 @@ export default function GameList() {
       </div>
 
       {/* Game Mode Selection */}
-      <div className="flex-1 bg-[#FFF6F4] py-16 px-10">
+      <div className="flex-1  py-16 px-10">
         <div className="max-w-[1000px] mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {GAMES.map((game) => (

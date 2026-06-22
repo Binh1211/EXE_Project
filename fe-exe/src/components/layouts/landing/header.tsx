@@ -326,29 +326,25 @@ export default function Header() {
             >
               <Link
                 to="/"
-                className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
-                style={{ color: isDark ? "#F5DEB3" : "inherit" }}
+                className={`flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3] hover:!text-black ${isDark ? "text-[#F5DEB3]" : ""}`}
               >
                 Về Vistory
               </Link>
               <Link
                 to="/#team"
-                className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
-                style={{ color: isDark ? "#F5DEB3" : "inherit" }}
+                className={`flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3] hover:!text-black ${isDark ? "text-[#F5DEB3]" : ""}`}
               >
                 Thành phần
               </Link>
               <Link
                 to="/#features"
-                className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
-                style={{ color: isDark ? "#F5DEB3" : "inherit" }}
+                className={`flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3] hover:!text-black ${isDark ? "text-[#F5DEB3]" : ""}`}
               >
                 Tính năng
               </Link>
               <Link
                 to="/#benefits"
-                className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
-                style={{ color: isDark ? "#F5DEB3" : "inherit" }}
+                className={`flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3] hover:!text-black ${isDark ? "text-[#F5DEB3]" : ""}`}
               >
                 Lợi ích
               </Link>
@@ -370,49 +366,49 @@ export default function Header() {
             >
               <Link
                 to="/time-line"
-                className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
+                className={`flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3] hover:!text-black ${isDark ? "text-[#F5DEB3]" : ""}`}
               >
                 Time Line Lịch sử
               </Link>
               <Link
                 to="/course/all"
-                className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
+                className={`flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3] hover:!text-black ${isDark ? "text-[#F5DEB3]" : ""}`}
               >
                 Kho học liệu
               </Link>
               <Link
                 to="/flashcard-rooms/join"
-                className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
+                className={`flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3] hover:!text-black ${isDark ? "text-[#F5DEB3]" : ""}`}
               >
                 Ôn thi
               </Link>
               <div className="group/lophoc relative">
-                <div className="flex items-center justify-between rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3] cursor-pointer">
+                <div
+                  className={`flex items-center justify-between rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3] hover:!text-black cursor-pointer ${isDark ? "text-[#F5DEB3]" : ""}`}
+                >
                   Lớp học
-                  <svg
-                    className="ml-1 h-3 w-3"
-                    viewBox="0 0 12 12"
-                    fill="currentColor"
-                  >
+                  <svg className="ml-1 h-3 w-3" viewBox="0 0 12 12" fill="currentColor">
                     <path d="M4.5 2l4 4-4 4" />
                   </svg>
                 </div>
-                <div className="invisible absolute left-full top-0 z-[230] ml-1 w-36 rounded-xl bg-[#fff3e9] p-1 opacity-0 shadow-lg transition-all duration-200 group-hover/lophoc:visible group-hover/lophoc:opacity-100">
+                <div className="invisible absolute left-full top-0 z-[230] ml-1 w-36 rounded-xl p-1 opacity-0 shadow-lg transition-all duration-200 group-hover/lophoc:visible group-hover/lophoc:opacity-100"
+                  style={{ backgroundColor: isDark ? "#3D2010" : "#fff3e9" }}
+                >
                   <Link
                     to="/course/all?class=10"
-                    className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
+                    className={`flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3] hover:!text-black ${isDark ? "text-[#F5DEB3]" : ""}`}
                   >
                     Lớp 10
                   </Link>
                   <Link
                     to="/course/all?class=11"
-                    className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
+                    className={`flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3] hover:!text-black ${isDark ? "text-[#F5DEB3]" : ""}`}
                   >
                     Lớp 11
                   </Link>
                   <Link
                     to="/course/all?class=12"
-                    className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
+                    className={`flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3] hover:!text-black ${isDark ? "text-[#F5DEB3]" : ""}`}
                   >
                     Lớp 12
                   </Link>
@@ -421,7 +417,7 @@ export default function Header() {
 
               <Link
                 to="/news"
-                className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
+                className={`flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3] hover:!text-black ${isDark ? "text-[#F5DEB3]" : ""}`}
               >
                 Sách
               </Link>

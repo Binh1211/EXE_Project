@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTheme } from "@/lib/ThemeContext";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   Gamepad2,
@@ -24,6 +25,7 @@ interface ChapterWithLessons {
 export default function GameLessonSelect() {
   const { gameName } = useParams();
   const navigate = useNavigate();
+  const { isDark } = useTheme();
   const [data, setData] = useState<ChapterWithLessons[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -108,7 +110,7 @@ export default function GameLessonSelect() {
   return (
     <div className="flex-1 w-full flex flex-col">
       {/* Hero Banner */}
-      <div className="relative bg-[#5c3a21] text-white overflow-hidden">
+      <div className="relative  text-white overflow-hidden">
         <div
           className="absolute inset-0 opacity-10 pointer-events-none"
           style={{
@@ -148,13 +150,13 @@ export default function GameLessonSelect() {
       </div>
 
       {/* Game list */}
-      <div className="flex-1 bg-[#FFF6F4] py-12 px-10">
+      <div className="flex-1 py-12 px-10">
         <div className="max-w-[1280px] mx-auto">
           {/* Back button */}
-          <button 
-            type="button" 
+          <button
+            type="button"
             onClick={() => navigate('/game/list')}
-            className="flex items-center gap-2 text-[#5c3a21] hover:text-[#7a4e2d] font-semibold mb-8 transition-colors"
+            className={`flex items-center gap-2 font-semibold mb-8 transition-colors ${isDark ? "text-white hover:text-gray-200" : "text-[#5c3a21] hover:text-[#7a4e2d]"}`}
           >
             <ArrowLeft size={20} />
             Quay lại danh sách trò chơi
@@ -166,10 +168,10 @@ export default function GameLessonSelect() {
               <Swords size={22} className="text-white" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-[#5c3a21] capitalize">
+              <h2 className={`text-2xl font-bold capitalize ${isDark ? "text-white" : "text-[#5c3a21]"}`}>
                 Vượt rào
               </h2>
-              <p className="text-sm text-gray-500">
+              <p className={`text-sm ${isDark ? "text-gray-300" : "text-gray-500"}`}>
                 Danh sách đầy đủ bài quiz từ tất cả chapter và lesson có thể chơi.
               </p>
             </div>
