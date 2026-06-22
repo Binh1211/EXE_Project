@@ -1,5 +1,6 @@
-import { Search, Menu, X } from "lucide-react";
+import { Search, Menu, X, Moon, Sun } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useTheme } from "@/lib/ThemeContext";
 import { createPortal } from "react-dom";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../../ui/button";
@@ -88,6 +89,7 @@ type CourseHit = { id: string; title: string };
 export default function Header() {
   const navigate = useNavigate();
   const { isLoggedIn } = useAuthUser();
+  const { isDark, toggleTheme } = useTheme();
   const searchRef = useRef<HTMLDivElement>(null);
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -173,7 +175,10 @@ export default function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-[200] isolate w-full bg-[#fbf0ce] backdrop-blur shadow-sm">
+    <header
+      className="sticky top-0 z-[200] isolate w-full backdrop-blur shadow-sm transition-colors duration-500"
+      style={{ backgroundColor: isDark ? "#1E0F05" : "#fbf0ce" }}
+    >
       <div className="relative z-[200] mx-auto flex h-20 items-center justify-between gap-7 px-6">
         <button
           type="button"
@@ -182,17 +187,21 @@ export default function Header() {
           aria-label="Về trang chủ"
         >
           <img
-            src={IMG.logo}
+            src={isDark ? IMG.logoWhite : IMG.logo}
             alt="EXE"
-            className="h-16 w-auto object-contain"
+            className="h-16 w-auto object-contain transition-opacity duration-500"
           />
         </button>
 
         <div ref={searchRef} className="relative z-[210] w-[40%]">
-          <div className="flex h-10 items-center rounded-xl bg-white px-1 py-5">
+          <div
+            className="flex h-10 items-center rounded-xl px-1 py-5 transition-colors duration-500"
+            style={{ backgroundColor: isDark ? "#3D2010" : "white" }}
+          >
             <Search className="ml-4 inline h-4 w-4 text-gray-400" />
             <input
-              className="w-full text-sm focus:outline-none"
+              className="w-full text-sm focus:outline-none bg-transparent"
+              style={{ color: isDark ? "#F5DEB3" : "inherit" }}
               type="text"
               value={searchQuery}
               onChange={(e) => {
@@ -207,7 +216,13 @@ export default function Header() {
               value={searchScope}
               onValueChange={(v) => setSearchScope(v as SearchScope)}
             >
-              <SelectTrigger className="h-8 w-[28%] rounded-xl border-none bg-[#fff3e9] text-[#5f3713] [&>span]:text-[#5f3713] [&>span[data-placeholder]]:text-[#5f3713]">
+              <SelectTrigger
+                className="h-8 w-[28%] rounded-xl border-none"
+                style={{
+                  backgroundColor: isDark ? "#5C3317" : "#fff3e9",
+                  color: isDark ? "#F5DEB3" : "#5f3713",
+                }}
+              >
                 <SelectValue placeholder="Tất cả" />
               </SelectTrigger>
               <SelectContent className="z-[300] rounded-xl bg-[#fff3e9] text-[#5f3713]">
@@ -299,33 +314,41 @@ export default function Header() {
           <div className="group relative inline-block">
             <button
               type="button"
-              className="text-sm font-medium hover:text-[#5f3713]"
+              className="text-sm font-medium transition-colors duration-300"
+              style={{ color: isDark ? "#F5DEB3" : "inherit" }}
               onClick={() => navigate("/")}
             >
               Trang chủ
             </button>
-            <div className="invisible absolute left-0 z-[220] mt-2 w-40 rounded-xl bg-[#fff3e9] p-1 opacity-0 shadow-lg transition-all duration-200 group-hover:visible group-hover:opacity-100">
+            <div
+              className="invisible absolute left-0 z-[220] mt-2 w-40 rounded-xl p-1 opacity-0 shadow-lg transition-all duration-200 group-hover:visible group-hover:opacity-100"
+              style={{ backgroundColor: isDark ? "#3D2010" : "#fff3e9" }}
+            >
               <Link
                 to="/"
                 className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
+                style={{ color: isDark ? "#F5DEB3" : "inherit" }}
               >
                 Về Vistory
               </Link>
               <Link
                 to="/#team"
                 className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
+                style={{ color: isDark ? "#F5DEB3" : "inherit" }}
               >
                 Thành phần
               </Link>
               <Link
                 to="/#features"
                 className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
+                style={{ color: isDark ? "#F5DEB3" : "inherit" }}
               >
                 Tính năng
               </Link>
               <Link
                 to="/#benefits"
                 className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
+                style={{ color: isDark ? "#F5DEB3" : "inherit" }}
               >
                 Lợi ích
               </Link>
@@ -335,12 +358,16 @@ export default function Header() {
           <div className="group relative inline-block">
             <button
               type="button"
-              className="text-sm font-medium hover:text-[#5f3713]"
+              className="text-sm font-medium transition-colors duration-300"
+              style={{ color: isDark ? "#F5DEB3" : "inherit" }}
               onClick={() => navigate("/time-line")}
             >
               Khóa học
             </button>
-            <div className="invisible absolute left-0 z-[220] mt-2 w-44 rounded-xl bg-[#fff3e9] p-1 opacity-0 shadow-lg transition-all duration-200 group-hover:visible group-hover:opacity-100">
+            <div
+              className="invisible absolute left-0 z-[220] mt-2 w-44 rounded-xl p-1 opacity-0 shadow-lg transition-all duration-200 group-hover:visible group-hover:opacity-100"
+              style={{ backgroundColor: isDark ? "#3D2010" : "#fff3e9" }}
+            >
               <Link
                 to="/time-line"
                 className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
@@ -403,7 +430,8 @@ export default function Header() {
           <div className="group relative inline-block">
             <button
               type="button"
-              className="text-sm font-medium hover:text-[#5f3713]"
+              className="text-sm font-medium transition-colors duration-300"
+              style={{ color: isDark ? "#F5DEB3" : "inherit" }}
               onClick={() => navigate("/game/list")}
             >
               Game
@@ -411,28 +439,52 @@ export default function Header() {
           </div>
           <Link
             to="/contact"
-            className="text-sm font-medium hover:text-[#5f3713]"
+            className="text-sm font-medium transition-colors duration-300"
+            style={{ color: isDark ? "#F5DEB3" : "inherit" }}
           >
             Liên hệ
           </Link>
-          <Link to="/news" className="text-sm font-medium hover:text-[#5f3713]">
+          <Link
+            to="/news"
+            className="text-sm font-medium transition-colors duration-300"
+            style={{ color: isDark ? "#F5DEB3" : "inherit" }}
+          >
             Tin tức
           </Link>
         </nav>
 
         <div className="relative z-[210] flex items-center gap-2">
+          {/* Dark mode toggle */}
+          <button
+            type="button"
+            onClick={toggleTheme}
+            className="flex items-center justify-center w-9 h-9 rounded-full transition-all duration-300 hover:scale-110"
+            style={{
+              backgroundColor: isDark ? "#5C3317" : "#f3e2d3",
+              color: isDark ? "#F5DEB3" : "#5f3713",
+            }}
+            aria-label={isDark ? "Chuyển sang sáng" : "Chuyển sang tối"}
+          >
+            {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          </button>
+
           {isLoggedIn ? (
             <AvatarDropdown />
           ) : (
             <>
               <Button
-                className="w-24 rounded-xl text-sm font-medium text-black shadow-none hover:rounded-xl hover:text-[#5f3713]"
+                className="w-24 rounded-xl text-sm font-medium shadow-none hover:rounded-xl transition-colors duration-300"
+                style={{
+                  color: isDark ? "#F5DEB3" : "#000",
+                  backgroundColor: "transparent",
+                }}
                 onClick={() => navigate(AUTH_ROUTES.login)}
               >
                 Đăng nhập
               </Button>
               <Button
-                className="w-24 rounded-xl bg-[#5f3713] text-sm font-medium text-white shadow-none ring-0 hover:scale-105 hover:rounded-xl hover:bg-[#5f3713] hover:ring-2 hover:ring-[#f7f7f7]"
+                className="w-24 rounded-xl text-sm font-medium text-white shadow-none ring-0 hover:scale-105 hover:rounded-xl hover:ring-2 hover:ring-[#f7f7f7] transition-all duration-300"
+                style={{ backgroundColor: isDark ? "#8B4513" : "#5f3713" }}
                 onClick={() => navigate(AUTH_ROUTES.register)}
               >
                 Đăng ký

@@ -34,6 +34,7 @@ export const IMG = {
   heart: "https://res.cloudinary.com/duq6whfxw/image/upload/v1779595644/vistory/heart.png",
   stumblingBlock: "https://res.cloudinary.com/duq6whfxw/image/upload/v1779595654/vistory/stumbling_block.png",
   unStumblingBlock: "https://res.cloudinary.com/duq6whfxw/image/upload/v1779595656/vistory/un_stumbling_block.png",
+  bgDarkmode: "/BG_Darkmode.png", // TODO: replace with Cloudinary URL after upload
 
   // News (giữ local)
   news1: "/img/news1.png",

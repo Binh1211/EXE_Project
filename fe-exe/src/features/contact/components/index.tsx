@@ -92,8 +92,8 @@ function ContactContent() {
   }
 
   return (
-    <div className="bg-white py-14 mt-10">
-      <div className="max-w-5xl mx-auto px-6 rounded-xl">
+    <div className="py-14 mt-10 px-4">
+      <div className="bg-white max-w-5xl mx-auto px-8 py-12 rounded-3xl shadow-md border border-gray-100">
         <h1 className="text-4xl font-bold text-[#785336] text-center">
           Liên hệ với Vistory
         </h1>
