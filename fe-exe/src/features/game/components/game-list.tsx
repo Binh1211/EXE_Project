@@ -1,9 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { Gamepad2, Swords, Trophy, Play } from "lucide-react";
 import { IMG } from "@/lib/images";
+import { useTheme } from "@/lib/ThemeContext";
 
 export default function GameList() {
   const navigate = useNavigate();
+  const { isDark } = useTheme();
 
   const GAMES = [
     {
@@ -41,17 +43,17 @@ export default function GameList() {
         <div className="relative z-10 max-w-[1280px] mx-auto px-10 py-16 flex items-center gap-12">
           <div className="flex-1">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur flex items-center justify-center">
-                <Trophy size={28} className="text-yellow-400" />
+              <div className={`w-14 h-14 rounded-2xl backdrop-blur flex items-center justify-center ${isDark ? "bg-white/10" : "bg-[#5c3a21]"}`}>
+                <Trophy size={28} className={isDark ? "text-yellow-400" : "text-white"} />
               </div>
-              <span className="text-xs font-bold uppercase tracking-[0.3em] text-white/50">
+              <span className={`text-xs font-bold uppercase tracking-[0.3em] ${isDark ? "text-white/50" : "text-[#5c3a21]"}`}>
                 Thử Thách
               </span>
             </div>
-            <h1 className="text-[48px] leading-[1.15] font-title font-bold italic mb-4">
+            <h1 className={`text-[48px] leading-[1.15] font-title font-bold italic mb-4 ${isDark ? "text-white" : "text-[#5c3a21]"}`}>
               Chọn Trò Chơi
             </h1>
-            <p className="text-white/60 text-lg max-w-xl leading-relaxed">
+            <p className={`text-lg max-w-xl leading-relaxed ${isDark ? "text-gray-300" : "text-[#5c3a21]"}`}>
               Hãy chọn một chế độ chơi mà bạn yêu thích. Vượt qua thử thách và ôn tập lại toàn bộ kiến thức một cách thú vị nhất!
             </p>
           </div>
