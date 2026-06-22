@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useTheme } from "@/lib/ThemeContext";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Medal } from "lucide-react";
 import { createDragonRaceSocket } from "../socket/dragon-race-socket";
@@ -6,6 +7,7 @@ import type { DragonRaceLeaderboardItem } from "../types/dragon-race";
 
 export default function DragonRaceResultPage() {
   const navigate = useNavigate();
+  const { isDark } = useTheme();
   const { roomCode } = useParams();
   const location = useLocation();
   const initialLeaderboard = useMemo(
@@ -38,12 +40,12 @@ export default function DragonRaceResultPage() {
   }, [roomCode]);
 
   return (
-    <div className="flex-1 bg-[#fff6f4] px-8 py-10">
+    <div className="flex-1  px-8 py-10">
       <div className="mx-auto max-w-4xl">
         <button
           type="button"
           onClick={() => navigate("/game/list")}
-          className="mb-8 inline-flex items-center gap-2 text-sm font-bold text-[#5c3a21]"
+          className={`mb-8 inline-flex items-center gap-2 text-sm font-bold ${isDark ? "text-white" : "text-[#5c3a21]"}`}
         >
           <ArrowLeft size={18} />
           Danh sách trò chơi

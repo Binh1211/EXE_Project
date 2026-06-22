@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useTheme } from "@/lib/ThemeContext";
 import { useNavigate, useParams } from "react-router-dom";
 import type { Socket } from "socket.io-client";
 import { ArrowLeft, Copy, Crown, Loader2, Play, ShieldCheck } from "lucide-react";
@@ -9,6 +10,7 @@ import type { DragonRaceRoom } from "../types/dragon-race";
 export default function DragonRaceLobbyPage() {
   const { roomCode = "" } = useParams();
   const navigate = useNavigate();
+  const { isDark } = useTheme();
   const currentUser = getStoredUser();
   const socketRef = useRef<Socket | null>(null);
   const [room, setRoom] = useState<DragonRaceRoom | null>(null);
@@ -54,12 +56,12 @@ export default function DragonRaceLobbyPage() {
   };
 
   return (
-    <div className="flex-1 bg-[#fff6f4] px-8 py-10">
+    <div className="flex-1   px-8 py-10">
       <div className="mx-auto max-w-5xl">
         <button
           type="button"
           onClick={() => navigate("/game/dua-rong/create")}
-          className="mb-8 inline-flex items-center gap-2 text-sm font-bold text-[#5c3a21]"
+          className={`mb-8 inline-flex items-center gap-2 text-sm font-bold ${isDark ? "text-white" : "text-[#5c3a21]"}`}
         >
           <ArrowLeft size={18} />
           Tạo phòng khác
@@ -122,11 +124,10 @@ export default function DragonRaceLobbyPage() {
                     </div>
                   </div>
                   <span
-                    className={`rounded-full px-3 py-1 text-xs font-bold ${
-                      player.isReady
+                    className={`rounded-full px-3 py-1 text-xs font-bold ${player.isReady
                         ? "bg-emerald-50 text-emerald-700"
                         : "bg-gray-100 text-gray-500"
-                    }`}
+                      }`}
                   >
                     {player.isReady ? "Ready" : "Chờ"}
                   </span>
