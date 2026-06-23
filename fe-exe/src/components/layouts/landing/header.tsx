@@ -193,7 +193,7 @@ export default function Header() {
           />
         </button>
 
-        <div ref={searchRef} className="relative z-[210] w-[40%]">
+        <div ref={searchRef} className="relative z-[210] hidden w-[40%] md:block">
           <div
             className="flex h-10 items-center rounded-xl px-1 py-5 transition-colors duration-500"
             style={{ backgroundColor: isDark ? "#3D2010" : "white" }}
