@@ -75,7 +75,10 @@ export async function apiRequest<T>(
         if (refreshRes.ok) {
           const body = await refreshRes.json().catch(() => null) as any;
           if (body?.accessToken) {
+            // Persist new token and notify auth listeners
             localStorage.setItem("access_token", body.accessToken);
+            window.dispatchEvent(new Event("auth-session-changed"));
+
             // retry original request with new token
             const retryHeaders = new Headers(options.headers);
             if (
@@ -106,6 +109,11 @@ export async function apiRequest<T>(
             }
             return (retryResp.status === 204 || retryData === null) ? (undefined as unknown as T) : (retryData as T);
           }
+        } else {
+          // Refresh failed — clear stale session
+          localStorage.removeItem("access_token");
+          localStorage.removeItem("auth_user");
+          window.dispatchEvent(new Event("auth-session-changed"));
         }
       } catch (e) {
         // ignore and fallthrough to original error

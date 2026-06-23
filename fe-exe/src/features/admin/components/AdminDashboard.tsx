@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { UserTable } from "./UserTable";
 import { ContentEditor } from "./ContentEditor";
 import { RevenueChart } from "./RevenueChart";
+import { FeedbackList } from "./FeedbackList";
 import {
   Shield,
   Users,
@@ -10,6 +11,7 @@ import {
   BarChart3,
   LogOut,
   LayoutDashboard,
+  MessageSquareHeart,
 } from "lucide-react";
 import { authApi } from "@/features/auth/api/auth-api";
 import { AUTH_ROUTES } from "@/features/auth/constants";
@@ -17,12 +19,13 @@ import { clearAuthSession, getStoredUser } from "@/features/auth/lib/auth-sessio
 import { useAuthUser } from "@/features/auth/hooks/useAuthUser";
 import { IMG } from "@/lib/images";
 
-type Tab = "users" | "content" | "revenue";
+type Tab = "users" | "content" | "revenue" | "feedback";
 
 const navItems: { id: Tab; label: string; desc: string; icon: typeof Users }[] = [
   { id: "revenue", label: "Doanh thu", desc: "Thống kê thanh toán", icon: BarChart3 },
   { id: "users", label: "Người dùng", desc: "Quản lý tài khoản", icon: Users },
   { id: "content", label: "Nội dung", desc: "Timeline · Khóa học · Bài giảng", icon: BookOpen },
+  { id: "feedback", label: "Phản hồi", desc: "Khảo sát người dùng", icon: MessageSquareHeart },
 ];
 
 export function AdminDashboard() {
@@ -173,6 +176,7 @@ export function AdminDashboard() {
             {activeTab === "revenue" && <RevenueChart />}
             {activeTab === "users" && <UserTable />}
             {activeTab === "content" && <ContentEditor />}
+            {activeTab === "feedback" && <FeedbackList />}
           </main>
         </div>
       </div>

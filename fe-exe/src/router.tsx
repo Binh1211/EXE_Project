@@ -18,6 +18,7 @@ import ResetPasswordPage from './pages/forgot-password/reset';
 import ProfilePage from './pages/profile';
 import ChangePasswordPage from './pages/profile/change-password';
 import VipPage from './pages/vip';
+import FeedbackPage from './pages/feedback';
 import RequireAuth from '@/features/auth/components/RequireAuth';
 import HostRoomView from "@/features/flashcard-room/components/HostRoomView";
 import JoinRoomView from "@/features/flashcard-room/components/JoinRoomView";
@@ -63,6 +64,7 @@ function Router() {
             }
           />
           <Route path="/vip" element={<VipPage />} />
+          <Route path="/feedback" element={<FeedbackPage />} />
           <Route
             path="/profile/change-password"
             element={
