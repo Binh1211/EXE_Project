@@ -17,6 +17,7 @@ import gameRoomRoutes from "./game-room.routes.js";
 
 import flashcardRoomRoutes from "./flashcard-room.routes.js";
 import adminRoutes from "./admin.routes.js";
+import feedbackRoutes from "./feedback.routes.js";
 
 const router = Router();
 
@@ -37,5 +38,6 @@ router.use("/leaderboard-entries", leaderboardEntryRoutes);
 router.use("/game-rooms", gameRoomRoutes);
 router.use("/flashcard-rooms", flashcardRoomRoutes);
 router.use("/admin", adminRoutes);
+router.use("/feedbacks", feedbackRoutes);
 
 export default router;

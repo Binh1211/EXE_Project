@@ -14,14 +14,14 @@ export default function DragonRaceHomePage() {
           onClick={() => navigate("/game/list")}
           className={`mb-8 inline-flex items-center gap-2 text-sm font-bold ${isDark ? "text-white" : "text-[#5c3a21]"}`}
         >
-          <ArrowLeft size={18} />
-          Danh sách trò chơi
+          <ArrowLeft size={18} className={isDark ? "text-white" : "text-[#5c3a21]"} />
+          <span className={isDark ? "text-white" : "text-[#5c3a21]"}>Danh sách trò chơi</span>
         </button>
 
         <div className="rounded-3xl border border-[#5c3a21]/10 bg-white p-10 shadow-sm">
           <div className="mb-8">
-            <h1 className={`text-4xl font-bold ${isDark ? "text-white" : "text-[#5c3a21]"}`}>Đua Rồng</h1>
-            <p className={`mt-3 leading-relaxed text-lg ${isDark ? "text-gray-300" : "text-gray-600"}`}>
+            <h1 className={`text-4xl font-bold text-[#5c3a21]`}>Đua Rồng</h1>
+            <p className={`mt-3 leading-relaxed text-lg text-[#5c3a21]`}>
               Chọn một cách tham gia cuộc đua.
               Bạn có thể tạo phòng mới và mời bạn bè vào chơi, hoặc vào ngay phòng có sẵn bằng mã.
             </p>

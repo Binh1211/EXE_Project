@@ -100,8 +100,8 @@ export default function GameLessonSelect() {
     return (
       <div className="flex-1 flex items-center justify-center py-32">
         <div className="flex flex-col items-center gap-4">
-          <Loader2 className="animate-spin text-[#5c3a21]" size={40} />
-          <p className="text-[#5c3a21] font-medium">Đang tải danh sách game...</p>
+          <Loader2 className={`animate-spin ${isDark ? "text-white" : "text-[#5c3a21]"}`} size={40} />
+          <p className={`font-medium ${isDark ? "text-white" : "text-[#5c3a21]"}`}>Đang tải danh sách game...</p>
         </div>
       </div>
     );
@@ -121,17 +121,17 @@ export default function GameLessonSelect() {
         <div className="relative z-10 max-w-[1280px] mx-auto px-10 py-16 flex items-center gap-12">
           <div className="flex-1">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur flex items-center justify-center">
-                <Gamepad2 size={28} className="text-yellow-400" />
+              <div className={`w-14 h-14 rounded-2xl backdrop-blur flex items-center justify-center ${isDark ? "bg-white/10" : "bg-[#5c3a21]"}`}>
+                <Gamepad2 size={28} className={isDark ? "text-yellow-400" : "text-white"} />
               </div>
-              <span className="text-xs font-bold uppercase tracking-[0.3em] text-white/50">
+              <span className={`text-xs font-bold uppercase tracking-[0.3em] ${isDark ? "text-white/50" : "text-[#5c3a21]"}`}>
                 Mini Games
               </span>
             </div>
-            <h1 className="text-[48px] leading-[1.15] font-title font-bold italic mb-4">
+            <h1 className={`text-[48px] leading-[1.15] font-title font-bold italic mb-4 ${isDark ? "text-white" : "text-[#5c3a21]"}`}>
               Kho trò chơi lịch sử
             </h1>
-            <p className="text-white/60 text-lg max-w-xl leading-relaxed">
+            <p className={`text-lg max-w-xl leading-relaxed ${isDark ? "text-white/60" : "text-[#5c3a21]"}`}>
               Ôn tập kiến thức lịch sử qua các trò chơi hấp dẫn. Chọn bài học
               và bắt đầu thử thách ngay!
             </p>

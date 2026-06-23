@@ -27,22 +27,22 @@ router.post("/refresh", asyncHandler(async (req, res) => {
   const { hashToken } = await import("../utils/hash.js");
 
   const raw = req.cookies?.refresh_token as string | undefined;
-  if (!raw) return res.status(401).json({ message: "No refresh token." });
+  if (!raw) { res.status(401).json({ message: "No refresh token." }); return; }
 
   let payload: any;
   try {
     payload = verifyRefreshToken(raw);
-  } catch (err) {
-    return res.status(401).json({ message: "Invalid refresh token." });
+  } catch {
+    res.status(401).json({ message: "Invalid refresh token." }); return;
   }
 
   const tokenHash = hashToken(raw);
   const record = await RefreshToken.findOne({ tokenHash, userId: payload.sub, expiresAt: { $gt: new Date() } });
-  if (!record) return res.status(401).json({ message: "Refresh token expired or not found." });
+  if (!record) { res.status(401).json({ message: "Refresh token expired or not found." }); return; }
 
   const { signAccessToken } = await import("../utils/jwt.js");
   const user = await (await import("../models/index.js")).User.findById(payload.sub);
-  if (!user) return res.status(401).json({ message: "User not found." });
+  if (!user) { res.status(401).json({ message: "User not found." }); return; }
 
   const accessToken = signAccessToken({ sub: user._id.toString(), email: user.email, role: user.role });
   res.json({ accessToken });

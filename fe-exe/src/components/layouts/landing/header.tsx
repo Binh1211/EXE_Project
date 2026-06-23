@@ -117,7 +117,7 @@ export default function Header() {
           );
         }
       })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   useEffect(() => {
@@ -574,115 +574,115 @@ export default function Header() {
       )}
       {activeDropdown && dropdownPos
         ? createPortal(
-            <div
-              style={{
-                position: "absolute",
-                left: dropdownPos.left,
-                top: dropdownPos.top,
-                zIndex: 10000,
-                minWidth: 200,
-              }}
-              onMouseEnter={() => {
-                // keep submenu visible while mouse is inside the portal
-                setClassesSubOpen(true);
-              }}
-              onMouseLeave={() => {
-                setClassesSubOpen(false);
-                hideDropdown();
-              }}
-            >
-              <div className="rounded-xl bg-[#fff3e9] p-1 shadow-lg">
-                {activeDropdown === "home" ? (
-                  <div className="w-40">
-                    <Link
-                      to="/"
-                      className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
-                    >
-                      Về Vistory
-                    </Link>
-                    <Link
-                      to="/#team"
-                      className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
-                    >
-                      Thành phần
-                    </Link>
-                    <Link
-                      to="/#features"
-                      className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
-                    >
-                      Tính năng
-                    </Link>
-                    <Link
-                      to="/#benefits"
-                      className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
-                    >
-                      Lợi ích
-                    </Link>
-                  </div>
-                ) : (
-                  <div className="w-44 relative">
-                    <Link
-                      to="/time-line"
-                      className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
-                    >
-                      Time Line Lịch sử
-                    </Link>
-                    <Link
-                      to="/course/all"
-                      className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
-                    >
-                      Kho học liệu
-                    </Link>
-                    <Link
-                      to="/flashcard-rooms/join"
-                      className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
-                    >
-                      Ôn thi
-                    </Link>
-                    <div
-                      className="border-t mt-1 pt-1 relative"
-                      onMouseEnter={() => setClassesSubOpen(true)}
-                      onMouseLeave={() => setClassesSubOpen(false)}
-                    >
-                      <div className="text-sm px-2 py-2 rounded-xl hover:bg-[#f3e2d3] flex items-center justify-between">
-                        <span>Lớp học</span>
-                        <span className="ml-2 text-xs">›</span>
-                      </div>
-                      {classesSubOpen && (
-                        <div style={{ left: 'calc(100% - 8px)', top: 0 }} className="absolute w-36 rounded-lg bg-[#fff3e9] p-1 shadow-lg">
-                          <Link
-                            to="/course/all?class=10"
-                            className="block px-2 py-1 text-sm hover:bg-[#f3e2d3] rounded-md"
-                          >
-                            Lớp 10
-                          </Link>
-                          <Link
-                            to="/course/all?class=11"
-                            className="block px-2 py-1 text-sm hover:bg-[#f3e2d3] rounded-md"
-                          >
-                            Lớp 11
-                          </Link>
-                          <Link
-                            to="/course/all?class=12"
-                            className="block px-2 py-1 text-sm hover:bg-[#f3e2d3] rounded-md"
-                          >
-                            Lớp 12
-                          </Link>
-                        </div>
-                      )}
+          <div
+            style={{
+              position: "absolute",
+              left: dropdownPos.left,
+              top: dropdownPos.top,
+              zIndex: 10000,
+              minWidth: 200,
+            }}
+            onMouseEnter={() => {
+              // keep submenu visible while mouse is inside the portal
+              setClassesSubOpen(true);
+            }}
+            onMouseLeave={() => {
+              setClassesSubOpen(false);
+              hideDropdown();
+            }}
+          >
+            <div className="rounded-xl bg-[#fff3e9] p-1 shadow-lg">
+              {activeDropdown === "home" ? (
+                <div className="w-40">
+                  <Link
+                    to="/"
+                    className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
+                  >
+                    Về Vistory
+                  </Link>
+                  <Link
+                    to="/#team"
+                    className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
+                  >
+                    Thành phần
+                  </Link>
+                  <Link
+                    to="/#features"
+                    className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
+                  >
+                    Tính năng
+                  </Link>
+                  <Link
+                    to="/#benefits"
+                    className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
+                  >
+                    Lợi ích
+                  </Link>
+                </div>
+              ) : (
+                <div className="w-44 relative">
+                  <Link
+                    to="/time-line"
+                    className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
+                  >
+                    Time Line Lịch sử
+                  </Link>
+                  <Link
+                    to="/course/all"
+                    className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
+                  >
+                    Kho học liệu
+                  </Link>
+                  <Link
+                    to="/flashcard-rooms/join"
+                    className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3]"
+                  >
+                    Ôn thi
+                  </Link>
+                  <div
+                    className="border-t mt-1 pt-1 relative"
+                    onMouseEnter={() => setClassesSubOpen(true)}
+                    onMouseLeave={() => setClassesSubOpen(false)}
+                  >
+                    <div className="text-sm px-2 py-2 rounded-xl hover:bg-[#f3e2d3] flex items-center justify-between">
+                      <span>Lớp học</span>
+                      <span className="ml-2 text-xs">›</span>
                     </div>
-                    <Link
-                      to="/news"
-                      className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3] mt-1"
-                    >
-                      Sách
-                    </Link>
+                    {classesSubOpen && (
+                      <div style={{ left: 'calc(100% - 8px)', top: 0 }} className="absolute w-36 rounded-lg bg-[#fff3e9] p-1 shadow-lg">
+                        <Link
+                          to="/course/all?class=10"
+                          className="block px-2 py-1 text-sm hover:bg-[#f3e2d3] rounded-md"
+                        >
+                          Lớp 10
+                        </Link>
+                        <Link
+                          to="/course/all?class=11"
+                          className="block px-2 py-1 text-sm hover:bg-[#f3e2d3] rounded-md"
+                        >
+                          Lớp 11
+                        </Link>
+                        <Link
+                          to="/course/all?class=12"
+                          className="block px-2 py-1 text-sm hover:bg-[#f3e2d3] rounded-md"
+                        >
+                          Lớp 12
+                        </Link>
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-            </div>,
-            document.body,
-          )
+                  <Link
+                    to="/news"
+                    className="flex items-center rounded-xl px-2 py-3 text-sm transition-all hover:border-l-2 hover:border-[#623715] hover:bg-[#f3e2d3] mt-1"
+                  >
+                    Sách
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>,
+          document.body,
+        )
         : null}
     </header>
   );

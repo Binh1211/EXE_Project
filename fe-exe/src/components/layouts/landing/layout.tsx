@@ -3,6 +3,7 @@ import Footer from "./footer";
 import Header from "./header";
 import { IMG } from "@/lib/images";
 import { useTheme } from "@/lib/ThemeContext";
+import { FeedbackWidget } from "@/components/shared/feedback-widget";
 
 function LandingLayout() {
   const { isDark } = useTheme();
@@ -21,6 +22,7 @@ function LandingLayout() {
       <Outlet />
 
       <Footer />
+      <FeedbackWidget />
     </div>
   );
 }
