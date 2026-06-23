@@ -9,7 +9,7 @@ function LandingLayout() {
 
   return (
     <div
-      className="flex min-h-screen flex-col bg-cover font-history transition-all duration-500"
+      className="flex min-h-screen flex-col bg-cover font-history transition-all duration-500 overflow-x-hidden w-full max-w-[100vw]"
       style={{
         backgroundImage: isDark
           ? `url(${IMG.bgDarkmode})`
