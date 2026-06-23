@@ -43,7 +43,9 @@ export function FeedbackWidget() {
         })
         .catch(() => showWidget()); // fallback nếu lỗi mạng
     } else {
-      showWidget(); // Guest → chỉ dùng localStorage
+      // Guest → không hiện form feedback
+      setChecked(true);
+      return;
     }
 
     function showWidget() {

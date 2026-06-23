@@ -26,6 +26,7 @@ import {
 import type { Chapter, Lesson } from "../types";
 import type { Timeline } from "@/features/timeLine/types";
 import { useChapterAccess } from "../hooks/useChapterAccess";
+import { useTheme } from "@/lib/ThemeContext";
 
 const CourseDetailPage = () => {
   const { slug: timelineSlug, chapterSlug } = useParams<{
@@ -40,6 +41,7 @@ const CourseDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const { isAuthenticated, levelLocked } = useChapterAccess(chapter);
+  const { isDark } = useTheme();
 
   useEffect(() => {
     if (loading || !chapter) return;
@@ -213,10 +215,10 @@ const CourseDetailPage = () => {
           <div className="max-w-7xl mx-auto px-4 md:px-0">
             <div className="flex flex-col md:flex-row justify-between items-end mb-6 md:mb-10">
               <div>
-                <h2 className="text-2xl md:text-[42px] font-serif font-bold text-gray-800 mb-3 md:mb-4 italic">
+                <h2 className={`text-2xl md:text-[42px] font-serif font-bold  mb-3 md:mb-4 italic ${isDark ? "text-white" : "text-gray-800"}`}>
                   Nội dung bài học
                 </h2>
-                <p className="text-[13px] font-semibold text-gray-500 uppercase tracking-[0.3em]">
+                <p className={`text-[13px] font-semibold uppercase tracking-[0.3em] ${isDark ? "text-white" : "text-gray-500"}`}>
                   {publishedLessons.length} bài • {videoCount} video
                 </p>
               </div>
@@ -274,7 +276,7 @@ const CourseDetailPage = () => {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-10">
               <RelatedCourseCard
-                image= "https://tse4.mm.bing.net/th/id/OIP.N__X_XjUoI1_8tNsHfYwaQHaKf?cb=thfc1falcon2&rs=1&pid=ImgDetMain&o=7&rm=3"
+                image="https://tse4.mm.bing.net/th/id/OIP.N__X_XjUoI1_8tNsHfYwaQHaKf?cb=thfc1falcon2&rs=1&pid=ImgDetMain&o=7&rm=3"
                 title="Lịch Sử Việt Nam Qua Các Thời Kỳ"
                 rating="5.0"
                 description="Tìm hiểu hành trình phát triển của Việt Nam từ thời kỳ dựng nước."

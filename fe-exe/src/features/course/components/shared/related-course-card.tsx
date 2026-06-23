@@ -31,7 +31,7 @@ export const RelatedCourseCard = ({
                 </div>
             </div>
 
-            <h4 className="font-serif font-bold text-gray-800 text-[20px] leading-[1.3] mb-4 line-clamp-2 flex-grow">
+            <h4 className="font-aria font-bold text-gray-800 text-[20px] leading-[1.3] mb-4 line-clamp-2 flex-grow">
                 {title}
             </h4>
 
