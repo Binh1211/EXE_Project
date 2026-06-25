@@ -9,6 +9,7 @@ import {
   mapQuizToGameQuestions,
   type GameQuestion,
 } from "../lib/map-quiz-to-game";
+import { useTheme } from "@/lib/ThemeContext";
 
 type AnswerRecord = {
   questionIndex: number;
@@ -70,6 +71,7 @@ export default function HistoryMiniGame() {
   const worldRef = useRef<HTMLDivElement | null>(null);
   const [worldWidth, setWorldWidth] = useState(0);
   const questionCount = questions.length;
+  const { isDark } = useTheme();
 
   const backUrl = "/game/vuot-rao";
 
@@ -511,11 +513,11 @@ export default function HistoryMiniGame() {
             Quay lại bài học
           </button>
 
-          <h1 className="game-title">
-            <Gamepad2 size={32} className="game-title-icon" />
+          <h1 className="game-title" style={{ color: isDark ? "white" : "black" }}>
+            <Gamepad2 size={32} className="game-title-icon" style={{ color: isDark ? "white" : "black" }} />
             {quizTitle}
           </h1>
-          <p className="game-subtitle">{questionCount} câu hỏi từ quiz bài học</p>
+          <p className="game-subtitle" style={{ color: isDark ? "white" : "black" }}>{questionCount} câu hỏi từ quiz bài học</p>
 
           <button type="button" className="startBtn" onClick={() => setStarted(true)}>
             Bắt đầu chơi
