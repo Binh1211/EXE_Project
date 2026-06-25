@@ -19,13 +19,12 @@ const RatingStars = ({ value, onChange, max = 5 }: { value: number; onChange: (v
             key={i}
             onClick={() => onChange(starValue)}
             onMouseEnter={() => setHoverValue(starValue)}
-            className={`transition-all hover:scale-110 active:scale-95 ${
-              active ? "text-yellow-400 drop-shadow-md" : "text-gray-300 dark:text-zinc-700"
-            }`}
+            className={`transition-all hover:scale-110 active:scale-95 ${active ? "text-yellow-400 drop-shadow-md" : "text-gray-300 dark:text-zinc-700"
+              }`}
           >
-            <Star 
-              size={32} 
-              fill={active ? "currentColor" : "transparent"} 
+            <Star
+              size={32}
+              fill={active ? "currentColor" : "transparent"}
               strokeWidth={1.5}
             />
           </button>
@@ -41,7 +40,7 @@ export default function FeedbackPage() {
   const { user } = useAuthUser();
   const userId = user?.id || "guest";
   const SUBMIT_KEY = `vistory_feedback_submitted_${userId}`;
-  
+
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -93,7 +92,7 @@ export default function FeedbackPage() {
 
 
   return (
-    <div 
+    <div
       className="min-h-screen bg-cover font-history p-4 md:p-8 flex items-center justify-center transition-all duration-500"
       style={{ backgroundImage: isDark ? `url(${IMG.bgDarkmode})` : `url(${IMG.paperTexture})` }}
     >
@@ -136,7 +135,7 @@ export default function FeedbackPage() {
                 <span className="flex h-8 w-8 items-center justify-center rounded-full bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400 text-sm">2</span>
                 Trải nghiệm Giao diện & Tương tác (UI/UX)
               </h3>
-              
+
               <div className="space-y-6">
                 <div>
                   <p className="font-semibold text-gray-800 dark:text-gray-200 mb-2">Ấn tượng đầu tiên của bạn về giao diện (màu sắc, hình ảnh, cách sắp xếp) của Vistory như thế nào?</p>
@@ -176,7 +175,7 @@ export default function FeedbackPage() {
                 <span className="flex h-8 w-8 items-center justify-center rounded-full bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400 text-sm">3</span>
                 Đánh giá Nội dung bài học số hóa
               </h3>
-              
+
               <div className="space-y-6">
                 <div>
                   <p className="font-semibold text-gray-800 dark:text-gray-200 mb-3">Bạn thấy cách giải thích lịch sử theo mô hình Mind-map như thế nào?</p>
@@ -210,7 +209,7 @@ export default function FeedbackPage() {
                 <span className="flex h-8 w-8 items-center justify-center rounded-full bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400 text-sm">4</span>
                 Tính năng Gamification
               </h3>
-              
+
               <div className="space-y-6">
                 <div>
                   <p className="font-semibold text-gray-800 dark:text-gray-200 mb-2">Hệ thống Game ôn tập / "Nhiệm vụ lịch sử" có đủ sức giữ chân bạn không?</p>
@@ -238,7 +237,7 @@ export default function FeedbackPage() {
                 <span className="flex h-8 w-8 items-center justify-center rounded-full bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400 text-sm">5</span>
                 Đánh giá Tổng kết & Đóng góp ý kiến
               </h3>
-              
+
               <div className="space-y-6">
                 <div>
                   <p className="font-semibold text-gray-800 dark:text-gray-200 mb-2">Mức độ sẵn sàng giới thiệu Vistory cho bạn bè hoặc thầy cô cùng sử dụng của bạn là bao nhiêu?</p>
@@ -254,11 +253,10 @@ export default function FeedbackPage() {
                         type="button"
                         key={opt}
                         onClick={() => handleCheckboxChange("improvements", opt)}
-                        className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                          formData.improvements.includes(opt)
+                        className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${formData.improvements.includes(opt)
                             ? "bg-red-100 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-900/50"
                             : "bg-gray-100 text-gray-600 border-gray-200 hover:bg-gray-200 dark:bg-zinc-800 dark:text-gray-400 dark:border-zinc-700 dark:hover:bg-zinc-700"
-                        } border`}
+                          } border`}
                       >
                         {opt}
                       </button>

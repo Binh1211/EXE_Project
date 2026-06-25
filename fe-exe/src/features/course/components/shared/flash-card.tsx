@@ -86,7 +86,7 @@ export default function FlashCards({ cards }: FlashCardsProps) {
             <div className={`
                 bg-gradient-to-br from-[#422006] via-[#713f12] to-[#451a03]
                 flex flex-col items-center justify-center p-6 transition-all duration-500
-                ${isFullscreen ? "fixed inset-0 z-[100] w-screen h-screen rounded-none" : "relative w-full h-[450px] rounded-3xl overflow-hidden"}
+                ${isFullscreen ? "fixed inset-0 z-[999] w-screen h-screen rounded-none" : "relative w-full h-[450px] rounded-3xl overflow-hidden"}
             `}>
                 <div className="absolute w-[700px] h-[700px] rounded-full bg-yellow-500/20 blur-[140px]" />
                 <div className="absolute right-0 bottom-0 w-[500px] h-[500px] rounded-full bg-amber-500/20 blur-[140px]" />
@@ -140,7 +140,7 @@ export default function FlashCards({ cards }: FlashCardsProps) {
                 bg-gradient-to-br from-[#422006] via-[#713f12] to-[#290f02]
                 flex items-center justify-center p-6 transition-all duration-500
                 ${isFullscreen
-                    ? "fixed inset-0 z-[100] w-screen h-screen rounded-none"
+                    ? "fixed inset-0 z-[999] w-screen h-screen rounded-none"
                     : "relative w-full rounded-3xl overflow-hidden"
                 }
             `}
@@ -155,7 +155,7 @@ export default function FlashCards({ cards }: FlashCardsProps) {
                     e.stopPropagation();
                     setIsFullscreen(!isFullscreen);
                 }}
-                className={`absolute right-6 z-50
+                className={`absolute right-6 top-6 z-50
                 w-14 h-14 rounded-full
                 bg-yellow-500 hover:bg-yellow-400
                 border-2 border-yellow-200
@@ -163,7 +163,6 @@ export default function FlashCards({ cards }: FlashCardsProps) {
                 flex items-center justify-center
                 hover:scale-110
                 transition-all duration-300
-                ${isFullscreen ? "top-24" : "top-6"}
                 `}
             >
                 {isFullscreen ? (
