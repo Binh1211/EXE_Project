@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { adminApi, getApiErrorMessage, type AdminUser } from "../api/admin-api";
-import { Users, Shield, RefreshCw } from "lucide-react";
+import { Users, Shield, RefreshCw, ChevronLeft, ChevronRight } from "lucide-react";
 import { API_BASE_URL } from "@/lib/api-client";
 import {
   AdminBadge,
@@ -22,13 +22,18 @@ export function UserTable() {
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [page, setPage] = useState(1);
+  const LIMIT = 10;
 
   const fetchUsers = () => {
     setLoading(true);
     setError("");
     adminApi
       .getUsers()
-      .then(setUsers)
+      .then((data) => {
+        setUsers(data);
+        setPage(1);
+      })
       .catch((e) => setError(getApiErrorMessage(e)))
       .finally(() => setLoading(false));
   };
@@ -61,6 +66,9 @@ export function UserTable() {
   const adminCount = users.length - regularUsers.length;
   const vipCount = regularUsers.filter((u) => (u.level ?? 1) >= 2).length;
 
+  const totalPages = Math.ceil(users.length / LIMIT) || 1;
+  const paginatedUsers = users.slice((page - 1) * LIMIT, page * LIMIT);
+
   return (
     <AdminCard>
       <AdminCardHeader
@@ -86,18 +94,19 @@ export function UserTable() {
       ) : users.length === 0 ? (
         <AdminEmpty title="Chưa có người dùng" description="Dữ liệu sẽ hiển thị khi có đăng ký mới." />
       ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead>
-              <tr className="border-y border-black/5 bg-[#fff3e9]/60 text-[11px] font-semibold uppercase tracking-wider text-[#5f3713]">
-                <th className="px-6 py-4">Người dùng</th>
-                <th className="px-6 py-4">Vai trò</th>
-                <th className="px-6 py-4">Cấp VIP</th>
-                <th className="px-6 py-4">Ngày tham gia</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-black/5">
-              {users.map((user) => {
+        <div className="flex flex-col">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead>
+                <tr className="border-y border-black/5 bg-[#fff3e9]/60 text-[11px] font-semibold uppercase tracking-wider text-[#5f3713]">
+                  <th className="px-6 py-4">Người dùng</th>
+                  <th className="px-6 py-4">Vai trò</th>
+                  <th className="px-6 py-4">Cấp VIP</th>
+                  <th className="px-6 py-4">Ngày tham gia</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-black/5">
+                {paginatedUsers.map((user) => {
                 const src = avatarSrc(user.avatarUrl);
                 const isAdmin = user.role === "admin";
                 return (
@@ -172,7 +181,31 @@ export function UserTable() {
             </tbody>
           </table>
         </div>
-      )}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between border-t border-black/5 px-6 py-4 bg-[#fff3e9]/10">
+            <p className="text-xs text-gray-500">
+              Trang {page} / {totalPages} · Tổng {users.length} người dùng
+            </p>
+            <div className="flex gap-2">
+              <button
+                disabled={page === 1}
+                onClick={() => setPage((p) => p - 1)}
+                className="flex items-center gap-1 rounded-full border-2 border-gray-200 bg-white px-3 py-1.5 text-xs font-bold text-gray-600 transition hover:border-[#5c3a21] hover:text-[#5c3a21] disabled:opacity-40"
+              >
+                <ChevronLeft size={14} /> Trước
+              </button>
+              <button
+                disabled={page === totalPages}
+                onClick={() => setPage((p) => p + 1)}
+                className="flex items-center gap-1 rounded-full border-2 border-gray-200 bg-white px-3 py-1.5 text-xs font-bold text-gray-600 transition hover:border-[#5c3a21] hover:text-[#5c3a21] disabled:opacity-40"
+              >
+                Sau <ChevronRight size={14} />
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    )}
 
       {!loading && users.length > 0 && (
         <div className="border-t border-black/5 bg-[#fff3e9]/30 px-6 py-3 text-xs text-gray-500">

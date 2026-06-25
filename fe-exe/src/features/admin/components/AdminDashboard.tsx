@@ -101,16 +101,8 @@ export function AdminDashboard() {
             })}
           </nav>
 
-          <div className="">
-            
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="flex w-full items-center gap-2 rounded-xl border-2 border-transparent px-3 py-2.5 text-sm font-bold text-red-600 transition hover:border-red-600 hover:bg-red-50"
-            >
-              <LogOut className="h-4 w-4" />
-              Đăng xuất
-            </button>
+          <div className="pb-4">
+            {/* Logout moved to profile */}
           </div>
         </aside>
 
@@ -152,22 +144,26 @@ export function AdminDashboard() {
               </div>
 
               <div className="flex items-center gap-3">
-                <div className="flex items-center gap-3 rounded-xl border border-black/5 bg-white/80 px-4 py-2 shadow-sm">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#5f3713] text-sm font-bold text-white">
-                    {displayName.charAt(0).toUpperCase()}
+                <div className="flex items-center gap-2 rounded-xl border border-black/5 bg-white/80 pl-2 pr-2 py-1.5 shadow-sm">
+                  <div className="flex items-center gap-2 px-1">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#5f3713] text-sm font-bold text-white">
+                      {displayName.charAt(0).toUpperCase()}
+                    </div>
+                    <div className="hidden text-left sm:block">
+                      <p className="text-xs font-bold text-gray-800 leading-tight">{displayName}</p>
+                      <p className="max-w-[140px] truncate text-[10px] text-gray-500">{email}</p>
+                    </div>
                   </div>
-                  <div className="hidden text-right sm:block">
-                    <p className="text-sm font-medium text-gray-800">{displayName}</p>
-                    <p className="max-w-[160px] truncate text-[11px] text-gray-500">{email}</p>
-                  </div>
+                  <div className="h-6 w-[1px] bg-black/10 mx-1 hidden sm:block"></div>
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    title="Đăng xuất"
+                    className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-500 transition hover:bg-red-50 hover:text-red-600"
+                  >
+                    <LogOut className="h-4 w-4" />
+                  </button>
                 </div>
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  className="flex items-center gap-2 rounded-xl border-2 border-red-200 bg-white px-3 py-2 text-sm font-bold text-red-600 transition hover:border-red-600 hover:bg-red-50 lg:hidden"
-                >
-                  <LogOut className="h-4 w-4" />
-                </button>
               </div>
             </div>
           </header>
