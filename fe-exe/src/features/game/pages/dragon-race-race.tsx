@@ -168,44 +168,44 @@ export default function DragonRaceRacePage() {
   const laneTemplates: LaneTemplate[] = [
     {
       label: "YOU",
-      img: "https://lh3.googleusercontent.com/aida-public/AB6AXuD_c0vorgzS-rcPBh-RHs0c4xS4ZhYxED5s75lqEHaghUiWPn5vdzn-AE6kLwTdmKHTR-0_3SJ8QJ5K-v-cuVy--Psm8XKAmMxa30qibQvSbNcjKGgF_lDYmoTlegCg2QOx36j87ZM2giptQgT7UAivx5yrsLnKttf_wT6FbLWf8o264j3TNat4B_o8XFrF_ioqzmDI_WnIaTvAihcBSFyradNsd6qTXR9po1iIKMmtYF1ZACZwSNkW1bXsXhTzqK7wLbmeUVfPAV9s",
+      img: "/dau-rong.png",
       border: "border-[#ffb599]",
       defaultLeft: "65%",
-      extraClass: "border-[#ffb599]",
+      extraClass: "brightness-105 contrast-125 saturate-110 drop-shadow-xl",
     },
     {
       label: "Bolt",
-      img: "https://lh3.googleusercontent.com/aida-public/AB6AXuD_c0vorgzS-rcPBh-RHs0c4xS4ZhYxED5s75lqEHaghUiWPn5vdzn-AE6kLwTdmKHTR-0_3SJ8QJ5K-v-cuVy--Psm8XKAmMxa30qibQvSbNcjKGgF_lDYmoTlegCg2QOx36j87ZM2giptQgT7UAivx5yrsLnKttf_wT6FbLWf8o264j3TNat4B_o8XFrF_ioqzmDI_WnIaTvAihcBSFyradNsd6qTXR9po1iIKMmtYF1ZACZwSNkW1bXsXhTzqK7wLbmeUVfPAV9s",
+      img: "/dau-rong.png",
       border: "border-[#bc70ff]",
       defaultLeft: "42%",
-      extraClass: "opacity-80",
+      extraClass: "brightness-105 contrast-125 saturate-110 drop-shadow-xl",
     },
     {
       label: "Frost",
-      img: "https://lh3.googleusercontent.com/aida-public/AB6AXuD_c0vorgzS-rcPBh-RHs0c4xS4ZhYxED5s75lqEHaghUiWPn5vdzn-AE6kLwTdmKHTR-0_3SJ8QJ5K-v-cuVy--Psm8XKAmMxa30qibQvSbNcjKGgF_lDYmoTlegCg2QOx36j87ZM2giptQgT7UAivx5yrsLnKttf_wT6FbLWf8o264j3TNat4B_o8XFrF_ioqzmDI_WnIaTvAihcBSFyradNsd6qTXR9po1iIKMmtYF1ZACZwSNkW1bXsXhTzqK7wLbmeUVfPAV9s",
+      img: "/dau-rong.png",
       border: "border-[#ffb4a8]",
       defaultLeft: "58%",
-      extraClass: "opacity-80",
+      extraClass: "brightness-105 contrast-125 saturate-110 drop-shadow-xl",
     },
     {
       label: "Terra",
-      img: "https://lh3.googleusercontent.com/aida-public/AB6AXuD_c0vorgzS-rcPBh-RHs0c4xS4ZhYxED5s75lqEHaghUiWPn5vdzn-AE6kLwTdmKHTR-0_3SJ8QJ5K-v-cuVy--Psm8XKAmMxa30qibQvSbNcjKGgF_lDYmoTlegCg2QOx36j87ZM2giptQgT7UAivx5yrsLnKttf_wT6FbLWf8o264j3TNat4B_o8XFrF_ioqzmDI_WnIaTvAihcBSFyradNsd6qTXR9po1iIKMmtYF1ZACZwSNkW1bXsXhTzqK7wLbmeUVfPAV9s",
+      img: "/dau-rong.png",
       border: "border-[#9ca3af]",
       defaultLeft: "30%",
-      extraClass: "opacity-80",
+      extraClass: "brightness-105 contrast-125 saturate-110 drop-shadow-xl",
     },
   ];
 
   const topLanes: LaneData[] = sortedPlayers.length > 0
     ? sortedPlayers.map((player, index) => {
-        const template = laneTemplates[index % laneTemplates.length];
-        const left = player.position !== undefined ? `${Math.min(player.position, 94)}%` : template.defaultLeft;
-        return { ...template, left, player };
-      })
+      const template = laneTemplates[index % laneTemplates.length];
+      const left = player.position !== undefined ? `${Math.min(player.position, 94)}%` : template.defaultLeft;
+      return { ...template, left, player };
+    })
     : laneTemplates.map((template) => ({
-        ...template,
-        left: template.defaultLeft,
-      }));
+      ...template,
+      left: template.defaultLeft,
+    }));
 
   return (
     <div className="min-h-screen bg-[#171119] text-[#ecdfeb] overflow-x-hidden">
@@ -235,27 +235,55 @@ export default function DragonRaceRacePage() {
           </div>
 
           <div className="relative z-10 flex flex-grow gap-3 px-4 py-3 lg:px-7 lg:py-5">
-            <div className="flex-grow flex flex-col gap-2 relative overflow-y-auto pb-2">
-              {topLanes.map((lane) => (
+            <div className="flex-grow flex flex-col gap-2 relative overflow-y-auto pb-2 pt-4">
+              {topLanes.map((lane, laneIndex) => (
                 <div
                   key={lane.player?.userId ?? lane.label}
-                  className={`min-h-[56px] rounded-xl border-l-4 ${lane.border} relative overflow-hidden bg-[#1c1322]/70`}
+                  className={`min-h-[44px] rounded-xl border-l-4 ${lane.border} relative overflow-visible bg-[#1c1322]/70`}
                 >
                   <div
                     className="absolute inset-0"
                     style={{ backgroundImage: "linear-gradient(90deg, rgba(23,17,25,0) 0%, rgba(255,95,5,0.05) 100%)" }}
                   />
-                  <div className="absolute top-1/2 flex items-center transition-all duration-1000 ease-out z-20"
+                  {/* The stretching tail body */}
+                  <div className="absolute top-1/2 left-0 transition-all duration-1000 ease-out z-20"
+                       style={{ width: `max(0px, calc(${lane.left} - 45px))`, transform: "translateY(-50%)" }}>
+                    
+                    {/* Wavy snake body divided into 20 segments */}
+                    <div className="w-full h-[64px] relative flex">
+                      {Array.from({ length: 20 }).map((_, i) => (
+                        <div key={i} className="h-full flex-1 relative overflow-hidden"
+                             style={{
+                               animation: `tail-segment-wave 1.5s ease-in-out infinite`,
+                               animationDelay: `${-(20 - i) * 0.1}s`
+                             }}>
+                          <div className="absolute top-1/2 h-[48px]"
+                               style={{
+                                 width: `2000%`,
+                                 left: `-${i * 100}%`,
+                                 transform: "translateY(-50%)",
+                                 backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='48'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%23b91c1c'/%3E%3Cstop offset='100%25' stop-color='%23ea580c'/%3E%3C/linearGradient%3E%3ClinearGradient id='sg' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%23fb923c'/%3E%3Cstop offset='100%25' stop-color='%23dc2626'/%3E%3C/linearGradient%3E%3CradialGradient id='bl' cx='50%25' cy='0%25' r='100%25'%3E%3Cstop offset='0%25' stop-color='%23fef08a'/%3E%3Cstop offset='100%25' stop-color='%23ca8a04'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect x='0' y='12' width='30' height='24' fill='url(%23bg)'/%3E%3Cpath d='M0,12 C10,0 20,16 30,2 L30,12 Z' fill='%23991b1b'/%3E%3Cpath d='M5,12 C12,4 20,12 30,6 L30,12 Z' fill='%23ea580c'/%3E%3Cpath d='M0,36 Q15,48 30,36 Z' fill='url(%23bl)' stroke='%23a16207' stroke-width='1'/%3E%3Cg fill='url(%23sg)' stroke='%237f1d1d' stroke-width='0.75'%3E%3Cpath d='M-15,14 A15,7 0 0,1 15,14 Z'/%3E%3Cpath d='M15,14 A15,7 0 0,1 45,14 Z'/%3E%3Cpath d='M0,19 A15,7 0 0,1 30,19 Z'/%3E%3Cpath d='M-15,24 A15,7 0 0,1 15,24 Z'/%3E%3Cpath d='M15,24 A15,7 0 0,1 45,24 Z'/%3E%3Cpath d='M0,29 A15,7 0 0,1 30,29 Z'/%3E%3Cpath d='M-15,34 A15,7 0 0,1 15,34 Z'/%3E%3Cpath d='M15,34 A15,7 0 0,1 45,34 Z'/%3E%3C/g%3E%3C/svg%3E\")",
+                                 backgroundSize: "30px 48px",
+                                 backgroundPosition: "left center"
+                               }}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Dragon head */}
+                  <div className="absolute top-1/2 flex items-center transition-all duration-1000 ease-out z-30"
                     style={{ left: lane.left, transform: "translate(-50%, -50%)" }}
                   >
-                    <div className="w-10 h-10 relative animate-drift">
+                    <div className="w-24 h-24 relative animate-drift flex-shrink-0" style={{ marginLeft: '-12px' }}>
                       <img
                         alt={`${lane.label} Dragon`}
-                        className={`w-full h-full rounded-full border-4 flame-trail ${lane.extraClass}`}
+                        className={`w-full h-full object-contain drop-shadow-lg ${lane.extraClass}`}
                         src={lane.img}
                       />
                     </div>
-                    <div className="ml-2 rounded-full bg-[#ffdbce] px-2 py-1 text-[10px] font-semibold text-[#531900] shadow-lg">
+                    <div className="ml-2 rounded-full bg-[#ffdbce] px-2 py-1 text-[10px] font-semibold text-[#531900] shadow-lg whitespace-nowrap">
                       {lane.player?.username ?? lane.label}
                     </div>
                   </div>
@@ -372,15 +400,14 @@ export default function DragonRaceRacePage() {
                           type="button"
                           disabled={Boolean(selectedOptionId)}
                           onClick={() => submitAnswer(option.id)}
-                          className={`btn-game group relative rounded-3xl border px-5 py-4 text-left transition-all duration-300 ${
-                            isSelected
-                              ? answerResult === "correct"
-                                ? "border-emerald-400 bg-emerald-900/30 text-[#ecdfeb] shadow-[0_0_30px_rgba(74,222,128,0.15)]"
-                                : "border-[#93000a] bg-[#93000a]/20 text-[#ffdad6]"
-                              : showCorrectAnswer
-                                ? "border-emerald-400 bg-emerald-900/20 text-[#ecdfeb]"
-                                : "border-[#aa897d]/30 bg-[#241d26]/80 hover:border-[#ff5f05] hover:bg-[#2b1f2b]"
-                          }`}
+                          className={`btn-game group relative rounded-3xl border px-5 py-4 text-left transition-all duration-300 ${isSelected
+                            ? answerResult === "correct"
+                              ? "border-emerald-400 bg-emerald-900/30 text-[#ecdfeb] shadow-[0_0_30px_rgba(74,222,128,0.15)]"
+                              : "border-[#93000a] bg-[#93000a]/20 text-[#ffdad6]"
+                            : showCorrectAnswer
+                              ? "border-emerald-400 bg-emerald-900/20 text-[#ecdfeb]"
+                              : "border-[#aa897d]/30 bg-[#241d26]/80 hover:border-[#ff5f05] hover:bg-[#2b1f2b]"
+                            }`}
                         >
                           <div className="flex items-center gap-3">
                             <span className={`flex h-10 w-10 items-center justify-center rounded-2xl bg-[#ffdbce]/20 text-[#ffb599] text-lg font-bold transition-all duration-300 ${isWrongSelected ? "bg-[#93000a]/25 text-[#ffdad6]" : "group-hover:bg-[#ffb599] group-hover:text-[#171119]"}`}>
@@ -413,9 +440,7 @@ export default function DragonRaceRacePage() {
         .dragon-lane-gradient {
           background: linear-gradient(90deg, rgba(23, 17, 25, 0) 0%, rgba(255, 95, 5, 0.05) 100%);
         }
-        .flame-trail {
-          box-shadow: 0 0 15px #ff5f05, 0 0 30px #ffb599;
-        }
+        .flame-trail {}
         .glass-panel {
           background: rgba(36, 29, 38, 0.8);
           backdrop-filter: blur(12px);
@@ -427,6 +452,14 @@ export default function DragonRaceRacePage() {
           100% { transform: translate(0, 0); }
         }
         .animate-drift { animation: drift 4s ease-in-out infinite; }
+        @keyframes tail-segment-wave {
+          0%, 100% { transform: translateY(5px); }
+          50% { transform: translateY(-5px); }
+        }
+        .dragon-tail-svg {
+          animation: dragon-tail-wave 2.6s ease-in-out infinite;
+          transform-origin: right center;
+        }
         .btn-game:active { transform: scale(0.97) translateY(1px); }
         .btn-game:hover { transform: scale(1.02); }
         .correct-toast {

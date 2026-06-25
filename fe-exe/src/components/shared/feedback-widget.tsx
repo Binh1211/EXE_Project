@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { X, MessageSquareHeart } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuthUser } from "@/features/auth/hooks/useAuthUser";
@@ -16,6 +16,24 @@ export function FeedbackWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [checked, setChecked] = useState(false);
+
+  // Lưu pathname trước đó để phát hiện khi user rời khỏi trang /feedback
+  const prevPathRef = useRef<string | null>(null);
+
+  // Khi user rời khỏi trang /feedback (ví dụ bấm Hủy bỏ) → hiện lại widget ở dạng minimized
+  useEffect(() => {
+    const prev = prevPathRef.current;
+    if (prev === "/feedback" && location.pathname !== "/feedback") {
+      // Vừa rời trang feedback → hiện lại widget (minimized) nếu chưa submit
+      const localSubmitted = localStorage.getItem(SUBMIT_KEY);
+      if (!localSubmitted) {
+        setIsOpen(true);
+        setIsMinimized(true);
+      }
+    }
+    prevPathRef.current = location.pathname;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.pathname]);
 
   useEffect(() => {
     setIsOpen(false);
