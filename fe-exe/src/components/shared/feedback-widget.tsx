@@ -32,7 +32,7 @@ export function FeedbackWidget() {
       }
     }
     prevPathRef.current = location.pathname;
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
 
   useEffect(() => {
@@ -76,7 +76,7 @@ export function FeedbackWidget() {
       }
       setTimeout(() => setIsOpen(true), 3000);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
 
   const handleDismiss = () => {

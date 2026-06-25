@@ -52,25 +52,26 @@ export const CourseProgressCard = ({
     }
 
     return (
-        <div className="bg-[#5c3a21] text-white p-6 rounded-[32px] shadow-2xl shadow-[#5c3a21]/20">
-            <div className="flex items-center gap-6 mb-8">
+        <div className="bg-[#5c3a21] text-white p-4 sm:p-6 rounded-[32px] shadow-2xl shadow-[#5c3a21]/20">
+            <div className="flex items-center gap-4 sm:gap-6 mb-6 sm:mb-8">
                 <BarChart3 size={32} className="text-white/90" />
-                <span className="font-bold text-[26px] font-title">Tiến độ khóa học</span>
+                <span className="font-bold text-[20px] sm:text-[26px] font-title">Tiến độ khóa học</span>
             </div>
 
-            <div className="flex items-center justify-between">
-                <div className="flex-[1.5] space-y-4 pr-2">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-6 sm:gap-0">
+                <div className="w-full sm:flex-[1.5] space-y-4 pr-0 sm:pr-2">
                     <div className="pb-4 flex justify-between items-center text-[12px] gap-4">
                         <span className="text-white/60 whitespace-nowrap">Tiến độ hoàn thành:</span>
                         <span className="font-bold whitespace-nowrap">{progressPercentage}%</span>
                     </div>
                 </div>
 
-                <div className="w-[1px] h-36 bg-white/10"></div>
+                <div className="hidden sm:block w-[1px] h-36 bg-white/10"></div>
+                <div className="block sm:hidden w-full h-[1px] bg-white/10"></div>
 
-                <div className="flex-1 flex justify-center pl-10">
-                    <div className="relative w-40 h-40 flex items-center justify-center">
-                        <svg className="w-full h-full -rotate-90">
+                <div className="flex-1 flex justify-center pl-0 sm:pl-10">
+                    <div className="relative w-32 h-32 sm:w-40 sm:h-40 flex items-center justify-center">
+                        <svg className="w-full h-full -rotate-90" viewBox="0 0 160 160">
                             <circle cx="80" cy="80" r="64" stroke="currentColor" strokeWidth="16" fill="transparent" className="text-white" />
                             <circle
                                 cx="80"
@@ -85,7 +86,7 @@ export const CourseProgressCard = ({
                                 strokeLinecap="round"
                             />
                         </svg>
-                        <span className="absolute text-2xl font-bold">{progressPercentage}%</span>
+                        <span className="absolute text-xl sm:text-2xl font-bold">{progressPercentage}%</span>
                     </div>
                 </div>
             </div>

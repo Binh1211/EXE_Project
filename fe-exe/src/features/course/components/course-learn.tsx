@@ -180,10 +180,26 @@ const CourseLearningPage = () => {
       .finally(() => setDetailLoading(false));
   }, [activeLesson?._id]);
 
+  const videoWatchedRef = useRef(videoWatched);
+  useEffect(() => {
+    videoWatchedRef.current = videoWatched;
+  }, [videoWatched]);
+
+  const activeLessonRef = useRef(activeLesson);
+  useEffect(() => {
+    activeLessonRef.current = activeLesson;
+  }, [activeLesson]);
+
+  const refreshLessonsRef = useRef(refreshLessons);
+  useEffect(() => {
+    refreshLessonsRef.current = refreshLessons;
+  }, [refreshLessons]);
+
   useEffect(() => {
     if (!activeVideoId) return;
 
     let playerInstance: { destroy: () => void } | null = null;
+    let progressInterval: number | undefined;
 
     const createPlayer = () => {
       if (!ytContainerRef.current) return;
@@ -207,17 +223,44 @@ const CourseLearningPage = () => {
         height: "100%",
         playerVars: { rel: 0, modestbranding: 1 },
         events: {
+          onReady: (event: any) => {
+            progressInterval = setInterval(() => {
+              try {
+                if (event.target && event.target.getDuration && event.target.getCurrentTime) {
+                  const duration = event.target.getDuration();
+                  const currentTime = event.target.getCurrentTime();
+                  if (duration > 0 && currentTime / duration >= 0.9 && !videoWatchedRef.current) {
+                    setVideoWatched(true);
+                    const currentLesson = activeLessonRef.current;
+                    if (currentLesson?._id) {
+                      lessonProgressApi
+                        .upsert({
+                          lessonId: currentLesson._id,
+                          status: "completed",
+                          videoWatchedPct: 100,
+                        })
+                        .then(() => refreshLessonsRef.current())
+                        .catch(console.error);
+                    }
+                  }
+                }
+              } catch (e) {
+                // ignore
+              }
+            }, 3000);
+          },
           onStateChange: (event: { data: number }) => {
-            if (event.data === 0) {
+            if (event.data === 0 && !videoWatchedRef.current) {
               setVideoWatched(true);
-              if (activeLesson?._id) {
+              const currentLesson = activeLessonRef.current;
+              if (currentLesson?._id) {
                 lessonProgressApi
                   .upsert({
-                    lessonId: activeLesson._id,
+                    lessonId: currentLesson._id,
                     status: "completed",
                     videoWatchedPct: 100,
                   })
-                  .then(() => refreshLessons())
+                  .then(() => refreshLessonsRef.current())
                   .catch(console.error);
               }
             }
@@ -225,6 +268,14 @@ const CourseLearningPage = () => {
         },
       });
       ytPlayerRef.current = playerInstance;
+      
+      if (playerInstance) {
+        const originalDestroy = playerInstance.destroy.bind(playerInstance);
+        playerInstance.destroy = () => {
+          clearInterval(progressInterval);
+          originalDestroy();
+        };
+      }
     };
 
     if ((window as any).YT?.Player) {
