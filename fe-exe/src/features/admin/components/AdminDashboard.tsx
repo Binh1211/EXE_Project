@@ -75,10 +75,10 @@ export function AdminDashboard() {
                   key={id}
                   type="button"
                   onClick={() => setActiveTab(id)}
-                  className={`flex w-full items-start gap-3 rounded-xl px-4 py-3.5 text-left transition ${
+                  className={`flex w-full items-start gap-3 rounded-xl border-2 px-4 py-3.5 text-left transition ${
                     active
-                      ? "bg-[#5c3a21] text-white shadow-md"
-                      : "text-gray-700 hover:bg-white/60"
+                      ? "border-[#5c3a21] bg-[#5c3a21] text-white shadow-md"
+                      : "border-transparent text-gray-700 hover:border-[#5c3a21]/30 hover:bg-white/60"
                   }`}
                 >
                   <div
@@ -106,7 +106,7 @@ export function AdminDashboard() {
             <button
               type="button"
               onClick={handleLogout}
-              className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-sm text-red-600 transition hover:bg-red-50"
+              className="flex w-full items-center gap-2 rounded-xl border-2 border-transparent px-3 py-2.5 text-sm font-bold text-red-600 transition hover:border-red-600 hover:bg-red-50"
             >
               <LogOut className="h-4 w-4" />
               Đăng xuất
@@ -123,10 +123,10 @@ export function AdminDashboard() {
                   key={id}
                   type="button"
                   onClick={() => setActiveTab(id)}
-                  className={`flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold transition ${
+                  className={`flex shrink-0 items-center gap-2 rounded-full border-2 px-4 py-2 text-xs font-bold transition ${
                     activeTab === id
-                      ? "bg-[#5c3a21] text-white"
-                      : "border border-black/10 bg-white text-gray-600"
+                      ? "border-[#5c3a21] bg-[#5c3a21] text-white"
+                      : "border-black/10 bg-white text-gray-600 hover:border-[#5c3a21]/50"
                   }`}
                 >
                   <Icon className="h-3.5 w-3.5" />
@@ -164,7 +164,7 @@ export function AdminDashboard() {
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="flex items-center gap-2 rounded-xl border border-red-200 bg-white px-3 py-2 text-sm font-medium text-red-600 transition hover:bg-red-50 lg:hidden"
+                  className="flex items-center gap-2 rounded-xl border-2 border-red-200 bg-white px-3 py-2 text-sm font-bold text-red-600 transition hover:border-red-600 hover:bg-red-50 lg:hidden"
                 >
                   <LogOut className="h-4 w-4" />
                 </button>

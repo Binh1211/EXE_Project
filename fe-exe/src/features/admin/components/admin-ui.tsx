@@ -116,7 +116,7 @@ export function AdminBtnPrimary({
     <button
       type={type}
       onClick={onClick}
-      className={`w-full rounded-xl bg-[#5f3713] py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-[#4a2e1a] active:scale-[0.98] ${className}`}
+      className={`w-full rounded-xl border-2 border-[#5f3713] bg-[#5f3713] py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-white hover:text-[#5f3713] active:scale-[0.98] ${className}`}
     >
       {children}
     </button>
@@ -134,7 +134,7 @@ export function AdminGhostBtn({
     <button
       type="button"
       onClick={onClick}
-      className="flex items-center gap-1.5 rounded-xl border border-black/10 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 transition hover:border-[#5f3713]/30 hover:text-[#5f3713]"
+      className="flex items-center gap-1.5 rounded-xl border-2 border-[#5f3713] bg-white px-4 py-1.5 text-xs font-bold text-[#5f3713] transition hover:bg-[#5f3713] hover:text-white"
     >
       {children}
     </button>
@@ -179,9 +179,9 @@ export function AdminColumnPanel({
           <button
             type="button"
             onClick={onAdd}
-            className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#5f3713] text-white shadow-sm hover:bg-[#4a2e1a] transition"
+            className="flex h-8 w-8 items-center justify-center rounded-lg border-2 border-[#5f3713] bg-[#5f3713] text-white shadow-sm hover:bg-white hover:text-[#5f3713] transition"
           >
-            <span className="text-lg leading-none">+</span>
+            <span className="text-lg leading-none font-bold">+</span>
           </button>
         )}
       </div>
