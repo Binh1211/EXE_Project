@@ -236,7 +236,7 @@ export default function DragonRaceRacePage() {
 
           <div className="relative z-10 flex flex-grow gap-3 px-4 py-3 lg:px-7 lg:py-5">
             <div className="flex-grow flex flex-col gap-2 relative overflow-y-auto pb-2 pt-4">
-              {topLanes.map((lane, laneIndex) => (
+              {topLanes.map((lane) => (
                 <div
                   key={lane.player?.userId ?? lane.label}
                   className={`min-h-[44px] rounded-xl border-l-4 ${lane.border} relative overflow-visible bg-[#1c1322]/70`}
@@ -247,25 +247,25 @@ export default function DragonRaceRacePage() {
                   />
                   {/* The stretching tail body */}
                   <div className="absolute top-1/2 left-0 transition-all duration-1000 ease-out z-20"
-                       style={{ width: `max(0px, calc(${lane.left} - 45px))`, transform: "translateY(-50%)" }}>
-                    
+                    style={{ width: `max(0px, calc(${lane.left} - 45px))`, transform: "translateY(-50%)" }}>
+
                     {/* Wavy snake body divided into 20 segments */}
                     <div className="w-full h-[64px] relative flex">
                       {Array.from({ length: 20 }).map((_, i) => (
                         <div key={i} className="h-full flex-1 relative overflow-hidden"
-                             style={{
-                               animation: `tail-segment-wave 1.5s ease-in-out infinite`,
-                               animationDelay: `${-(20 - i) * 0.1}s`
-                             }}>
+                          style={{
+                            animation: `tail-segment-wave 1.5s ease-in-out infinite`,
+                            animationDelay: `${-(20 - i) * 0.1}s`
+                          }}>
                           <div className="absolute top-1/2 h-[48px]"
-                               style={{
-                                 width: `2000%`,
-                                 left: `-${i * 100}%`,
-                                 transform: "translateY(-50%)",
-                                 backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='48'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%23b91c1c'/%3E%3Cstop offset='100%25' stop-color='%23ea580c'/%3E%3C/linearGradient%3E%3ClinearGradient id='sg' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%23fb923c'/%3E%3Cstop offset='100%25' stop-color='%23dc2626'/%3E%3C/linearGradient%3E%3CradialGradient id='bl' cx='50%25' cy='0%25' r='100%25'%3E%3Cstop offset='0%25' stop-color='%23fef08a'/%3E%3Cstop offset='100%25' stop-color='%23ca8a04'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect x='0' y='12' width='30' height='24' fill='url(%23bg)'/%3E%3Cpath d='M0,12 C10,0 20,16 30,2 L30,12 Z' fill='%23991b1b'/%3E%3Cpath d='M5,12 C12,4 20,12 30,6 L30,12 Z' fill='%23ea580c'/%3E%3Cpath d='M0,36 Q15,48 30,36 Z' fill='url(%23bl)' stroke='%23a16207' stroke-width='1'/%3E%3Cg fill='url(%23sg)' stroke='%237f1d1d' stroke-width='0.75'%3E%3Cpath d='M-15,14 A15,7 0 0,1 15,14 Z'/%3E%3Cpath d='M15,14 A15,7 0 0,1 45,14 Z'/%3E%3Cpath d='M0,19 A15,7 0 0,1 30,19 Z'/%3E%3Cpath d='M-15,24 A15,7 0 0,1 15,24 Z'/%3E%3Cpath d='M15,24 A15,7 0 0,1 45,24 Z'/%3E%3Cpath d='M0,29 A15,7 0 0,1 30,29 Z'/%3E%3Cpath d='M-15,34 A15,7 0 0,1 15,34 Z'/%3E%3Cpath d='M15,34 A15,7 0 0,1 45,34 Z'/%3E%3C/g%3E%3C/svg%3E\")",
-                                 backgroundSize: "30px 48px",
-                                 backgroundPosition: "left center"
-                               }}
+                            style={{
+                              width: `2000%`,
+                              left: `-${i * 100}%`,
+                              transform: "translateY(-50%)",
+                              backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='48'%3E%3Cdefs%3E%3ClinearGradient id='bg' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%23b91c1c'/%3E%3Cstop offset='100%25' stop-color='%23ea580c'/%3E%3C/linearGradient%3E%3ClinearGradient id='sg' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0%25' stop-color='%23fb923c'/%3E%3Cstop offset='100%25' stop-color='%23dc2626'/%3E%3C/linearGradient%3E%3CradialGradient id='bl' cx='50%25' cy='0%25' r='100%25'%3E%3Cstop offset='0%25' stop-color='%23fef08a'/%3E%3Cstop offset='100%25' stop-color='%23ca8a04'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect x='0' y='12' width='30' height='24' fill='url(%23bg)'/%3E%3Cpath d='M0,12 C10,0 20,16 30,2 L30,12 Z' fill='%23991b1b'/%3E%3Cpath d='M5,12 C12,4 20,12 30,6 L30,12 Z' fill='%23ea580c'/%3E%3Cpath d='M0,36 Q15,48 30,36 Z' fill='url(%23bl)' stroke='%23a16207' stroke-width='1'/%3E%3Cg fill='url(%23sg)' stroke='%237f1d1d' stroke-width='0.75'%3E%3Cpath d='M-15,14 A15,7 0 0,1 15,14 Z'/%3E%3Cpath d='M15,14 A15,7 0 0,1 45,14 Z'/%3E%3Cpath d='M0,19 A15,7 0 0,1 30,19 Z'/%3E%3Cpath d='M-15,24 A15,7 0 0,1 15,24 Z'/%3E%3Cpath d='M15,24 A15,7 0 0,1 45,24 Z'/%3E%3Cpath d='M0,29 A15,7 0 0,1 30,29 Z'/%3E%3Cpath d='M-15,34 A15,7 0 0,1 15,34 Z'/%3E%3Cpath d='M15,34 A15,7 0 0,1 45,34 Z'/%3E%3C/g%3E%3C/svg%3E\")",
+                              backgroundSize: "30px 48px",
+                              backgroundPosition: "left center"
+                            }}
                           />
                         </div>
                       ))}
