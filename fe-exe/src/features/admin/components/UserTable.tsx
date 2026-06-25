@@ -130,10 +130,10 @@ export function UserTable() {
                       <button
                         type="button"
                         onClick={() => handleRoleChange(user._id, user.role)}
-                        className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-semibold uppercase tracking-wide transition ${
+                        className={`inline-flex items-center gap-1.5 rounded-lg border-2 px-3 py-1.5 text-xs font-bold uppercase tracking-wide transition ${
                           user.role === "admin"
-                            ? "border-red-200 bg-red-50 text-red-700 hover:bg-red-100"
-                            : "border-black/10 bg-white text-gray-600 hover:border-[#5f3713]/30"
+                            ? "border-red-200 bg-red-50 text-red-700 hover:border-red-400 hover:bg-red-100"
+                            : "border-black/10 bg-white text-gray-600 hover:border-[#5f3713]/50 hover:text-[#5f3713]"
                         }`}
                       >
                         <Shield className="h-3 w-3" />

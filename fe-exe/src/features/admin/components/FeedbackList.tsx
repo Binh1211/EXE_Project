@@ -118,7 +118,7 @@ export function FeedbackList() {
           <button
             onClick={() => fetchFeedbacks(page)}
             disabled={loading}
-            className="flex items-center gap-1.5 rounded-lg border border-black/10 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 transition hover:bg-gray-50 disabled:opacity-50"
+            className="flex items-center gap-1.5 rounded-full border-2 border-[#5c3a21] bg-white px-4 py-1.5 text-xs font-bold text-[#5c3a21] transition hover:bg-[#5c3a21] hover:text-white disabled:opacity-50 shadow-sm"
           >
             <RefreshCw size={12} className={loading ? "animate-spin" : ""} />
             Làm mới
@@ -182,7 +182,7 @@ export function FeedbackList() {
                     <td className="px-4 py-4">
                       <button
                         onClick={() => setSelected(f)}
-                        className="rounded-lg bg-[#5c3a21] px-3 py-1 text-xs font-medium text-white transition hover:bg-[#7a4e2d]"
+                        className="rounded-full border-2 border-[#5c3a21] bg-white px-3 py-1 text-xs font-bold text-[#5c3a21] transition hover:bg-[#5c3a21] hover:text-white shadow-sm"
                       >
                         Chi tiết
                       </button>
@@ -204,14 +204,14 @@ export function FeedbackList() {
               <button
                 disabled={page === 1}
                 onClick={() => setPage((p) => p - 1)}
-                className="flex items-center gap-1 rounded-lg border border-black/10 px-3 py-1.5 text-xs font-medium text-gray-600 transition hover:bg-gray-50 disabled:opacity-40"
+                className="flex items-center gap-1 rounded-full border-2 border-gray-200 bg-white px-3 py-1.5 text-xs font-bold text-gray-600 transition hover:border-[#5c3a21] hover:text-[#5c3a21] disabled:opacity-40"
               >
                 <ChevronLeft size={14} /> Trước
               </button>
               <button
                 disabled={page === totalPages}
                 onClick={() => setPage((p) => p + 1)}
-                className="flex items-center gap-1 rounded-lg border border-black/10 px-3 py-1.5 text-xs font-medium text-gray-600 transition hover:bg-gray-50 disabled:opacity-40"
+                className="flex items-center gap-1 rounded-full border-2 border-gray-200 bg-white px-3 py-1.5 text-xs font-bold text-gray-600 transition hover:border-[#5c3a21] hover:text-[#5c3a21] disabled:opacity-40"
               >
                 Sau <ChevronRight size={14} />
               </button>
@@ -223,57 +223,142 @@ export function FeedbackList() {
       {/* Detail Modal */}
       {selected && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 transition-all"
           onClick={() => setSelected(null)}
         >
           <div
-            className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl bg-white shadow-2xl p-8"
+            className="relative w-full max-w-3xl max-h-[90vh] flex flex-col rounded-3xl bg-white shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200"
             onClick={(e) => e.stopPropagation()}
           >
-            <button
-              onClick={() => setSelected(null)}
-              className="absolute right-5 top-5 rounded-full p-1.5 text-gray-400 hover:bg-gray-100 transition"
-            >
-              ✕
-            </button>
-
-            <div className="mb-6">
-              <Badge text={selected.role.split("(")[0].trim()} color={roleColor(selected.role)} />
-              <p className="mt-1 text-xs text-gray-400">
-                {new Date(selected.createdAt).toLocaleString("vi-VN")}
-                {selected.userId && ` · User: ${selected.userId}`}
-              </p>
+            {/* Modal Header */}
+            <div className="bg-gradient-to-r from-[#5c3a21] to-[#8c5a35] px-8 py-6 text-white relative flex-shrink-0">
+              <button
+                onClick={() => setSelected(null)}
+                className="absolute right-6 top-6 rounded-full bg-black/20 p-2 text-white/80 hover:bg-black/40 hover:text-white transition backdrop-blur-md"
+              >
+                ✕
+              </button>
+              <div className="flex items-start justify-between">
+                <div>
+                  <h3 className="text-2xl font-bold mb-2">Chi tiết phản hồi</h3>
+                  <div className="flex items-center gap-3">
+                    <span className="rounded-full bg-white/20 px-3 py-1 text-xs font-semibold backdrop-blur-md border border-white/10">
+                      {selected.role.split("(")[0].trim()}
+                    </span>
+                    <span className="text-sm text-white/80 flex items-center gap-1">
+                      🗓️ {new Date(selected.createdAt).toLocaleString("vi-VN")}
+                    </span>
+                    {selected.userId && (
+                      <span className="text-sm text-white/80 flex items-center gap-1 border-l border-white/20 pl-3">
+                        <User size={14} /> User: {selected.userId.slice(0,8)}...
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <div className="space-y-4">
-              {[
-                { label: "🎨 Điểm UI/UX", value: <StarDisplay value={selected.uiRating} /> },
-                { label: "⚙️ Thao tác Timeline", value: selected.uiInteraction },
-                { label: "🐛 Lỗi kỹ thuật", value: selected.techIssues },
-                { label: "🗺️ Mind-map", value: selected.contentMindmap },
-                { label: "📏 Độ dài bài học", value: selected.contentLength },
-                { label: "🎮 Điểm Gamification", value: <StarDisplay value={selected.gamificationRating} /> },
-                {
-                  label: "⭐ Tính năng yêu thích",
-                  value: selected.favoriteFeatures.length
-                    ? selected.favoriteFeatures.join(", ")
-                    : "Không chọn",
-                },
-                { label: "📣 NPS (Giới thiệu)", value: <StarDisplay value={selected.nps} /> },
-                {
-                  label: "💡 Đề xuất cải tiến",
-                  value: selected.improvements.length ? selected.improvements.join(", ") : "Không có",
-                },
-                {
-                  label: "✍️ Góp ý tự do",
-                  value: selected.generalFeedback || <span className="text-gray-400 italic">Không có</span>,
-                },
-              ].map(({ label, value }) => (
-                <div key={label} className="rounded-xl bg-gray-50 px-4 py-3">
-                  <p className="text-xs font-semibold text-gray-500 mb-1">{label}</p>
-                  <div className="text-sm text-gray-800">{value}</div>
+            {/* Modal Body */}
+            <div className="p-8 overflow-y-auto bg-gray-50/50 flex-1 space-y-8 custom-scrollbar">
+              {/* Ratings Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {[
+                  { label: "🎨 Điểm UI/UX", value: <StarDisplay value={selected.uiRating} /> },
+                  { label: "🎮 Gamification", value: <StarDisplay value={selected.gamificationRating} /> },
+                  { label: "📣 NPS", value: <StarDisplay value={selected.nps} /> },
+                ].map(({ label, value }) => (
+                  <div key={label} className="rounded-2xl border border-black/5 bg-white p-4 shadow-sm hover:shadow-md transition">
+                    <p className="text-xs font-semibold text-gray-500 mb-2">{label}</p>
+                    <div className="text-lg">{value}</div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Content Feedback */}
+              <div className="rounded-2xl border border-black/5 bg-white overflow-hidden shadow-sm">
+                <div className="bg-gray-50/80 px-5 py-3 border-b border-black/5">
+                  <h4 className="font-semibold text-[#5c3a21] flex items-center gap-2">
+                    <span>📝</span> Đánh giá trải nghiệm
+                  </h4>
                 </div>
-              ))}
+                <div className="p-5 grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <div>
+                    <p className="text-xs font-semibold text-gray-500 mb-1">⚙️ Thao tác Timeline</p>
+                    <p className="text-sm text-gray-800 bg-gray-50 p-3 rounded-xl">{selected.uiInteraction}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-gray-500 mb-1">🗺️ Mind-map</p>
+                    <p className="text-sm text-gray-800 bg-gray-50 p-3 rounded-xl">{selected.contentMindmap}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-gray-500 mb-1">📏 Độ dài bài học</p>
+                    <p className="text-sm text-gray-800 bg-gray-50 p-3 rounded-xl">{selected.contentLength}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-gray-500 mb-1">⭐ Tính năng yêu thích</p>
+                    <div className="flex flex-wrap gap-1.5 mt-1">
+                      {selected.favoriteFeatures.length > 0 ? (
+                        selected.favoriteFeatures.map(f => (
+                          <span key={f} className="inline-block bg-amber-50 text-amber-700 border border-amber-200 px-2.5 py-1 rounded-lg text-xs font-medium">
+                            {f}
+                          </span>
+                        ))
+                      ) : (
+                        <span className="text-sm text-gray-400 italic">Không chọn</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Issues & Improvements */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div className="rounded-2xl border border-black/5 bg-white shadow-sm flex flex-col">
+                  <div className="bg-red-50/50 px-5 py-3 border-b border-red-100">
+                    <h4 className="font-semibold text-red-700 flex items-center gap-2">
+                      <span>🐛</span> Lỗi kỹ thuật
+                    </h4>
+                  </div>
+                  <div className="p-5 flex-1">
+                    <p className="text-sm text-gray-800">{selected.techIssues}</p>
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-black/5 bg-white shadow-sm flex flex-col">
+                  <div className="bg-blue-50/50 px-5 py-3 border-b border-blue-100">
+                    <h4 className="font-semibold text-blue-700 flex items-center gap-2">
+                      <span>💡</span> Đề xuất cải tiến
+                    </h4>
+                  </div>
+                  <div className="p-5 flex-1">
+                    <div className="flex flex-wrap gap-1.5">
+                      {selected.improvements.length > 0 ? (
+                        selected.improvements.map(imp => (
+                          <span key={imp} className="inline-block bg-blue-50 text-blue-700 border border-blue-200 px-2.5 py-1 rounded-lg text-xs font-medium">
+                            {imp}
+                          </span>
+                        ))
+                      ) : (
+                        <span className="text-sm text-gray-400 italic">Không có</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* General Feedback */}
+              <div className="rounded-2xl border border-black/5 bg-white shadow-sm">
+                <div className="bg-green-50/50 px-5 py-3 border-b border-green-100">
+                  <h4 className="font-semibold text-green-700 flex items-center gap-2">
+                    <span>✍️</span> Góp ý tự do
+                  </h4>
+                </div>
+                <div className="p-5">
+                  <p className="text-sm text-gray-800 italic bg-gray-50/50 p-4 rounded-xl border border-gray-100">
+                    "{selected.generalFeedback || <span className="text-gray-400">Không có góp ý thêm</span>}"
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
