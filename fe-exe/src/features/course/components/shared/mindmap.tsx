@@ -148,7 +148,7 @@ const GridSection: React.FC<{
                           {item.label}
                         </span>
                       )}
-                      <div className="text-[#4d392d] italic">{item.content}</div>
+                      <div className="text-[#4d392d] italic whitespace-pre-line">{item.content}</div>
                     </div>
                   ))}
                 </div>
@@ -360,7 +360,7 @@ const ScrollSection: React.FC<{
                                   {item.label}
                                 </div>
                               )}
-                              <div className="text-[#4d392d]">{item.content}</div>
+                              <div className="text-[#4d392d] whitespace-pre-line">{item.content}</div>
                             </div>
                           ))}
                         </div>
@@ -377,7 +377,7 @@ const ScrollSection: React.FC<{
             {section.topics[0] && (
               <>
                 {section.topics[0].items[0] && (
-                  <p className="text-lg md:text-xl italic text-[#231a06] leading-loose mb-5">
+                  <p className="text-lg md:text-xl italic text-[#231a06] leading-loose mb-5 whitespace-pre-line">
                     <span
                       className="float-left font-bold mr-2 leading-none"
                       style={{ fontSize: "3rem", color: "#ad3130", lineHeight: 0.85 }}
@@ -389,7 +389,7 @@ const ScrollSection: React.FC<{
                 )}
                 {section.topics[0].items[1] && (
                   <div
-                    className="p-5 italic text-[#231a06]/80 text-base clearfix"
+                    className="p-5 italic text-[#231a06]/80 text-base clearfix whitespace-pre-line"
                     style={{
                       borderLeft: "4px solid #ad3130",
                       background: "rgba(35,26,6,0.04)",
