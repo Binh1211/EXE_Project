@@ -49,7 +49,7 @@ function Footer() {
         </div>
         <div className="flex flex-col gap-2">
           <h6 className="text-[#8C95A5] font-semibold text-sm">Cộng đồng</h6>
-          <Link to="#" className="text-sm font-medium hover:text-primary">
+          <Link to="https://www.facebook.com/profile.php?id=61590310663710" className="text-sm font-medium hover:text-primary">
             Facebook
           </Link>
           <Link to="#" className="text-sm font-medium hover:text-primary">
@@ -72,7 +72,7 @@ function Footer() {
         <div className="col-span-1 sm:col-span-2 md:col-span-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-4">
           <p className="text-[#8C95A5] font-semibold text-sm">&copy; {new Date().getFullYear()} Vistory. All rights reserved.</p>
           <div className="flex gap-4">
-            <Link to="#" className="text-sm font-medium hover:text-primary">
+            <Link to="https://www.facebook.com/profile.php?id=61590310663710" className="text-sm font-medium hover:text-primary">
               <Facebook className="rounded-full bg-white p-1 text-[#281510] w-8 h-8" />
             </Link>
             <Link to="#" className="text-sm font-medium hover:text-primary">
