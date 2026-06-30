@@ -98,6 +98,29 @@ export default function Header() {
   const [timelines, setTimelines] = useState<Timeline[]>([]);
   const [courses, setCourses] = useState<CourseHit[]>([]);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [show, setShow] = useState(true);
+  const lastScrollY = useRef(0);
+
+  useEffect(() => {
+    const controlNavbar = () => {
+      if (typeof window !== "undefined") {
+        // Cuộn xuống (ẩn đi nếu cuộn qua 100px)
+        if (window.scrollY > lastScrollY.current && window.scrollY > 100) {
+          setShow(false);
+        } 
+        // Cuộn lên (hiện lại)
+        else if (window.scrollY < lastScrollY.current) {
+          setShow(true);
+        }
+        lastScrollY.current = window.scrollY;
+      }
+    };
+
+    window.addEventListener("scroll", controlNavbar);
+    return () => {
+      window.removeEventListener("scroll", controlNavbar);
+    };
+  }, []);
 
   useEffect(() => {
     timelineApi
@@ -175,11 +198,16 @@ export default function Header() {
   };
 
   return (
-    <header
-      className="sticky top-0 z-[200] isolate w-full backdrop-blur shadow-sm transition-colors duration-500"
-      style={{ backgroundColor: isDark ? "#1E0F05" : "#fbf0ce" }}
-    >
-      <div className="relative z-[200] mx-auto flex h-20 items-center justify-between gap-7 px-6">
+    <>
+      {/* Placeholder to prevent layout shift */}
+      <div className="h-20 w-full shrink-0" />
+      <header
+        className={`fixed top-0 left-0 z-[200] isolate w-full backdrop-blur shadow-sm transition-transform duration-300 ${
+          show ? "translate-y-0" : "-translate-y-full"
+        }`}
+        style={{ backgroundColor: isDark ? "#1E0F05" : "#fbf0ce" }}
+      >
+        <div className="relative z-[200] mx-auto flex h-20 items-center justify-between gap-7 px-6">
         <button
           type="button"
           className="flex shrink-0 cursor-pointer items-center gap-2"
@@ -684,6 +712,7 @@ export default function Header() {
           document.body,
         )
         : null}
-    </header>
+      </header>
+    </>
   );
 }
