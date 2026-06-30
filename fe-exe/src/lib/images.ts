@@ -11,7 +11,7 @@ export const IMG = {
   thongNhat: "https://res.cloudinary.com/duq6whfxw/image/upload/v1779595655/vistory/thong%20nhat.jpg",
 
   // Home / Team
-  home1: "https://res.cloudinary.com/duq6whfxw/image/upload/v1779595644/vistory/home1.png",
+  home1: "https://res.cloudinary.com/duq6whfxw/image/upload/v1782782657/vistory/home1.jpg",
   home2: "https://res.cloudinary.com/duq6whfxw/image/upload/v1779595645/vistory/home2.png",
   home3: "https://res.cloudinary.com/duq6whfxw/image/upload/v1779595646/vistory/home3.png",
   home4: "https://res.cloudinary.com/duq6whfxw/image/upload/v1779595647/vistory/home4.png",

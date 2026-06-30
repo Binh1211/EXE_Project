@@ -192,7 +192,7 @@ export default function Home() {
             <img
               src={IMG.home1}
               alt="Homepage image"
-              className="w-full h-full object-contain rounded-full max-w-full"
+              className="w-full h-full object-cover rounded-full max-w-full"
             />
           </div>
 
